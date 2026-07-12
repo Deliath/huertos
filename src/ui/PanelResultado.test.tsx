@@ -15,6 +15,7 @@ const elecciones: EleccionEspecie[] = [{ cultivoId: 'tomate', obligatoriedad: 'o
 test('muestra el resumen de cosecha del tomate en kg', () => {
   const propuesta = proponerHuerto(clima, suelo, 5, bancales, elecciones)
   render(<PanelResultado propuesta={propuesta} bancales={bancales} orientacionNorte="norte" />)
-  expect(screen.queryAllByText(/Tomate/i).length).toBeGreaterThan(0)
+  // El tomate debe aparecer en ambas secciones: fila del calendario + línea de cosecha.
+  expect(screen.getAllByText(/Tomate/i)).toHaveLength(2)
   expect(screen.getByText(/kg/i)).toBeInTheDocument()
 })
