@@ -3,6 +3,7 @@ import type { PerfilClima, PerfilSuelo } from '../dominio/tipos'
 import { ZONAS_CLIMATICAS } from '../datos/zonas-climaticas'
 import { climaDeZona, climaDeCoordenadas } from '../dominio/clima'
 import { sueloDeCoordenadas } from '../dominio/suelo'
+import { buscarDireccion, type ResultadoGeocodificacion } from '../servicios/geocodificador'
 
 const MapaSelector = lazy(() => import('./MapaSelector').then((m) => ({ default: m.MapaSelector })))
 
@@ -15,6 +16,17 @@ export function PasoUbicacion({ onListo }: { onListo: (r: Listo) => void }) {
   const [modo, setModo] = useState<'precisa' | 'zona' | null>(null)
   const [zonaId, setZonaId] = useState('mediterraneo_litoral')
   const [error, setError] = useState<string | null>(null)
+  const [consulta, setConsulta] = useState('')
+  const [resultados, setResultados] = useState<ResultadoGeocodificacion[]>([])
+
+  async function buscar() {
+    setError(null)
+    try {
+      setResultados(await buscarDireccion(consulta))
+    } catch {
+      setError('No hemos podido buscar esa dirección; prueba de nuevo o pincha en el mapa.')
+    }
+  }
 
   async function usarCoordenadas(lat: number, lon: number) {
     setError(null)
@@ -34,10 +46,27 @@ export function PasoUbicacion({ onListo }: { onListo: (r: Listo) => void }) {
       </div>
 
       {modo === 'precisa' && (
-        <Suspense fallback={<p>Cargando mapa…</p>}>
-          <MapaSelector onSeleccion={usarCoordenadas} />
-          <p>Pincha tu punto en el mapa.</p>
-        </Suspense>
+        <div>
+          <form onSubmit={(e) => { e.preventDefault(); void buscar() }}>
+            <label>Buscar dirección
+              <input aria-label="Buscar dirección" value={consulta} onChange={(e) => setConsulta(e.target.value)} />
+            </label>
+            <button type="submit">Buscar</button>
+          </form>
+          {resultados.length > 0 && (
+            <ul>
+              {resultados.map((r, i) => (
+                <li key={`${r.lat}-${r.lon}-${i}`}>
+                  <button type="button" onClick={() => usarCoordenadas(r.lat, r.lon)}>{r.nombre}</button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <Suspense fallback={<p>Cargando mapa…</p>}>
+            <MapaSelector onSeleccion={usarCoordenadas} />
+            <p>Pincha tu punto en el mapa.</p>
+          </Suspense>
+        </div>
       )}
 
       {modo === 'zona' && (
