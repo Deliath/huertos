@@ -1,0 +1,11 @@
+# Obsidian editor state
+.obsidian/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+*.log
