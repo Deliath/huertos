@@ -4,6 +4,8 @@ import { ZONAS_CLIMATICAS } from '../datos/zonas-climaticas'
 import { climaDeZona, climaDeCoordenadas } from '../dominio/clima'
 import { sueloDeCoordenadas } from '../dominio/suelo'
 import { buscarDireccion, type ResultadoGeocodificacion } from '../servicios/geocodificador'
+import { ResumenClima } from './ResumenClima'
+import { EditorSuelo } from './EditorSuelo'
 
 const MapaSelector = lazy(() => import('./MapaSelector').then((m) => ({ default: m.MapaSelector })))
 
@@ -12,12 +14,17 @@ type Listo = {
   coordenadas?: { lat: number; lon: number }; zonaId?: string
 }
 
-export function PasoUbicacion({ onListo }: { onListo: (r: Listo) => void }) {
+// Ubicación elegida a la espera de que el usuario confirme (y ajuste el suelo).
+type Confirmando = { modo: 'precisa' | 'zona'; clima: PerfilClima; sueloAuto: PerfilSuelo | null; coordenadas?: { lat: number; lon: number }; zonaId?: string }
+
+export function PasoUbicacion({ onListo, mesActual = new Date().getMonth() }: { onListo: (r: Listo) => void; mesActual?: number }) {
   const [modo, setModo] = useState<'precisa' | 'zona' | null>(null)
   const [zonaId, setZonaId] = useState('mediterraneo_litoral')
   const [error, setError] = useState<string | null>(null)
   const [consulta, setConsulta] = useState('')
   const [resultados, setResultados] = useState<ResultadoGeocodificacion[]>([])
+  const [confirmando, setConfirmando] = useState<Confirmando | null>(null)
+  const [sueloElegido, setSueloElegido] = useState<PerfilSuelo | null>(null)
 
   async function buscar() {
     if (!consulta.trim()) return // no lanzar una búsqueda vacía a Nominatim
@@ -32,11 +39,43 @@ export function PasoUbicacion({ onListo }: { onListo: (r: Listo) => void }) {
   async function usarCoordenadas(lat: number, lon: number) {
     setError(null)
     try {
-      const [clima, sueloAuto] = await Promise.all([climaDeCoordenadas(lat, lon), sueloDeCoordenadas(lat, lon)])
-      onListo({ modo: 'precisa', clima, sueloAuto, coordenadas: { lat, lon } })
+      // El clima es imprescindible; el suelo es opcional: si esa zona no tiene dato
+      // (típico en suelo urbano), seguimos con sueloAuto=null y se elige a mano.
+      const clima = await climaDeCoordenadas(lat, lon)
+      const sueloAuto = await sueloDeCoordenadas(lat, lon).catch(() => null)
+      setSueloElegido(sueloAuto)
+      setConfirmando({ modo: 'precisa', clima, sueloAuto, coordenadas: { lat, lon } })
     } catch {
-      setError('No hemos podido obtener el clima/suelo de ese punto. Prueba con una zona climática.')
+      setError('No hemos podido obtener el clima de ese punto. Prueba con una zona climática.')
     }
+  }
+
+  function usarZona() {
+    setError(null)
+    setSueloElegido(null)
+    setConfirmando({ modo: 'zona', clima: climaDeZona(zonaId), sueloAuto: null, zonaId })
+  }
+
+  function continuar() {
+    if (!confirmando) return
+    onListo({
+      modo: confirmando.modo, clima: confirmando.clima, sueloAuto: sueloElegido,
+      coordenadas: confirmando.coordenadas, zonaId: confirmando.zonaId,
+    })
+  }
+
+  if (confirmando) {
+    return (
+      <div>
+        <h2>Confirma tu ubicación</h2>
+        <ResumenClima clima={confirmando.clima} mesActual={mesActual} />
+        <EditorSuelo inicial={confirmando.sueloAuto} onCambio={setSueloElegido} />
+        <div>
+          <button type="button" onClick={() => setConfirmando(null)}>Cambiar ubicación</button>
+          <button type="button" onClick={continuar}>Continuar</button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -77,9 +116,7 @@ export function PasoUbicacion({ onListo }: { onListo: (r: Listo) => void }) {
               {ZONAS_CLIMATICAS.map((z) => <option key={z.id} value={z.id}>{z.nombre}</option>)}
             </select>
           </label>
-          <button type="button" onClick={() => onListo({ modo: 'zona', clima: climaDeZona(zonaId), sueloAuto: null, zonaId })}>
-            Usar esta zona
-          </button>
+          <button type="button" onClick={usarZona}>Usar esta zona</button>
         </div>
       )}
 

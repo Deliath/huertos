@@ -27,7 +27,7 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
       {estado.paso === 'inicio' && <PantallaInicio onEmpezar={() => dispatch({ tipo: 'ir_a_paso', paso: 'ubicacion' })} />}
 
       {estado.paso === 'ubicacion' && (
-        <PasoUbicacion onListo={(r) => {
+        <PasoUbicacion mesActual={mesActual} onListo={(r) => {
           dispatch({ tipo: 'set_modo_ubicacion', modo: r.modo, coordenadas: r.coordenadas, zonaId: r.zonaId })
           dispatch({ tipo: 'set_clima', clima: r.clima })
           if (r.sueloAuto) dispatch({ tipo: 'set_suelo', suelo: r.sueloAuto })

@@ -13,6 +13,9 @@ test('flujo por zona climática hasta ver el resultado', async () => {
   await userEvent.selectOptions(screen.getByLabelText(/Zona climática/i), 'mediterraneo_litoral')
   await userEvent.click(screen.getByRole('button', { name: /Usar esta zona/i }))
 
+  // Confirmación de ubicación (clima + suelo)
+  await userEvent.click(screen.getByRole('button', { name: /Continuar/i }))
+
   // Bancales
   await userEvent.type(screen.getByLabelText(/Ancho/i), '2')
   await userEvent.type(screen.getByLabelText(/Largo/i), '3')

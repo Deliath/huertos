@@ -32,6 +32,8 @@ test('buscar una dirección y elegir un resultado usa esas coordenadas', async (
   await userEvent.click(screen.getByRole('button', { name: /^Buscar$/i }))
   expect(await screen.findByText(/Valencia, España/i)).toBeInTheDocument()
   await userEvent.click(screen.getByText(/Valencia, España/i))
+  // Tras cargar clima/suelo aparece la confirmación; "Continuar" entrega las coordenadas.
+  await userEvent.click(await screen.findByRole('button', { name: /Continuar/i }))
   await waitFor(() =>
     expect(onListo).toHaveBeenCalledWith(
       expect.objectContaining({ modo: 'precisa', coordenadas: { lat: 39.47, lon: -0.38 } }),

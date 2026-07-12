@@ -10,5 +10,7 @@ test('elegir una zona climática entrega su perfil sin suelo automático', async
   await userEvent.click(screen.getByRole('button', { name: /Elegir por zona climática/i }))
   await userEvent.selectOptions(screen.getByLabelText(/Zona climática/i), 'mediterraneo_litoral')
   await userEvent.click(screen.getByRole('button', { name: /Usar esta zona/i }))
+  // Ahora aparece la confirmación con el clima; "Continuar" entrega el perfil.
+  await userEvent.click(screen.getByRole('button', { name: /Continuar/i }))
   expect(onListo).toHaveBeenCalledWith(expect.objectContaining({ modo: 'zona', zonaId: 'mediterraneo_litoral', sueloAuto: null }))
 })
