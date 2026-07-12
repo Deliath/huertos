@@ -11,12 +11,15 @@ export function sueloManual(textura: Textura, ph = 6.5): PerfilSuelo {
 }
 
 export interface RespuestaSoilGrids {
-  properties: { layers: Array<{ name: string; depths: Array<{ values: { mean: number } }> }> }
+  properties: { layers: Array<{ name: string; depths: Array<{ values: { mean: number | null } }> }> }
 }
 
 function capa(r: RespuestaSoilGrids, nombre: string): number | undefined {
   const l = r.properties.layers.find((x) => x.name === nombre)
-  return l?.depths[0]?.values.mean
+  const v = l?.depths[0]?.values.mean
+  // SoilGrids devuelve mean:null en píxeles sin dato (p. ej. suelo urbano);
+  // lo tratamos igual que "ausente" para no fabricar textura/pH = 0.
+  return v == null ? undefined : v
 }
 
 export function perfilDesdeSoilGrids(r: RespuestaSoilGrids): PerfilSuelo {

@@ -44,3 +44,17 @@ test('perfilDesdeSoilGrids lanza si faltan los datos de textura (no inventa fran
   const r = { properties: { layers: [{ name: 'phh2o', depths: [{ values: { mean: 65 } }] }] } }
   expect(() => perfilDesdeSoilGrids(r)).toThrow()
 })
+
+test('perfilDesdeSoilGrids lanza si los valores son null (zona sin dato, p. ej. urbana)', () => {
+  // SoilGrids devuelve mean:null en píxeles sin dato; no debe pasar como franco/pH 0.
+  const r = {
+    properties: {
+      layers: [
+        { name: 'clay', depths: [{ values: { mean: null } }] },
+        { name: 'sand', depths: [{ values: { mean: null } }] },
+        { name: 'phh2o', depths: [{ values: { mean: null } }] },
+      ],
+    },
+  }
+  expect(() => perfilDesdeSoilGrids(r)).toThrow()
+})
