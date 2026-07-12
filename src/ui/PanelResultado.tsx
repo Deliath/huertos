@@ -4,21 +4,24 @@ import type { Bancal, Orientacion } from '../dominio/tipos'
 import { buscarCultivo } from '../datos/cultivos'
 import { PlanoBancal } from './PlanoBancal'
 import { VistaCalendario } from './VistaCalendario'
-import { descargarPng, descargarPdf } from './exportar'
 
 export function PanelResultado({ propuesta, bancales, orientacionNorte }: { propuesta: Propuesta; bancales: Bancal[]; orientacionNorte: Orientacion }) {
   const nombre = (id: string) => buscarCultivo(id)?.nombreComun ?? id
   const contenedores = useRef<Record<string, HTMLDivElement | null>>({})
 
-  const exportarPng = (b: Bancal) => {
+  // `exportar` arrastra jsPDF (~400 kB); se carga de forma perezosa solo al exportar,
+  // igual que el mapa de Leaflet, para no engordar la carga inicial.
+  const exportarPng = async (b: Bancal) => {
     const svg = contenedores.current[b.id]?.querySelector('svg')
     if (!svg) return
+    const { descargarPng } = await import('./exportar')
     void descargarPng(svg, `huerto-${b.nombre}.png`)
   }
 
-  const exportarPdf = (b: Bancal) => {
+  const exportarPdf = async (b: Bancal) => {
     const svg = contenedores.current[b.id]?.querySelector('svg')
     if (!svg) return
+    const { descargarPdf } = await import('./exportar')
     void descargarPdf(svg, `huerto-${b.nombre}.pdf`)
   }
 
@@ -33,8 +36,8 @@ export function PanelResultado({ propuesta, bancales, orientacionNorte }: { prop
               <h3>{b.nombre}</h3>
               <PlanoBancal bancal={b} asignaciones={col?.asignaciones ?? []} orientacionNorte={orientacionNorte} />
               <div>
-                <button type="button" onClick={() => exportarPng(b)}>Descargar PNG</button>
-                <button type="button" onClick={() => exportarPdf(b)}>Descargar PDF</button>
+                <button type="button" onClick={() => { void exportarPng(b) }}>Descargar PNG</button>
+                <button type="button" onClick={() => { void exportarPdf(b) }}>Descargar PDF</button>
               </div>
             </div>
           )

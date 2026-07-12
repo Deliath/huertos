@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { PanelResultado } from './PanelResultado'
@@ -23,7 +23,9 @@ test('los botones de descarga exportan el SVG del bancal a PNG y PDF', async () 
   const usuario = userEvent.setup()
   await usuario.click(screen.getByRole('button', { name: 'Descargar PNG' }))
 
-  expect(descargarPng).toHaveBeenCalledTimes(1)
+  // El handler importa `./exportar` de forma perezosa (dynamic import), así que la
+  // llamada al mock ocurre tras un microtask: esperamos a que se registre.
+  await waitFor(() => expect(descargarPng).toHaveBeenCalledTimes(1))
   const [svgArgPng, nombrePng] = vi.mocked(descargarPng).mock.calls[0]
   expect(svgArgPng).toBeTruthy()
   expect((svgArgPng as SVGSVGElement).tagName.toLowerCase()).toBe('svg')
@@ -31,7 +33,7 @@ test('los botones de descarga exportan el SVG del bancal a PNG y PDF', async () 
 
   await usuario.click(screen.getByRole('button', { name: 'Descargar PDF' }))
 
-  expect(descargarPdf).toHaveBeenCalledTimes(1)
+  await waitFor(() => expect(descargarPdf).toHaveBeenCalledTimes(1))
   const [svgArgPdf, nombrePdf] = vi.mocked(descargarPdf).mock.calls[0]
   expect(svgArgPdf).toBeTruthy()
   expect((svgArgPdf as SVGSVGElement).tagName.toLowerCase()).toBe('svg')
