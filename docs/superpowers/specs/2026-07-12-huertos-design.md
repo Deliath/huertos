@@ -35,7 +35,8 @@ Web dirigida a personas **no profesionales** con un pequeño terreno que quieren
 - **Mapa:** Leaflet + OpenStreetMap (gratis, sin clave).
 - **Plano:** dibujado en **SVG** a escala (nítido y fácil de exportar).
 - **Almacenamiento:** navegador (localStorage) en el MVP, detrás de una interfaz intercambiable.
-- **Alojamiento:** gratuito (GitHub Pages / Netlify).
+- **Alojamiento:** gratuito (GitHub Pages / Netlify), siempre por **HTTPS**.
+- **Seguridad y privacidad por defecto** (ver §13): al no haber servidor, los datos del usuario se quedan en su navegador; a terceros solo se envía lo imprescindible.
 - **Principio clave:** separación estricta entre el **cerebro** (lógica de dominio, funciones puras sin React) y la **interfaz**, para que migrar a la Opción 3 (full-stack con cuentas) sea *añadir* backend/login + un pequeño cambio de armazón, no una reescritura.
 
 ### Camino de evolución a la Opción 3 (referencia)
@@ -117,3 +118,25 @@ Un SVG por bancal, a escala, con cuadrícula, cada planta con su icono y etiquet
 ## 12. Fuera del alcance del MVP (YAGNI)
 
 Cuentas de usuario, guardado en la nube, seguimiento durante la temporada, notificaciones, comunidad, terreno de forma libre, multi-idioma y alcance global. El diseño deja la puerta abierta a todo ello.
+
+## 13. Seguridad y privacidad (por defecto)
+
+Principio transversal: **minimizar los datos, mantenerlos locales y aplicar mínimo privilegio** en toda conexión externa. La ubicación es un dato personal (RGPD), así que se trata con cuidado desde el diseño.
+
+**Privacidad de los datos del usuario**
+- La ubicación y la configuración del huerto **no salen del navegador**: se guardan solo en local (localStorage) y el usuario puede borrarlas.
+- A servicios externos se envía únicamente lo imprescindible (coordenadas al servicio de clima; texto de búsqueda al geocodificador). Se valora **reducir la precisión** de las coordenadas antes de enviarlas.
+- **Sin analítica de rastreo** ni cesión de la ubicación a terceros. Aviso de privacidad claro y sencillo.
+
+**Seguridad del cliente (secure by default)**
+- **Content Security Policy (CSP) estricta**: el navegador solo puede conectar y cargar recursos de los orígenes que usamos (clima, mapa/tiles, geocodificador); todo lo demás, bloqueado → corta inyección y exfiltración de datos.
+- **Renderizado seguro**: React escapa por defecto; se prohíbe `dangerouslySetInnerHTML`; el texto introducido por el usuario (p. ej. nombres de bancal) y el SVG generado se tratan de forma segura → prevención de XSS.
+- **HTTPS obligatorio** en el alojamiento y en todas las llamadas externas.
+- **Validación de entradas** (coordenadas y medidas dentro de rangos razonables) también como medida defensiva, no solo de usabilidad.
+
+**Cadena de suministro / dependencias**
+- Dependencias mínimas y necesarias, versiones fijadas con lockfile, `npm audit` dentro del proceso de build/CI.
+- **Sin claves de API en el cliente**: se usan servicios sin clave (Open-Meteo, OpenStreetMap). Si en el futuro un servicio requiere clave, se accede a través de un backend, nunca embebida en el navegador.
+
+**Preparación para la Opción 3 (seguro desde el diseño)**
+Cuando se añadan cuentas y backend: autenticación con buenas prácticas (contraseñas con hashing fuerte u OAuth), **autorización** estricta (cada usuario solo accede a sus propios huertos), validación también en el servidor, gestión de secretos fuera del código, límites de peticiones (rate limiting) y almacenamiento de la ubicación solo mientras sea necesario. Se anota ahora para no tomar en el MVP decisiones que después resulten inseguras.
