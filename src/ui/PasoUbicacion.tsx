@@ -20,6 +20,7 @@ export function PasoUbicacion({ onListo }: { onListo: (r: Listo) => void }) {
   const [resultados, setResultados] = useState<ResultadoGeocodificacion[]>([])
 
   async function buscar() {
+    if (!consulta.trim()) return // no lanzar una búsqueda vacía a Nominatim
     setError(null)
     try {
       setResultados(await buscarDireccion(consulta))
