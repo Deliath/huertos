@@ -1,4 +1,4 @@
-import { CULTIVOS, buscarCultivo } from '../datos/cultivos'
+import { buscarCultivo } from '../datos/cultivos'
 
 export interface ParejaSinergia { a: string; b: string; tipo: 'favorable' | 'conflictiva' }
 
