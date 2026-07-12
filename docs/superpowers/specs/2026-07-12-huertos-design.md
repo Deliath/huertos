@@ -20,15 +20,19 @@ Web dirigida a personas **no profesionales** con un pequeño terreno que quieren
    - **Ubicación precisa:** busca su dirección o pincha su punto en un mapa (Leaflet + OpenStreetMap) → obtenemos latitud/longitud y consultamos el clima real de ese punto (Open-Meteo).
    - **Zona climática:** selecciona una de las zonas climáticas curadas (sobre un mapa estilizado de España o desde tarjetas con descripción) → usamos el perfil climático de esa zona. Alternativa respetuosa con la privacidad (no hace falta revelar la ubicación exacta).
 3. **Bancales** — el usuario define uno o varios bancales (ancho × largo en metros) y la **orientación** del huerto (hacia dónde está el norte).
-4. **Especies** — elige del catálogo curado las especies que le interesan (agrupadas por tipo, con icono). Por cada especie indica si es **obligatoria u opcional** para su huerto y un **nivel de cantidad relativo** (poca / media / mucha), proporcional al bancal — sin introducir números exactos.
-5. **Resultado** — la web calcula y muestra:
+4. **Suelo** — el tipo de suelo entra en la recomendación:
+   - Si se dio **ubicación precisa**, deducimos el tipo de suelo automáticamente por coordenadas (base de datos SoilGrids/ISRIC, gratuita y sin clave) y el usuario puede **corregirlo**.
+   - Si no (modo zona climática o suelo desconocido), el usuario **elige el tipo de suelo**, con una **guía de cómo averiguarlo experimentando** (prueba del bote/sedimentación, prueba del rollito a mano, prueba de drenaje y nota sobre el pH).
+5. **Especies** — elige del catálogo curado las especies que le interesan (agrupadas por tipo, con icono). Por cada especie indica si es **obligatoria u opcional** para su huerto y un **nivel de cantidad relativo** (poca / media / mucha), proporcional al bancal — sin introducir números exactos.
+6. **Resultado** — la web calcula y muestra:
    - Aviso de **idoneidad** por especie (apta ahora / mejor sembrar en tal mes / no recomendada en tu clima).
    - **Plano visual** de cada bancal con la colocación de las plantas y la orientación.
    - **Calendario** de siembra, trasplante y cosecha.
    - **Fichas de cuidados** por especie.
    - **Resumen de cosecha**: cantidad estimada por especie (en su unidad natural) y fecha/ventana de recogida.
    - **Avisos de sinergias**: qué especies elegidas se ayudan o se perjudican, y **1-2 sugerencias de compañeras extra** que mejorarían el huerto.
-6. **Guardar / exportar** — guarda en el navegador y puede descargar el plano como imagen/PDF.
+   - **Consejos de suelo**: si el suelo no es el ideal para alguna especie, cómo mejorarlo (enmiendas, drenaje, corrección de pH).
+7. **Guardar / exportar** — guarda en el navegador y puede descargar el plano como imagen/PDF.
 
 ## 4. Arquitectura técnica
 
@@ -36,6 +40,7 @@ Web dirigida a personas **no profesionales** con un pequeño terreno que quieren
 - **Clima:** dos fuentes intercambiables que entregan el mismo perfil al cerebro (temperaturas por mes, temporada libre de heladas, riesgo de heladas):
   - por **coordenadas** → API gratuita (Open-Meteo, sin clave);
   - por **zona climática** → perfil climático curado que guardamos nosotros.
+- **Suelo:** dos fuentes intercambiables → por **coordenadas** (SoilGrids/ISRIC, gratuita y sin clave) o **indicado por el usuario** (con guía de experimentación).
 - **Mapa:** Leaflet + OpenStreetMap (gratis, sin clave).
 - **Plano:** dibujado en **SVG** a escala (nítido y fácil de exportar).
 - **Almacenamiento:** navegador (localStorage) en el MVP, detrás de una interfaz intercambiable.
@@ -51,8 +56,10 @@ Se conserva intacto: catálogo, todo `dominio/*`, componentes de UI (Next.js es 
 
 - `datos/cultivos` — el catálogo de especies (datos).
 - `datos/zonas-climaticas` — las zonas climáticas curadas de España y su perfil climático (datos).
+- `datos/suelos` — tipos de suelo, sus características y la guía de experimentación para identificarlos (datos).
 - `dominio/clima` — servicio con dos implementaciones tras una misma interfaz: coordenadas (Open-Meteo) o zona climática → temporada y temperaturas.
-- `dominio/idoneidad` — decide si una especie es apta ahora / cuándo sembrarla / no apta.
+- `dominio/suelo` — servicio con dos implementaciones tras una misma interfaz: coordenadas (SoilGrids/ISRIC) o tipo indicado por el usuario → perfil de suelo.
+- `dominio/idoneidad` — decide si una especie es apta ahora / cuándo sembrarla / no apta, combinando **clima + época + suelo**, y genera consejos de enmienda del suelo.
 - `dominio/colocacion` — reparte y coloca las plantas en los bancales por prioridad (obligatorias/opcionales) y peso de cantidad, respetando sinergias, sol/orientación y marco.
 - `dominio/calendario` — genera el calendario de siembra/trasplante/cosecha.
 - `dominio/cosecha` — estima cantidad y fecha/ventana de recogida por especie.
@@ -69,6 +76,7 @@ Cada especie del catálogo incluye:
 
 - **Identidad:** nombre común, nombre científico, icono, familia botánica, tipo (fruto / hoja / raíz / bulbo / leguminosa…).
 - **Requisitos térmicos:** temperatura mínima de germinación, temperatura óptima, tolerancia a heladas (sensible / resistente).
+- **Preferencias de suelo:** textura preferida (arenoso / franco / arcilloso), rango de pH y necesidad de drenaje.
 - **Método:** siembra directa o semillero + trasplante.
 - **Sol:** pleno sol / semisombra.
 - **Marco de plantación:** distancia entre plantas y entre líneas (define cuántas caben por bancal).
@@ -81,7 +89,7 @@ Cada especie del catálogo incluye:
 
 ## 7. El cerebro: cómo se genera la recomendación
 
-**a) Idoneidad (clima + época).** Con las temperaturas del punto del usuario, para cada especie elegida se decide: *apta para sembrar ahora* / *mejor esperar a tal mes* / *no recomendada en tu clima*. La regla es térmica (sembrar cuando la temperatura media supera el umbral de la especie y dentro de la temporada libre de heladas), no una simple tabla fija de meses.
+**a) Idoneidad (clima + época + suelo).** Con las temperaturas del punto del usuario, para cada especie elegida se decide: *apta para sembrar ahora* / *mejor esperar a tal mes* / *no recomendada en tu clima*. La regla es térmica (sembrar cuando la temperatura media supera el umbral de la especie y dentro de la temporada libre de heladas), no una simple tabla fija de meses. El **suelo** entra como modificador: se compara el perfil del suelo (textura, pH, drenaje) con las preferencias de la especie y, si no encaja, se recomienda cómo **enmendarlo** (compost, mejorar drenaje, corregir pH) en lugar de descartarla — salvo incompatibilidades extremas (p. ej. drenaje muy deficiente para una especie que no lo tolera).
 
 **b) Sinergias.** Se evalúan las combinaciones entre las especies aptas: se marcan las parejas favorables y las conflictivas, y se generan **1-2 sugerencias de compañeras extra** del catálogo que mejorarían el conjunto.
 
@@ -112,6 +120,7 @@ Un SVG por bancal, a escala, con cuadrícula, cada planta con su icono y etiquet
 ## 10. Manejo de errores
 
 - **API de clima caída o sin datos** (modo ubicación precisa) → aviso y propuesta de cambiar al **modo zona climática** para no bloquear al usuario.
+- **Servicio de suelo caído o sin datos** para las coordenadas → aviso y opción de que el usuario **indique el tipo de suelo a mano** (con la guía de experimentación).
 - **Ubicación fuera de España** → advertencia (el catálogo está pensado para España) pero se puede continuar.
 - **Ninguna especie apta ahora** → se explica por qué y se sugiere cuándo volver.
 - **Bancal demasiado pequeño** → si no caben las **obligatorias**, se avisa y se indica cuánto falta; las opcionales se recortan automáticamente antes que las obligatorias.
@@ -119,7 +128,7 @@ Un SVG por bancal, a escala, con cuadrícula, cada planta con su icono y etiquet
 
 ## 11. Pruebas
 
-- Tests unitarios del **cerebro** (`idoneidad`, `sinergias`, `colocacion`, `calendario`, `cosecha`) con casos claros: clima frío vs. cálido, antagonistas que acaban separados, plantas altas al norte, bancal pequeño que obliga a priorizar, cálculo de cantidad y fechas de cosecha. Con Vitest.
+- Tests unitarios del **cerebro** (`idoneidad`, `sinergias`, `colocacion`, `calendario`, `cosecha`) con casos claros: clima frío vs. cálido, suelo compatible vs. suelo que requiere enmienda vs. incompatibilidad extrema de drenaje, antagonistas que acaban separados, plantas altas al norte, bancal pequeño que obliga a priorizar, cálculo de cantidad y fechas de cosecha. Con Vitest.
 - Al ser lógica pura, se prueba sin interfaz. El cerebro se construye con **TDD**.
 
 ## 12. Fuera del alcance del MVP (YAGNI)
@@ -132,8 +141,8 @@ Principio transversal: **minimizar los datos, mantenerlos locales y aplicar mín
 
 **Privacidad de los datos del usuario**
 - La ubicación y la configuración del huerto **no salen del navegador**: se guardan solo en local (localStorage) y el usuario puede borrarlas.
-- A servicios externos se envía únicamente lo imprescindible (coordenadas al servicio de clima; texto de búsqueda al geocodificador). Se valora **reducir la precisión** de las coordenadas antes de enviarlas.
-- El **modo "zona climática"** permite usar la web **sin revelar la ubicación exacta** ni contactar con servicios externos de mapa/clima: privacidad máxima por elección del usuario.
+- A servicios externos se envía únicamente lo imprescindible (coordenadas al servicio de clima y al de suelo; texto de búsqueda al geocodificador). Se valora **reducir la precisión** de las coordenadas antes de enviarlas.
+- El **modo "zona climática" + suelo indicado a mano** permite usar la web **sin revelar la ubicación exacta** ni contactar con servicios externos de mapa/clima/suelo: privacidad máxima por elección del usuario.
 - **Sin analítica de rastreo** ni cesión de la ubicación a terceros. Aviso de privacidad claro y sencillo.
 
 **Seguridad del cliente (secure by default)**
