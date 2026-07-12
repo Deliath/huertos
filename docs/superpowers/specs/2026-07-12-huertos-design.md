@@ -16,9 +16,11 @@ Web dirigida a personas **no profesionales** con un pequeño terreno que quieren
 ## 3. Flujo del usuario (asistente por pasos)
 
 1. **Inicio** — explicación breve + "Crear mi huerto".
-2. **Ubicación** — mapa (Leaflet + OpenStreetMap); el usuario busca su dirección o pincha su punto → obtenemos latitud/longitud y consultamos el clima real de ese punto.
+2. **Ubicación** — el usuario elige entre dos modos:
+   - **Ubicación precisa:** busca su dirección o pincha su punto en un mapa (Leaflet + OpenStreetMap) → obtenemos latitud/longitud y consultamos el clima real de ese punto (Open-Meteo).
+   - **Zona climática:** selecciona una de las zonas climáticas curadas (sobre un mapa estilizado de España o desde tarjetas con descripción) → usamos el perfil climático de esa zona. Alternativa respetuosa con la privacidad (no hace falta revelar la ubicación exacta).
 3. **Bancales** — el usuario define uno o varios bancales (ancho × largo en metros) y la **orientación** del huerto (hacia dónde está el norte).
-4. **Especies** — elige del catálogo curado las especies que le interesan (agrupadas por tipo, con icono).
+4. **Especies** — elige del catálogo curado las especies que le interesan (agrupadas por tipo, con icono). Por cada especie indica si es **obligatoria u opcional** para su huerto y un **nivel de cantidad relativo** (poca / media / mucha), proporcional al bancal — sin introducir números exactos.
 5. **Resultado** — la web calcula y muestra:
    - Aviso de **idoneidad** por especie (apta ahora / mejor sembrar en tal mes / no recomendada en tu clima).
    - **Plano visual** de cada bancal con la colocación de las plantas y la orientación.
@@ -31,7 +33,9 @@ Web dirigida a personas **no profesionales** con un pequeño terreno que quieren
 ## 4. Arquitectura técnica
 
 - **React + Vite**, aplicación de una sola página, **sin servidor** (Opción 1).
-- **Clima:** API gratuita por coordenadas (Open-Meteo, sin clave). De los datos derivamos temperaturas medias por mes, temporada libre de heladas y riesgo de heladas.
+- **Clima:** dos fuentes intercambiables que entregan el mismo perfil al cerebro (temperaturas por mes, temporada libre de heladas, riesgo de heladas):
+  - por **coordenadas** → API gratuita (Open-Meteo, sin clave);
+  - por **zona climática** → perfil climático curado que guardamos nosotros.
 - **Mapa:** Leaflet + OpenStreetMap (gratis, sin clave).
 - **Plano:** dibujado en **SVG** a escala (nítido y fácil de exportar).
 - **Almacenamiento:** navegador (localStorage) en el MVP, detrás de una interfaz intercambiable.
@@ -46,9 +50,10 @@ Se conserva intacto: catálogo, todo `dominio/*`, componentes de UI (Next.js es 
 ## 5. Módulos (una responsabilidad cada uno)
 
 - `datos/cultivos` — el catálogo de especies (datos).
-- `dominio/clima` — servicio: coordenadas → temporada y temperaturas (intercambiable).
+- `datos/zonas-climaticas` — las zonas climáticas curadas de España y su perfil climático (datos).
+- `dominio/clima` — servicio con dos implementaciones tras una misma interfaz: coordenadas (Open-Meteo) o zona climática → temporada y temperaturas.
 - `dominio/idoneidad` — decide si una especie es apta ahora / cuándo sembrarla / no apta.
-- `dominio/colocacion` — reparte y coloca las plantas en los bancales (sinergias + sol/orientación + marco).
+- `dominio/colocacion` — reparte y coloca las plantas en los bancales por prioridad (obligatorias/opcionales) y peso de cantidad, respetando sinergias, sol/orientación y marco.
 - `dominio/calendario` — genera el calendario de siembra/trasplante/cosecha.
 - `dominio/cosecha` — estima cantidad y fecha/ventana de recogida por especie.
 - `dominio/sinergias` — evalúa combinaciones entre las especies elegidas y sugiere compañeras extra.
@@ -80,11 +85,13 @@ Cada especie del catálogo incluye:
 
 **b) Sinergias.** Se evalúan las combinaciones entre las especies aptas: se marcan las parejas favorables y las conflictivas, y se generan **1-2 sugerencias de compañeras extra** del catálogo que mejorarían el conjunto.
 
-**c) Colocación en los bancales.** Con las especies aptas:
-- Se respeta el **marco de plantación** (cuántas plantas caben por bancal).
+**c) Colocación priorizada en los bancales.** Con las especies aptas:
+- **Prioridad y cantidad relativa:** cada especie es *obligatoria* u *opcional* y tiene un nivel de cantidad (poca / media / mucha) que actúa como **peso**. El espacio del bancal se reparte en proporción a esos pesos. Las **obligatorias reservan su parte primero** (con un mínimo garantizado); las **opcionales** se reparten el espacio restante y son las primeras en recortarse si falta sitio.
+- Ese reparto proporcional se convierte en **nº de plantas** usando el **marco de plantación** (define cuántas caben) — de forma interna; el usuario no introduce números.
 - **Asociación de cultivos:** se agrupan las compañeras y se separan las antagonistas (en zonas o bancales distintos).
 - **Sol y orientación:** las plantas **altas** se colocan al **norte** del bancal para no dar sombra a las bajas; las de pleno sol, en las posiciones más soleadas.
-- MVP: **heurística voraz** (ordenar por altura, colocar de norte a sur, separar incompatibles, rellenar por densidad) — sencilla, explicable y suficiente.
+- MVP: **heurística voraz** (reservar obligatorias por peso, repartir opcionales en el hueco, ordenar por altura de norte a sur, separar incompatibles) — sencilla, explicable y suficiente.
+- Si una **obligatoria no cabe** en la cantidad implícita mínima, se avisa claramente y se indica cuánto espacio faltaría.
 
 **d) Cosecha.** Por especie: `nº de plantas × rendimiento por planta` = cantidad total estimada (en unidad natural), y **fecha/ventana de cosecha** = fecha de siembra recomendada + días hasta cosecha. Siempre presentada como **rango orientativo** con aviso de que depende de las condiciones.
 
@@ -104,10 +111,10 @@ Un SVG por bancal, a escala, con cuadrícula, cada planta con su icono y etiquet
 
 ## 10. Manejo de errores
 
-- **API de clima caída o sin datos** → aviso y respaldo: permitir elegir una zona climática a mano para no bloquear al usuario.
+- **API de clima caída o sin datos** (modo ubicación precisa) → aviso y propuesta de cambiar al **modo zona climática** para no bloquear al usuario.
 - **Ubicación fuera de España** → advertencia (el catálogo está pensado para España) pero se puede continuar.
 - **Ninguna especie apta ahora** → se explica por qué y se sugiere cuándo volver.
-- **Bancal demasiado pequeño** para lo elegido → aviso y priorización.
+- **Bancal demasiado pequeño** → si no caben las **obligatorias**, se avisa y se indica cuánto falta; las opcionales se recortan automáticamente antes que las obligatorias.
 - **Datos inválidos** (medidas a cero, etc.) → validación en los formularios.
 
 ## 11. Pruebas
@@ -126,6 +133,7 @@ Principio transversal: **minimizar los datos, mantenerlos locales y aplicar mín
 **Privacidad de los datos del usuario**
 - La ubicación y la configuración del huerto **no salen del navegador**: se guardan solo en local (localStorage) y el usuario puede borrarlas.
 - A servicios externos se envía únicamente lo imprescindible (coordenadas al servicio de clima; texto de búsqueda al geocodificador). Se valora **reducir la precisión** de las coordenadas antes de enviarlas.
+- El **modo "zona climática"** permite usar la web **sin revelar la ubicación exacta** ni contactar con servicios externos de mapa/clima: privacidad máxima por elección del usuario.
 - **Sin analítica de rastreo** ni cesión de la ubicación a terceros. Aviso de privacidad claro y sencillo.
 
 **Seguridad del cliente (secure by default)**
