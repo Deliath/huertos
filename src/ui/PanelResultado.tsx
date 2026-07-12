@@ -1,18 +1,43 @@
+import { useRef } from 'react'
 import type { Propuesta } from '../app/proponer'
 import type { Bancal, Orientacion } from '../dominio/tipos'
 import { buscarCultivo } from '../datos/cultivos'
 import { PlanoBancal } from './PlanoBancal'
 import { VistaCalendario } from './VistaCalendario'
+import { descargarPng, descargarPdf } from './exportar'
 
 export function PanelResultado({ propuesta, bancales, orientacionNorte }: { propuesta: Propuesta; bancales: Bancal[]; orientacionNorte: Orientacion }) {
   const nombre = (id: string) => buscarCultivo(id)?.nombreComun ?? id
+  const contenedores = useRef<Record<string, HTMLDivElement | null>>({})
+
+  const exportarPng = (b: Bancal) => {
+    const svg = contenedores.current[b.id]?.querySelector('svg')
+    if (!svg) return
+    void descargarPng(svg, `huerto-${b.nombre}.png`)
+  }
+
+  const exportarPdf = (b: Bancal) => {
+    const svg = contenedores.current[b.id]?.querySelector('svg')
+    if (!svg) return
+    void descargarPdf(svg, `huerto-${b.nombre}.pdf`)
+  }
+
   return (
     <div>
       <section>
         <h2>Tu huerto</h2>
         {bancales.map((b) => {
           const col = propuesta.colocacion.bancales.find((x) => x.bancalId === b.id)
-          return <div key={b.id}><h3>{b.nombre}</h3><PlanoBancal bancal={b} asignaciones={col?.asignaciones ?? []} orientacionNorte={orientacionNorte} /></div>
+          return (
+            <div key={b.id} ref={(el) => { contenedores.current[b.id] = el }}>
+              <h3>{b.nombre}</h3>
+              <PlanoBancal bancal={b} asignaciones={col?.asignaciones ?? []} orientacionNorte={orientacionNorte} />
+              <div>
+                <button type="button" onClick={() => exportarPng(b)}>Descargar PNG</button>
+                <button type="button" onClick={() => exportarPdf(b)}>Descargar PDF</button>
+              </div>
+            </div>
+          )
         })}
       </section>
 
