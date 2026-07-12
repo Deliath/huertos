@@ -1,7 +1,7 @@
 # Diseño — Huertos: recomendador de huerto para pequeños terrenos
 
 **Fecha:** 2026-07-12
-**Estado:** Diseño aprobado (pendiente de revisión final)
+**Estado:** Diseño aprobado por la usuaria (Eva) — listo para plan de implementación
 
 ## 1. Propósito
 
@@ -68,7 +68,7 @@ Se conserva intacto: catálogo, todo `dominio/*`, componentes de UI (Next.js es 
 - `dominio/cosecha` — estima cantidad y fecha/ventana de recogida por especie.
 - `dominio/sinergias` — evalúa combinaciones entre las especies elegidas y sugiere compañeras extra.
 - `almacenamiento/almacen` — interfaz `guardar/cargar` (localStorage hoy; servidor mañana).
-- `ui/` — componentes: mapa de ubicación, editor de bancales, selector de especies, plano SVG, calendario, ficha de cultivo, resumen de cosecha, pantalla de resultado.
+- `ui/` — componentes: mapa de ubicación / selector de zona climática, editor de bancales, selector de suelo con guía de experimentación, selector de especies con botón "Hazme tú una sugerencia", plano SVG, calendario, ficha de cultivo, resumen de cosecha, pantalla de resultado y su edición en la fase de validación.
 - `app/` — estado global del huerto y orquestación del asistente por pasos, incluida la **recalculación** de la propuesta cuando el usuario ajusta las entradas en la fase de validación.
 
 Todo `dominio/*` son funciones puras, sin React → se testean solas y se reutilizan intactas en el futuro.
@@ -151,7 +151,7 @@ Principio transversal: **minimizar los datos, mantenerlos locales y aplicar mín
 - **Sin analítica de rastreo** ni cesión de la ubicación a terceros. Aviso de privacidad claro y sencillo.
 
 **Seguridad del cliente (secure by default)**
-- **Content Security Policy (CSP) estricta**: el navegador solo puede conectar y cargar recursos de los orígenes que usamos (clima, mapa/tiles, geocodificador); todo lo demás, bloqueado → corta inyección y exfiltración de datos.
+- **Content Security Policy (CSP) estricta**: el navegador solo puede conectar y cargar recursos de los orígenes que usamos (clima, suelo, mapa/tiles, geocodificador); todo lo demás, bloqueado → corta inyección y exfiltración de datos.
 - **Renderizado seguro**: React escapa por defecto; se prohíbe `dangerouslySetInnerHTML`; el texto introducido por el usuario (p. ej. nombres de bancal) y el SVG generado se tratan de forma segura → prevención de XSS.
 - **HTTPS obligatorio** en el alojamiento y en todas las llamadas externas.
 - **Validación de entradas** (coordenadas y medidas dentro de rangos razonables) también como medida defensiva, no solo de usabilidad.
