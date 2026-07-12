@@ -3,7 +3,7 @@ import { buscarCultivo } from '../datos/cultivos'
 
 export interface AsignacionCultivo { cultivoId: string; numPlantas: number }
 export interface BancalColocado { bancalId: string; asignaciones: AsignacionCultivo[] }
-export interface ResultadoColocacion { bancales: BancalColocado[]; avisos: string[] }
+export interface ResultadoColocacion { bancales: BancalColocado[]; avisos: string[]; noColocadas: string[] }
 
 const PESO: Record<NivelCantidad, number> = { poca: 1, media: 2, mucha: 3 }
 
@@ -24,6 +24,7 @@ function esAntagonistaDe(c: Cultivo, ids: Set<string>): boolean {
 export function colocar(bancales: Bancal[], elecciones: EleccionEspecie[]): ResultadoColocacion {
   const estados: EstadoBancal[] = bancales.map((b) => ({ bancal: b, areaLibreCm2: areaCm2(b), asignaciones: [], ids: new Set() }))
   const avisos: string[] = []
+  const noColocadas: string[] = []
 
   // Ordenar: obligatorias antes que opcionales; dentro, mayor peso primero.
   const orden = [...elecciones].sort((a, b) => {
@@ -42,6 +43,7 @@ export function colocar(bancales: Bancal[], elecciones: EleccionEspecie[]): Resu
 
     const destino = candidatos[0]
     if (!destino) {
+      noColocadas.push(c.id)
       if (e.obligatoriedad === 'obligatoria') avisos.push(`No hay bancal compatible para ${c.nombreComun} (conflicto de vecindad).`)
       continue
     }
@@ -68,5 +70,6 @@ export function colocar(bancales: Bancal[], elecciones: EleccionEspecie[]): Resu
   return {
     bancales: estados.map((s) => ({ bancalId: s.bancal.id, asignaciones: s.asignaciones })),
     avisos,
+    noColocadas,
   }
 }

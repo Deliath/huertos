@@ -38,3 +38,13 @@ test('no coloca dos antagonistas en el mismo bancal', () => {
     expect(ids.includes('cebolla') && ids.includes('judia')).toBe(false)
   }
 })
+
+test('una opcional sin bancal compatible se registra en noColocadas', () => {
+  const b1: Bancal = { id: 'b1', nombre: 'B1', anchoM: 2, largoM: 2 }
+  const elecciones: EleccionEspecie[] = [
+    { cultivoId: 'cebolla', obligatoriedad: 'obligatoria', cantidad: 'media' },
+    { cultivoId: 'judia', obligatoriedad: 'opcional', cantidad: 'media' },
+  ]
+  const r = colocar([b1], elecciones)
+  expect(r.noColocadas).toContain('judia')
+})
