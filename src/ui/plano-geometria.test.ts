@@ -10,13 +10,16 @@ test('genera una marca por planta', () => {
 })
 
 test('las plantas más altas quedan más al norte (y menor) que las bajas', () => {
-  const marcas = calcularMarcas(bancal, [
+  // Bancal estrecho y largo (1×3 m) fuerza una sola columna → dos filas,
+  // de modo que la altura decide la fila (norte) y no solo la columna.
+  const bancalAlto: Bancal = { id: 'b2', nombre: 'Alto', anchoM: 1, largoM: 3 }
+  const marcas = calcularMarcas(bancalAlto, [
     { cultivoId: 'tomate', numPlantas: 1 }, // 150 cm
     { cultivoId: 'lechuga', numPlantas: 1 }, // 25 cm
   ])
   const tomate = marcas.find((m) => m.cultivoId === 'tomate')!
   const lechuga = marcas.find((m) => m.cultivoId === 'lechuga')!
-  expect(tomate.yCm).toBeLessThanOrEqual(lechuga.yCm)
+  expect(tomate.yCm).toBeLessThan(lechuga.yCm)
 })
 
 test('todas las marcas caen dentro del bancal', () => {
