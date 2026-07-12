@@ -26,3 +26,21 @@ test('perfilDesdeSoilGrids clasifica textura por dominancia de arcilla/arena', (
   expect(p.ph).toBeCloseTo(6.8, 1)
   expect(p.drenaje).toBe('malo')
 })
+
+test('perfilDesdeSoilGrids devuelve franco REAL cuando hay datos pero sin dominancia', () => {
+  const r = {
+    properties: {
+      layers: [
+        { name: 'clay', depths: [{ values: { mean: 200 } }] }, // 20%
+        { name: 'sand', depths: [{ values: { mean: 400 } }] }, // 40%
+        { name: 'phh2o', depths: [{ values: { mean: 65 } }] },
+      ],
+    },
+  }
+  expect(perfilDesdeSoilGrids(r).textura).toBe('franco')
+})
+
+test('perfilDesdeSoilGrids lanza si faltan los datos de textura (no inventa franco)', () => {
+  const r = { properties: { layers: [{ name: 'phh2o', depths: [{ values: { mean: 65 } }] }] } }
+  expect(() => perfilDesdeSoilGrids(r)).toThrow()
+})

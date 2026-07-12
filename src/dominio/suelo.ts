@@ -20,8 +20,13 @@ function capa(r: RespuestaSoilGrids, nombre: string): number | undefined {
 }
 
 export function perfilDesdeSoilGrids(r: RespuestaSoilGrids): PerfilSuelo {
-  const clay = (capa(r, 'clay') ?? 0) / 10 // g/kg*10 → %
-  const sand = (capa(r, 'sand') ?? 0) / 10
+  const clayRaw = capa(r, 'clay')
+  const sandRaw = capa(r, 'sand')
+  if (clayRaw === undefined || sandRaw === undefined) {
+    throw new Error('SoilGrids no devolvió datos de textura para estas coordenadas; indica el suelo a mano.')
+  }
+  const clay = clayRaw / 10 // g/kg*10 → %
+  const sand = sandRaw / 10
   const phRaw = capa(r, 'phh2o')
   const ph = phRaw !== undefined ? phRaw / 10 : 6.5
   let textura: Textura = 'franco'
