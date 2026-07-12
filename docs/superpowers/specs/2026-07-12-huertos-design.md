@@ -33,7 +33,8 @@ Web dirigida a personas **no profesionales** con un pequeño terreno que quieren
    - **Resumen de cosecha**: cantidad estimada por especie (en su unidad natural) y fecha/ventana de recogida.
    - **Avisos de sinergias**: qué especies elegidas se ayudan o se perjudican, y **1-2 sugerencias de compañeras extra** que mejorarían el huerto.
    - **Consejos de suelo**: si el suelo no es el ideal para alguna especie, cómo mejorarlo (enmiendas, drenaje, corrección de pH).
-7. **Guardar / exportar** — guarda en el navegador y puede descargar el plano como imagen/PDF.
+7. **Validación / ajuste** — la propuesta es editable, no definitiva. El usuario ajusta las **entradas** (añadir/quitar especies, cambiar obligatoria↔opcional, nivel de cantidad, aceptar/rechazar las compañeras sugeridas, retocar bancales) y el huerto se **recalcula** al momento (plano, cosecha, calendario y avisos se actualizan). *(La edición manual directa sobre el plano —mover/fijar plantas— queda como evolución futura, ver §12.)*
+8. **Guardar / exportar** — guarda en el navegador y puede descargar el plano como imagen/PDF.
 
 ## 4. Arquitectura técnica
 
@@ -68,7 +69,7 @@ Se conserva intacto: catálogo, todo `dominio/*`, componentes de UI (Next.js es 
 - `dominio/sinergias` — evalúa combinaciones entre las especies elegidas y sugiere compañeras extra.
 - `almacenamiento/almacen` — interfaz `guardar/cargar` (localStorage hoy; servidor mañana).
 - `ui/` — componentes: mapa de ubicación, editor de bancales, selector de especies, plano SVG, calendario, ficha de cultivo, resumen de cosecha, pantalla de resultado.
-- `app/` — estado global del huerto y orquestación del asistente por pasos.
+- `app/` — estado global del huerto y orquestación del asistente por pasos, incluida la **recalculación** de la propuesta cuando el usuario ajusta las entradas en la fase de validación.
 
 Todo `dominio/*` son funciones puras, sin React → se testean solas y se reutilizan intactas en el futuro.
 
@@ -137,7 +138,7 @@ Un SVG por bancal, a escala, con cuadrícula, cada planta con su icono y etiquet
 
 ## 12. Fuera del alcance del MVP (YAGNI)
 
-Cuentas de usuario, guardado en la nube, seguimiento durante la temporada, notificaciones, comunidad, terreno de forma libre, multi-idioma y alcance global. El diseño deja la puerta abierta a todo ello.
+Cuentas de usuario, guardado en la nube, seguimiento durante la temporada, notificaciones, comunidad, terreno de forma libre, multi-idioma, alcance global y la **edición manual directa sobre el plano** (mover/fijar plantas y re-optimizar el resto alrededor — opción C de la fase de validación). El diseño deja la puerta abierta a todo ello.
 
 ## 13. Seguridad y privacidad (por defecto)
 
