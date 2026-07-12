@@ -24,6 +24,7 @@ Web dirigida a personas **no profesionales** con un pequeño terreno que quieren
    - Si se dio **ubicación precisa**, deducimos el tipo de suelo automáticamente por coordenadas (base de datos SoilGrids/ISRIC, gratuita y sin clave) y el usuario puede **corregirlo**.
    - Si no (modo zona climática o suelo desconocido), el usuario **elige el tipo de suelo**, con una **guía de cómo averiguarlo experimentando** (prueba del bote/sedimentación, prueba del rollito a mano, prueba de drenaje y nota sobre el pH).
 5. **Especies** — elige del catálogo curado las especies que le interesan (agrupadas por tipo, con icono). Por cada especie indica si es **obligatoria u opcional** para su huerto y un **nivel de cantidad relativo** (poca / media / mucha), proporcional al bancal — sin introducir números exactos.
+   - Si el usuario no sabe qué plantar, un botón **"Hazme tú una sugerencia"** propone automáticamente un conjunto de especies **muy idóneas** para su clima, época y suelo, con buena diversidad y sinergias. Base de densidad: **~6 especies distintas por m²** de bancal (parámetro configurable), escalando con la superficie total. La propuesta **rellena la selección** y el usuario puede **retocarla** libremente después.
 6. **Resultado** — la web calcula y muestra:
    - Aviso de **idoneidad** por especie (apta ahora / mejor sembrar en tal mes / no recomendada en tu clima).
    - **Plano visual** de cada bancal con la colocación de las plantas y la orientación.
@@ -59,7 +60,8 @@ Se conserva intacto: catálogo, todo `dominio/*`, componentes de UI (Next.js es 
 - `datos/suelos` — tipos de suelo, sus características y la guía de experimentación para identificarlos (datos).
 - `dominio/clima` — servicio con dos implementaciones tras una misma interfaz: coordenadas (Open-Meteo) o zona climática → temporada y temperaturas.
 - `dominio/suelo` — servicio con dos implementaciones tras una misma interfaz: coordenadas (SoilGrids/ISRIC) o tipo indicado por el usuario → perfil de suelo.
-- `dominio/idoneidad` — decide si una especie es apta ahora / cuándo sembrarla / no apta, combinando **clima + época + suelo**, y genera consejos de enmienda del suelo.
+- `dominio/idoneidad` — decide si una especie es apta ahora / cuándo sembrarla / no apta, combinando **clima + época + suelo**; devuelve además una **puntuación de idoneidad** y genera consejos de enmienda del suelo.
+- `dominio/sugerencia` — propone automáticamente un conjunto de especies muy idóneas (base ~6 especies distintas por m²), priorizando puntuación de idoneidad, diversidad y sinergias.
 - `dominio/colocacion` — reparte y coloca las plantas en los bancales por prioridad (obligatorias/opcionales) y peso de cantidad, respetando sinergias, sol/orientación y marco.
 - `dominio/calendario` — genera el calendario de siembra/trasplante/cosecha.
 - `dominio/cosecha` — estima cantidad y fecha/ventana de recogida por especie.
@@ -90,6 +92,8 @@ Cada especie del catálogo incluye:
 ## 7. El cerebro: cómo se genera la recomendación
 
 **a) Idoneidad (clima + época + suelo).** Con las temperaturas del punto del usuario, para cada especie elegida se decide: *apta para sembrar ahora* / *mejor esperar a tal mes* / *no recomendada en tu clima*. La regla es térmica (sembrar cuando la temperatura media supera el umbral de la especie y dentro de la temporada libre de heladas), no una simple tabla fija de meses. El **suelo** entra como modificador: se compara el perfil del suelo (textura, pH, drenaje) con las preferencias de la especie y, si no encaja, se recomienda cómo **enmendarlo** (compost, mejorar drenaje, corregir pH) en lugar de descartarla — salvo incompatibilidades extremas (p. ej. drenaje muy deficiente para una especie que no lo tolera).
+
+**a-bis) Sugerencia automática (opcional).** Si el usuario pulsa "Hazme tú una sugerencia", se selecciona un conjunto de especies partiendo de las de **mayor puntuación de idoneidad**, buscando **diversidad** (distintas familias/tipos) y **buenas sinergias** (evitando antagonistas). El tamaño del conjunto parte de **~6 especies distintas por m²** de bancal (parámetro configurable) y escala con la superficie total. El resultado precarga la selección de especies (por defecto opcionales, cantidad media) y sigue siendo editable por el usuario.
 
 **b) Sinergias.** Se evalúan las combinaciones entre las especies aptas: se marcan las parejas favorables y las conflictivas, y se generan **1-2 sugerencias de compañeras extra** del catálogo que mejorarían el conjunto.
 
@@ -128,7 +132,7 @@ Un SVG por bancal, a escala, con cuadrícula, cada planta con su icono y etiquet
 
 ## 11. Pruebas
 
-- Tests unitarios del **cerebro** (`idoneidad`, `sinergias`, `colocacion`, `calendario`, `cosecha`) con casos claros: clima frío vs. cálido, suelo compatible vs. suelo que requiere enmienda vs. incompatibilidad extrema de drenaje, antagonistas que acaban separados, plantas altas al norte, bancal pequeño que obliga a priorizar, cálculo de cantidad y fechas de cosecha. Con Vitest.
+- Tests unitarios del **cerebro** (`idoneidad`, `sugerencia`, `sinergias`, `colocacion`, `calendario`, `cosecha`) con casos claros: la sugerencia respeta ~6 especies/m² y escala con la superficie, prioriza idoneidad y evita antagonistas; clima frío vs. cálido, suelo compatible vs. suelo que requiere enmienda vs. incompatibilidad extrema de drenaje, antagonistas que acaban separados, plantas altas al norte, bancal pequeño que obliga a priorizar, cálculo de cantidad y fechas de cosecha. Con Vitest.
 - Al ser lógica pura, se prueba sin interfaz. El cerebro se construye con **TDD**.
 
 ## 12. Fuera del alcance del MVP (YAGNI)
