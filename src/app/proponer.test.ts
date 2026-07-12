@@ -32,3 +32,13 @@ test('sugiere compañeras no elegidas', () => {
   const p = proponerHuerto(clima, suelo, 5, bancales, elecciones)
   expect(p.companerasSugeridas).toContain('albahaca')
 })
+
+test('ignora sin fallar las elecciones con un cultivo desconocido', () => {
+  const elecciones: EleccionEspecie[] = [
+    { cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'media' },
+    { cultivoId: 'dragon', obligatoriedad: 'obligatoria', cantidad: 'media' }, // no existe en el catálogo
+  ]
+  const p = proponerHuerto(clima, suelo, 5, bancales, elecciones)
+  expect(p.cultivos.map((c) => c.cultivoId)).toEqual(['tomate'])
+  expect(p.cultivos.find((c) => c.cultivoId === 'dragon')).toBeUndefined()
+})
