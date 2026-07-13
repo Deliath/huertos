@@ -1,7 +1,11 @@
 import type { PerfilClima } from './tipos'
 import { buscarZona } from '../datos/zonas-climaticas'
 
-const UMBRAL_HELADA = 0.5 // °C: un mes con mínima media por debajo se considera con riesgo de helada
+// Helar es un evento de la COLA fría, no de la media: un mes cuya mínima media
+// ronda los 0°C hiela casi todas las noches, pero un mes templado de media
+// (p. ej. Madrid en enero, mínima media ~2°C) hiela igualmente muchas noches.
+// Por eso el riesgo se decide por FRECUENCIA de noches bajo cero, no por la media.
+const UMBRAL_NOCHES_HELADA_ANO = 1 // ≥1 noche con Tmin<0 al año ⇒ mes con riesgo de helada
 
 export function climaDeZona(zonaId: string): PerfilClima {
   const z = buscarZona(zonaId)
@@ -35,6 +39,32 @@ function mediaMensual(time: string[], valores: (number | null)[]): number[] {
   return suma.map((s, m) => (cuenta[m] > 0 ? s / cuenta[m] : NaN))
 }
 
+// Nº medio de noches de helada (Tmin<0°C) por mes y año, a partir de la serie diaria.
+// Contamos las noches bajo cero y dividimos por los años presentes en los datos.
+function nochesHeladaPorMes(time: string[], min: (number | null)[]): number[] {
+  const heladas = new Array<number>(12).fill(0)
+  const anios = new Set<string>()
+  for (let i = 0; i < time.length; i++) {
+    const v = min[i]
+    if (v === null || v === undefined || !Number.isFinite(v)) continue
+    anios.add(time[i].slice(0, 4))
+    if (v < 0) {
+      const mes = Number(time[i].slice(5, 7)) - 1
+      if (mes >= 0 && mes <= 11) heladas[mes] += 1
+    }
+  }
+  const n = Math.max(1, anios.size)
+  return heladas.map((h) => h / n)
+}
+
+// Definición ÚNICA de "mes con riesgo de helada", compartida por idoneidad y la UI:
+// un mes está dentro de la ventana [inicio..mesUltimaHelada] o [mesPrimeraHelada..fin].
+export function esMesHelada(clima: PerfilClima, mes: number): boolean {
+  const enPrimavera = clima.mesUltimaHelada >= 0 && mes <= clima.mesUltimaHelada
+  const enOtono = clima.mesPrimeraHelada >= 0 && mes >= clima.mesPrimeraHelada
+  return enPrimavera || enOtono
+}
+
 export function perfilDesdeOpenMeteo(respuesta: RespuestaOpenMeteo): PerfilClima {
   const { time, temperature_2m_mean, temperature_2m_min } = respuesta.daily
   const mean = mediaMensual(time, temperature_2m_mean)
@@ -42,8 +72,9 @@ export function perfilDesdeOpenMeteo(respuesta: RespuestaOpenMeteo): PerfilClima
   if (mean.some((x) => !Number.isFinite(x)) || min.some((x) => !Number.isFinite(x))) {
     throw new Error('Open-Meteo no devolvió clima suficiente para estas coordenadas; prueba con una zona climática.')
   }
-  const mesesConHelada = min.map((t, i) => ({ t, i })).filter((x) => x.t < UMBRAL_HELADA).map((x) => x.i)
-  // última helada de primavera: último mes frío en la primera mitad del año (ene-jun)
+  const heladas = nochesHeladaPorMes(time, temperature_2m_min)
+  const mesesConHelada = heladas.map((n, i) => ({ n, i })).filter((x) => x.n >= UMBRAL_NOCHES_HELADA_ANO).map((x) => x.i)
+  // última helada de primavera: último mes con riesgo en la primera mitad del año (ene-jun)
   const primavera = mesesConHelada.filter((i) => i <= 5)
   const otono = mesesConHelada.filter((i) => i >= 6)
   return {

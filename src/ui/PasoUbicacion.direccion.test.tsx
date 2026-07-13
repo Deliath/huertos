@@ -18,6 +18,9 @@ vi.mock('../dominio/clima', () => ({
       mesUltimaHelada: -1, mesPrimeraHelada: -1,
     }),
   ),
+  esMesHelada: (clima: PerfilClima, mes: number) =>
+    (clima.mesUltimaHelada >= 0 && mes <= clima.mesUltimaHelada) ||
+    (clima.mesPrimeraHelada >= 0 && mes >= clima.mesPrimeraHelada),
 }))
 
 vi.mock('../dominio/suelo', () => ({

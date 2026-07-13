@@ -1,4 +1,5 @@
 import type { Cultivo, PerfilClima, PerfilSuelo, ResultadoIdoneidad, Drenaje } from './tipos'
+import { esMesHelada } from './clima'
 
 const ORDEN_DRENAJE: Record<Drenaje, number> = { malo: 0, medio: 1, bueno: 2 }
 
@@ -6,11 +7,7 @@ function mesesEnVentana(cultivo: Cultivo, clima: PerfilClima): number[] {
   const meses: number[] = []
   for (let m = 0; m < 12; m++) {
     const calido = clima.tempMediaMensual[m] >= cultivo.tempMinGerminacion
-    let sinHelada = true
-    if (cultivo.toleranciaHelada === 'sensible') {
-      if (clima.mesUltimaHelada >= 0 && m <= clima.mesUltimaHelada) sinHelada = false
-      if (clima.mesPrimeraHelada >= 0 && m >= clima.mesPrimeraHelada) sinHelada = false
-    }
+    const sinHelada = cultivo.toleranciaHelada !== 'sensible' || !esMesHelada(clima, m)
     if (calido && sinHelada) meses.push(m)
   }
   return meses

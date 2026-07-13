@@ -1,11 +1,12 @@
 import type { PerfilClima } from '../dominio/tipos'
+import { esMesHelada } from '../dominio/clima'
 
-// Mismo umbral que dominio/clima.ts: por debajo se considera mes con riesgo de helada.
-const UMBRAL_HELADA = 0.5
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
 export function ResumenClima({ clima, mesActual }: { clima: PerfilClima; mesActual: number }) {
-  const conHelada = clima.tempMinMensual.map((t) => t < UMBRAL_HELADA)
+  // Definición unificada con dominio/clima.ts e idoneidad.ts: la helada se decide
+  // por la ventana de riesgo, no por la mínima media (que puede ser > 0 y helar igual).
+  const conHelada = MESES.map((_, i) => esMesHelada(clima, i))
   const hayHelada = conHelada.some(Boolean)
 
   return (
@@ -54,7 +55,7 @@ export function ResumenClima({ clima, mesActual }: { clima: PerfilClima; mesActu
         </tbody>
       </table>
       {hayHelada
-        ? <p>❄️ Meses con riesgo de helada resaltados (mínima media &lt; 0,5 °C): planta ahí solo especies resistentes o espera.</p>
+        ? <p>❄️ Meses con riesgo de helada resaltados: planta ahí solo especies resistentes o espera.</p>
         : <p>Sin meses con riesgo de helada.</p>}
     </section>
   )

@@ -17,9 +17,23 @@ test('resalta el mes actual', () => {
   expect(screen.getByRole('columnheader', { name: /Ene/i })).not.toHaveAttribute('aria-current')
 })
 
-test('marca los meses con riesgo de helada (mínima < 0,5 °C)', () => {
-  render(<ResumenClima clima={climaDeZona('montana')} mesActual={6} />) // ene -3, feb -2 → helada
+test('marca los meses dentro de la ventana de heladas', () => {
+  render(<ResumenClima clima={climaDeZona('montana')} mesActual={6} />) // ultima=4, primera=9
   expect(screen.getByRole('columnheader', { name: /Ene/i })).toHaveAttribute('data-helada', 'true')
+  expect(screen.getByRole('columnheader', { name: /Jul/i })).not.toHaveAttribute('data-helada', 'true')
+})
+
+test('marca meses de helada por la ventana aunque la mínima media sea > 0,5 °C (Madrid)', () => {
+  const madrid = {
+    id: 'coordenadas', nombre: 'Ubicación precisa',
+    tempMediaMensual: [6, 8, 11, 13, 17, 23, 26, 26, 21, 15, 10, 7],
+    tempMinMensual: [2, 3, 5, 8, 11, 15, 18, 18, 15, 10, 5, 3], // todas > 0,5 °C
+    mesUltimaHelada: 2, mesPrimeraHelada: 10, // marzo / noviembre
+  }
+  render(<ResumenClima clima={madrid} mesActual={6} />)
+  expect(screen.getByRole('columnheader', { name: /Ene/i })).toHaveAttribute('data-helada', 'true')
+  expect(screen.getByRole('columnheader', { name: /Mar/i })).toHaveAttribute('data-helada', 'true')
+  expect(screen.getByRole('columnheader', { name: /Nov/i })).toHaveAttribute('data-helada', 'true')
   expect(screen.getByRole('columnheader', { name: /Jul/i })).not.toHaveAttribute('data-helada', 'true')
 })
 
