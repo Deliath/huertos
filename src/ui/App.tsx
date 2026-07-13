@@ -72,7 +72,12 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
             <p>¿Quieres cambiar algo? Vuelve a las especies o los bancales y el huerto se recalcula solo.</p>
             <button type="button" onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'especies' })}>Ajustar especies</button>
             <button type="button" onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'bancales' })}>Ajustar bancales</button>
-            <button type="button" onClick={() => almacen.guardar('actual', { huerto: { orientacionNorte: estado.orientacionNorte, bancales: estado.bancales }, elecciones: estado.elecciones })}>Guardar</button>
+            <button type="button" onClick={() => almacen.guardar({
+              id: crypto.randomUUID(), nombre: 'Mi huerto', guardadoEn: Date.now(), mesSiembra: mesActual,
+              modoUbicacion: estado.modoUbicacion ?? 'zona', coordenadas: estado.coordenadas, zonaId: estado.zonaId,
+              clima: estado.clima!, suelo: estado.suelo!, orientacionNorte: estado.orientacionNorte,
+              bancales: estado.bancales, elecciones: estado.elecciones,
+            })}>Guardar</button>
           </div>
         </div>
       )}
