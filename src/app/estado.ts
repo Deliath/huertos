@@ -30,6 +30,7 @@ export type Accion =
   | { tipo: 'set_elecciones'; elecciones: EleccionEspecie[] }
   | { tipo: 'empezar_plan'; mesSiembra: number }
   | { tipo: 'cargar_plan'; plan: PlanHuerto }
+  | { tipo: 'set_guardado'; id: string; nombre: string }
 
 export const estadoInicial: EstadoApp = {
   paso: 'inicio', modoUbicacion: null, coordenadas: null, zonaId: null,
@@ -59,5 +60,6 @@ export function reducer(estado: EstadoApp, accion: Accion): EstadoApp {
         bancales: p.bancales, elecciones: p.elecciones,
       }
     }
+    case 'set_guardado': return { ...estado, idGuardado: accion.id, nombreGuardado: accion.nombre }
   }
 }

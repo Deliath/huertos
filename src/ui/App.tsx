@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useState } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { reducer, estadoInicial } from '../app/estado'
 import { proponerHuerto } from '../app/proponer'
 import { crearAlmacenLocal } from '../almacenamiento/almacen'
@@ -17,6 +17,19 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
   const almacen = useMemo(() => crearAlmacenLocal(), [])
   const [planes, setPlanes] = useState<PlanHuerto[]>(() => almacen.listar())
   const refrescarPlanes = () => setPlanes(almacen.listar())
+  const [nombrePlan, setNombrePlan] = useState('')
+  const [guardadoOk, setGuardadoOk] = useState(false)
+  const pasoAnteriorRef = useRef(estado.paso)
+
+  // Solo reinicia el campo/aviso al ENTRAR en resultado (no en cada guardado,
+  // que también cambia estado.nombreGuardado y borraría el "Guardado ✓").
+  useEffect(() => {
+    if (estado.paso === 'resultado' && pasoAnteriorRef.current !== 'resultado') {
+      setNombrePlan(estado.nombreGuardado ?? '')
+      setGuardadoOk(false)
+    }
+    pasoAnteriorRef.current = estado.paso
+  }, [estado.paso, estado.nombreGuardado])
 
   const superficieM2 = estado.bancales.reduce((s, b) => s + b.anchoM * b.largoM, 0)
 
@@ -82,12 +95,23 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
             <p>¿Quieres cambiar algo? Vuelve a las especies o los bancales y el huerto se recalcula solo.</p>
             <button type="button" onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'especies' })}>Ajustar especies</button>
             <button type="button" onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'bancales' })}>Ajustar bancales</button>
-            <button type="button" onClick={() => almacen.guardar({
-              id: crypto.randomUUID(), nombre: 'Mi huerto', guardadoEn: Date.now(), mesSiembra: mesActual,
-              modoUbicacion: estado.modoUbicacion ?? 'zona', coordenadas: estado.coordenadas, zonaId: estado.zonaId,
-              clima: estado.clima!, suelo: estado.suelo!, orientacionNorte: estado.orientacionNorte,
-              bancales: estado.bancales, elecciones: estado.elecciones,
-            })}>Guardar</button>
+            <div>
+              <label>Nombre del plan: <input value={nombrePlan} onChange={(e) => { setNombrePlan(e.target.value); setGuardadoOk(false) }} /></label>
+              <button type="button" disabled={!nombrePlan.trim()} onClick={() => {
+                const mismoNombre = estado.idGuardado != null && nombrePlan.trim() === estado.nombreGuardado
+                const id = mismoNombre ? estado.idGuardado! : crypto.randomUUID()
+                almacen.guardar({
+                  id, nombre: nombrePlan.trim(), guardadoEn: Date.now(), mesSiembra: estado.mesSiembra,
+                  modoUbicacion: estado.modoUbicacion ?? 'zona', coordenadas: estado.coordenadas, zonaId: estado.zonaId,
+                  clima: estado.clima!, suelo: estado.suelo!, orientacionNorte: estado.orientacionNorte,
+                  bancales: estado.bancales, elecciones: estado.elecciones,
+                })
+                dispatch({ tipo: 'set_guardado', id, nombre: nombrePlan.trim() })
+                refrescarPlanes()
+                setGuardadoOk(true)
+              }}>Guardar plan</button>
+              {guardadoOk && <span> Guardado ✓</span>}
+            </div>
           </div>
         </div>
       )}

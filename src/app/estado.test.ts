@@ -53,3 +53,9 @@ test('cargar_plan rehidrata el estado y aterriza en resultado', () => {
   expect(s.modoUbicacion).toBe('precisa')
   expect(s.coordenadas).toEqual({ lat: 40, lon: -3 })
 })
+
+test('set_guardado fija id y nombre guardados', () => {
+  const s = reducer(estadoInicial, { tipo: 'set_guardado', id: 'abc', nombre: 'Terraza' })
+  expect(s.idGuardado).toBe('abc')
+  expect(s.nombreGuardado).toBe('Terraza')
+})
