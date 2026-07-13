@@ -1,4 +1,5 @@
 import type { Bancal, Orientacion, PerfilClima, PerfilSuelo, EleccionEspecie } from '../dominio/tipos'
+import type { PlanHuerto } from '../almacenamiento/almacen'
 
 export type Paso = 'inicio' | 'ubicacion' | 'bancales' | 'suelo' | 'especies' | 'resultado'
 
@@ -12,6 +13,9 @@ export interface EstadoApp {
   orientacionNorte: Orientacion
   bancales: Bancal[]
   elecciones: EleccionEspecie[]
+  idGuardado: string | null
+  nombreGuardado: string | null
+  mesSiembra: number
 }
 
 export type Accion =
@@ -24,10 +28,13 @@ export type Accion =
   | { tipo: 'editar_bancal'; bancal: Bancal }
   | { tipo: 'borrar_bancal'; id: string }
   | { tipo: 'set_elecciones'; elecciones: EleccionEspecie[] }
+  | { tipo: 'empezar_plan'; mesSiembra: number }
+  | { tipo: 'cargar_plan'; plan: PlanHuerto }
 
 export const estadoInicial: EstadoApp = {
   paso: 'inicio', modoUbicacion: null, coordenadas: null, zonaId: null,
   clima: null, suelo: null, orientacionNorte: 'norte', bancales: [], elecciones: [],
+  idGuardado: null, nombreGuardado: null, mesSiembra: 0,
 }
 
 export function reducer(estado: EstadoApp, accion: Accion): EstadoApp {
@@ -41,5 +48,16 @@ export function reducer(estado: EstadoApp, accion: Accion): EstadoApp {
     case 'editar_bancal': return { ...estado, bancales: estado.bancales.map((b) => (b.id === accion.bancal.id ? accion.bancal : b)) }
     case 'borrar_bancal': return { ...estado, bancales: estado.bancales.filter((b) => b.id !== accion.id) }
     case 'set_elecciones': return { ...estado, elecciones: accion.elecciones }
+    case 'empezar_plan': return { ...estado, paso: 'ubicacion', mesSiembra: accion.mesSiembra }
+    case 'cargar_plan': {
+      const p = accion.plan
+      return {
+        ...estado, paso: 'resultado',
+        idGuardado: p.id, nombreGuardado: p.nombre, mesSiembra: p.mesSiembra,
+        modoUbicacion: p.modoUbicacion, coordenadas: p.coordenadas, zonaId: p.zonaId,
+        clima: p.clima, suelo: p.suelo, orientacionNorte: p.orientacionNorte,
+        bancales: p.bancales, elecciones: p.elecciones,
+      }
+    }
   }
 }

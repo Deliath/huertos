@@ -22,3 +22,34 @@ test('el reducer no muta el estado anterior', () => {
   reducer(estadoInicial, { tipo: 'añadir_bancal', bancal: { id: 'b1', nombre: 'B1', anchoM: 1, largoM: 1 } })
   expect(estadoInicial.bancales.length).toBe(antes)
 })
+
+import type { PlanHuerto } from '../almacenamiento/almacen'
+
+test('empezar_plan fija el mes de siembra y pasa a ubicacion', () => {
+  const s = reducer(estadoInicial, { tipo: 'empezar_plan', mesSiembra: 5 })
+  expect(s.paso).toBe('ubicacion')
+  expect(s.mesSiembra).toBe(5)
+})
+
+test('cargar_plan rehidrata el estado y aterriza en resultado', () => {
+  const plan: PlanHuerto = {
+    id: 'p1', nombre: 'Terraza', guardadoEn: 1000, mesSiembra: 3,
+    modoUbicacion: 'precisa', coordenadas: { lat: 40, lon: -3 }, zonaId: null,
+    clima: { id: 'coordenadas', nombre: 'Ubicación precisa', tempMediaMensual: Array(12).fill(15), tempMinMensual: Array(12).fill(5), mesUltimaHelada: 2, mesPrimeraHelada: 10 },
+    suelo: { textura: 'franco', ph: 6.8, drenaje: 'medio' },
+    orientacionNorte: 'sur', bancales: [{ id: 'b1', nombre: 'B1', anchoM: 2, largoM: 3 }],
+    elecciones: [{ cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'media' }],
+  }
+  const s = reducer(estadoInicial, { tipo: 'cargar_plan', plan })
+  expect(s.paso).toBe('resultado')
+  expect(s.idGuardado).toBe('p1')
+  expect(s.nombreGuardado).toBe('Terraza')
+  expect(s.mesSiembra).toBe(3)
+  expect(s.clima).toEqual(plan.clima)
+  expect(s.suelo).toEqual(plan.suelo)
+  expect(s.bancales).toEqual(plan.bancales)
+  expect(s.elecciones).toEqual(plan.elecciones)
+  expect(s.orientacionNorte).toBe('sur')
+  expect(s.modoUbicacion).toBe('precisa')
+  expect(s.coordenadas).toEqual({ lat: 40, lon: -3 })
+})
