@@ -2,7 +2,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, test, vi } from 'vitest'
-import { PantallaInicio, subtituloPlan } from './PantallaInicio'
+import { PantallaInicio } from './PantallaInicio'
+import { subtituloPlan } from './plan-resumen'
 import type { PlanHuerto } from '../almacenamiento/almacen'
 
 function plan(over: Partial<PlanHuerto> = {}): PlanHuerto {
@@ -41,6 +42,14 @@ test('Borrar dispara onBorrar con el id tras confirmar', async () => {
   render(<PantallaInicio planes={[plan()]} onEmpezar={() => {}} onAbrir={() => {}} onBorrar={onBorrar} />)
   await userEvent.click(screen.getByRole('button', { name: /Borrar/i }))
   expect(onBorrar).toHaveBeenCalledWith('p1')
+})
+
+test('Borrar no dispara onBorrar si se cancela la confirmación', async () => {
+  const onBorrar = vi.fn()
+  vi.spyOn(window, 'confirm').mockReturnValue(false)
+  render(<PantallaInicio planes={[plan()]} onEmpezar={() => {}} onAbrir={() => {}} onBorrar={onBorrar} />)
+  await userEvent.click(screen.getByRole('button', { name: /Borrar/i }))
+  expect(onBorrar).not.toHaveBeenCalled()
 })
 
 test('subtituloPlan incluye el mes de siembra', () => {

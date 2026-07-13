@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 import { reducer, estadoInicial } from './estado'
+import type { PlanHuerto } from '../almacenamiento/almacen'
 
 test('añadir_bancal agrega un bancal con id único', () => {
   const s1 = reducer(estadoInicial, { tipo: 'añadir_bancal', bancal: { id: 'b1', nombre: 'B1', anchoM: 2, largoM: 3 } })
@@ -22,8 +23,6 @@ test('el reducer no muta el estado anterior', () => {
   reducer(estadoInicial, { tipo: 'añadir_bancal', bancal: { id: 'b1', nombre: 'B1', anchoM: 1, largoM: 1 } })
   expect(estadoInicial.bancales.length).toBe(antes)
 })
-
-import type { PlanHuerto } from '../almacenamiento/almacen'
 
 test('empezar_plan fija el mes de siembra y pasa a ubicacion', () => {
   const s = reducer(estadoInicial, { tipo: 'empezar_plan', mesSiembra: 5 })
