@@ -1,4 +1,6 @@
 import type { PerfilClima, PerfilSuelo, Bancal, Orientacion, EleccionEspecie } from '../dominio/tipos'
+import type { AjustesColocacion } from '../dominio/colocacion'
+import type { ModoIntercalado } from '../dominio/distribucion'
 
 // Un PlanHuerto es un huerto físico (ubicación, clima, suelo, orientación,
 // bancales) + las especies elegidas. NO confundir con `Cultivo` (una especie).
@@ -15,6 +17,9 @@ export interface PlanHuerto {
   orientacionNorte: Orientacion
   bancales: Bancal[]
   elecciones: EleccionEspecie[]
+  // Personalización del resultado; opcionales para que los planes antiguos sigan cargando.
+  modoIntercalado?: ModoIntercalado
+  ajustes?: AjustesColocacion
 }
 
 export interface Almacen {

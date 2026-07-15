@@ -68,3 +68,19 @@ test('ignora claves de otros prefijos', () => {
   a.guardar(plan({ id: 'bueno' }))
   expect(a.listar().map((p) => p.id)).toEqual(['bueno'])
 })
+
+test('guarda y recupera modoIntercalado y ajustes', () => {
+  const a = crearAlmacenLocal(storageFalso())
+  a.guardar(plan({ id: 'px', modoIntercalado: 'mezcla', ajustes: { b1: { tomate: 2 } } }))
+  const cargado = a.cargar('px')!
+  expect(cargado.modoIntercalado).toBe('mezcla')
+  expect(cargado.ajustes).toEqual({ b1: { tomate: 2 } })
+})
+
+test('un plan guardado sin los campos nuevos sigue cargando', () => {
+  const a = crearAlmacenLocal(storageFalso())
+  a.guardar(plan()) // sin modoIntercalado ni ajustes
+  const cargado = a.cargar('p1')!
+  expect(cargado.modoIntercalado).toBeUndefined()
+  expect(cargado.ajustes).toBeUndefined()
+})
