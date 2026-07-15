@@ -34,7 +34,7 @@ export function PanelResultado({ propuesta, bancales, orientacionNorte }: { prop
           return (
             <div key={b.id} ref={(el) => { contenedores.current[b.id] = el }}>
               <h3>{b.nombre}</h3>
-              <PlanoBancal bancal={b} asignaciones={col?.asignaciones ?? []} orientacionNorte={orientacionNorte} />
+              <PlanoBancal bancal={b} asignaciones={col?.asignaciones ?? []} orientacionNorte={orientacionNorte} modoIntercalado="bloques" />
               <div>
                 <button type="button" onClick={() => { void exportarPng(b) }}>Descargar PNG</button>
                 <button type="button" onClick={() => { void exportarPdf(b) }}>Descargar PDF</button>
