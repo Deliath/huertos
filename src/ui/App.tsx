@@ -35,8 +35,8 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
 
   const propuesta = useMemo(() => {
     if (!estado.clima || !estado.suelo) return null
-    return proponerHuerto(estado.clima, estado.suelo, estado.mesSiembra, estado.bancales, estado.elecciones)
-  }, [estado.clima, estado.suelo, estado.bancales, estado.elecciones, estado.mesSiembra])
+    return proponerHuerto(estado.clima, estado.suelo, estado.mesSiembra, estado.bancales, estado.elecciones, estado.ajustes, estado.modoIntercalado)
+  }, [estado.clima, estado.suelo, estado.bancales, estado.elecciones, estado.mesSiembra, estado.ajustes, estado.modoIntercalado])
 
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: 16 }}>
@@ -89,8 +89,12 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
 
       {estado.paso === 'resultado' && propuesta && (
         <div>
-          {/* Apaño temporal: la Task 11 conecta modoIntercalado y los ajustes de cantidad al estado. */}
-          <PanelResultado propuesta={propuesta} bancales={estado.bancales} orientacionNorte={estado.orientacionNorte} modoIntercalado="bloques" onModoIntercalado={() => {}} onAjustarCantidad={() => {}} />
+          <PanelResultado
+            propuesta={propuesta} bancales={estado.bancales} orientacionNorte={estado.orientacionNorte}
+            modoIntercalado={estado.modoIntercalado}
+            onModoIntercalado={(modo) => dispatch({ tipo: 'set_modo_intercalado', modo })}
+            onAjustarCantidad={(bancalId, cultivoId, numPlantas) => dispatch({ tipo: 'ajustar_cantidad', bancalId, cultivoId, numPlantas })}
+          />
           <div>
             <h2>Ajustar (validación)</h2>
             <p>¿Quieres cambiar algo? Vuelve a las especies o los bancales y el huerto se recalcula solo.</p>
@@ -106,6 +110,7 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
                   modoUbicacion: estado.modoUbicacion ?? 'zona', coordenadas: estado.coordenadas, zonaId: estado.zonaId,
                   clima: estado.clima!, suelo: estado.suelo!, orientacionNorte: estado.orientacionNorte,
                   bancales: estado.bancales, elecciones: estado.elecciones,
+                  modoIntercalado: estado.modoIntercalado, ajustes: estado.ajustes,
                 })
                 dispatch({ tipo: 'set_guardado', id, nombre: nombrePlan.trim() })
                 refrescarPlanes()
