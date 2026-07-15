@@ -42,3 +42,31 @@ test('ignora sin fallar las elecciones con un cultivo desconocido', () => {
   expect(p.cultivos.map((c) => c.cultivoId)).toEqual(['tomate'])
   expect(p.cultivos.find((c) => c.cultivoId === 'dragon')).toBeUndefined()
 })
+
+test('los ajustes cambian las cantidades y la cosecha estimada', () => {
+  const bancales = [{ id: 'b1', nombre: 'B1', anchoM: 2, largoM: 3 }]
+  const elecciones: EleccionEspecie[] = [{ cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'media' }]
+  const sinAjustes = proponerHuerto(clima, suelo, 5, bancales, elecciones)
+  const conAjustes = proponerHuerto(clima, suelo, 5, bancales, elecciones, { b1: { tomate: 2 } })
+  expect(sinAjustes.cultivos[0].numPlantas).toBeGreaterThan(2)
+  expect(conAjustes.cultivos[0].numPlantas).toBe(2)
+  expect(conAjustes.colocacion.bancales[0].asignaciones[0].numPlantas).toBe(2)
+  expect(conAjustes.cultivos[0].cosecha!.cantidadMax).toBeLessThan(sinAjustes.cultivos[0].cosecha!.cantidadMax)
+})
+
+test('sin ajustes que desborden no hay recortes', () => {
+  const bancales = [{ id: 'b1', nombre: 'B1', anchoM: 2, largoM: 3 }]
+  const elecciones: EleccionEspecie[] = [{ cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'media' }]
+  const propuesta = proponerHuerto(clima, suelo, 5, bancales, elecciones)
+  expect(propuesta.recortes).toEqual([])
+})
+
+test('un ajuste que no cabe se recorta a lo que cabe geométricamente', () => {
+  const bancales = [{ id: 'b1', nombre: 'B1', anchoM: 2, largoM: 3 }]
+  const elecciones: EleccionEspecie[] = [{ cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'media' }]
+  // En 200×300 cm caben 20 tomateras (4 por fila × 5 filas a 50×60 cm).
+  const propuesta = proponerHuerto(clima, suelo, 5, bancales, elecciones, { b1: { tomate: 999 } })
+  expect(propuesta.colocacion.bancales[0].asignaciones[0].numPlantas).toBe(20)
+  expect(propuesta.cultivos[0].numPlantas).toBe(20)
+  expect(propuesta.recortes).toEqual([{ bancalId: 'b1', cultivoId: 'tomate', numPlantas: 979 }])
+})
