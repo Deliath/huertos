@@ -94,3 +94,12 @@ export function distribuir(bancal: Bancal, asignaciones: AsignacionCultivo[], mo
 
   return { plantas, noCaben: [...noCaben].map(([cultivoId, numPlantas]) => ({ cultivoId, numPlantas })) }
 }
+
+// Prueba a colocar una planta más de la especie dada; la UI lo usa para el botón «+».
+export function cabeUnaMas(bancal: Bancal, asignaciones: AsignacionCultivo[], modo: ModoIntercalado, cultivoId: string): boolean {
+  const existente = asignaciones.find((a) => a.cultivoId === cultivoId)
+  const conUnaMas = existente
+    ? asignaciones.map((a) => (a.cultivoId === cultivoId ? { ...a, numPlantas: a.numPlantas + 1 } : a))
+    : [...asignaciones, { cultivoId, numPlantas: 1 }]
+  return distribuir(bancal, conUnaMas, modo).noCaben.length === 0
+}

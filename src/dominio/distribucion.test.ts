@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { distribuir } from './distribucion'
+import { distribuir, cabeUnaMas } from './distribucion'
 import type { Bancal } from './tipos'
 
 const b2x2: Bancal = { id: 'b1', nombre: 'B1', anchoM: 2, largoM: 2 }
@@ -132,4 +132,18 @@ test('companeras sin relación entre sí se comporta como bloques', () => {
     { cultivoId: 'cebolla', numPlantas: 2 },
   ], 'companeras')
   expect(conCompaneras).toEqual(conBloques)
+})
+
+test('cabeUnaMas: true cuando hay sitio para una planta más', () => {
+  expect(cabeUnaMas(b2x2, [{ cultivoId: 'lechuga', numPlantas: 4 }], 'bloques', 'lechuga')).toBe(true)
+})
+
+test('cabeUnaMas: false cuando la siguiente planta no cabe', () => {
+  const mini: Bancal = { id: 'm1', nombre: 'Mini', anchoM: 0.3, largoM: 0.3 }
+  // Una lechuga cabe justa (25 cm de marco en 30 cm); la segunda ya no.
+  expect(cabeUnaMas(mini, [{ cultivoId: 'lechuga', numPlantas: 1 }], 'bloques', 'lechuga')).toBe(false)
+})
+
+test('cabeUnaMas: funciona con una especie aún sin asignación', () => {
+  expect(cabeUnaMas(b2x2, [], 'bloques', 'tomate')).toBe(true)
 })
