@@ -79,3 +79,57 @@ test('ignora cultivos desconocidos y cantidades a cero', () => {
   expect(plantas).toHaveLength(0)
   expect(noCaben).toHaveLength(0)
 })
+
+test('mezcla: alterna las especies round-robin dentro de la fila', () => {
+  const b3x3: Bancal = { id: 'b6', nombre: 'B6', anchoM: 3, largoM: 3 }
+  const { plantas } = distribuir(b3x3, [
+    { cultivoId: 'tomate', numPlantas: 2 },
+    { cultivoId: 'lechuga', numPlantas: 2 },
+  ], 'mezcla')
+  expect(plantas).toHaveLength(4)
+  // Caben todas en una fila y se alternan: tomate, lechuga, tomate, lechuga.
+  expect(new Set(plantas.map((p) => p.yCm)).size).toBe(1)
+  const porX = [...plantas].sort((a, b) => a.xCm - b.xCm).map((p) => p.cultivoId)
+  expect(porX).toEqual(['tomate', 'lechuga', 'tomate', 'lechuga'])
+})
+
+test('companeras: mezcla solo especies compañeras; el resto en bloques aparte', () => {
+  const b3x3: Bancal = { id: 'b7', nombre: 'B7', anchoM: 3, largoM: 3 }
+  // tomate y lechuga son compañeras; la cebolla no lo es de ninguna de las dos.
+  const { plantas } = distribuir(b3x3, [
+    { cultivoId: 'tomate', numPlantas: 2 },
+    { cultivoId: 'lechuga', numPlantas: 2 },
+    { cultivoId: 'cebolla', numPlantas: 2 },
+  ], 'companeras')
+  const yTomate = plantas.find((p) => p.cultivoId === 'tomate')!.yCm
+  const yLechuga = plantas.find((p) => p.cultivoId === 'lechuga')!.yCm
+  const ysCebolla = plantas.filter((p) => p.cultivoId === 'cebolla').map((p) => p.yCm)
+  expect(yLechuga).toBe(yTomate) // comparten fila
+  for (const y of ysCebolla) expect(y).toBeGreaterThan(yTomate) // bloque aparte, más al sur (menos alta)
+})
+
+test('companeras: una especie intermediaria une grupos (tomate-lechuga-zanahoria)', () => {
+  const b3x3: Bancal = { id: 'b8', nombre: 'B8', anchoM: 3, largoM: 3 }
+  // tomate↔lechuga y lechuga↔zanahoria son compañeras; tomate↔zanahoria no.
+  const { plantas, noCaben } = distribuir(b3x3, [
+    { cultivoId: 'tomate', numPlantas: 1 },
+    { cultivoId: 'zanahoria', numPlantas: 1 },
+    { cultivoId: 'lechuga', numPlantas: 1 },
+  ], 'companeras')
+  expect(noCaben).toHaveLength(0)
+  expect(new Set(plantas.map((p) => p.yCm)).size).toBe(1) // las tres en la misma fila
+})
+
+test('companeras sin relación entre sí se comporta como bloques', () => {
+  const b3x3: Bancal = { id: 'b9', nombre: 'B9', anchoM: 3, largoM: 3 }
+  // pimiento y cebolla no son compañeras entre sí.
+  const conBloques = distribuir(b3x3, [
+    { cultivoId: 'pimiento', numPlantas: 2 },
+    { cultivoId: 'cebolla', numPlantas: 2 },
+  ], 'bloques')
+  const conCompaneras = distribuir(b3x3, [
+    { cultivoId: 'pimiento', numPlantas: 2 },
+    { cultivoId: 'cebolla', numPlantas: 2 },
+  ], 'companeras')
+  expect(conCompaneras).toEqual(conBloques)
+})

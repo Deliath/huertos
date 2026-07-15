@@ -19,12 +19,30 @@ function entradasDe(asignaciones: AsignacionCultivo[]): Entrada[] {
   return res
 }
 
+function sonCompaneras(a: Cultivo, b: Cultivo): boolean {
+  return a.companeras.includes(b.id) || b.companeras.includes(a.id)
+}
+
 // Agrupa especies según el modo; cada grupo empieza en fila nueva y los grupos
-// se apilan de norte (altas) a sur (bajas). En 'bloques' cada especie es su grupo.
+// se apilan de norte (altas) a sur (bajas), por orden de creación sobre la
+// lista ya ordenada por altura.
 function agrupar(entradas: Entrada[], modo: ModoIntercalado): Entrada[][] {
   const porAltura = [...entradas].sort((a, b) => b.c.alturaCm - a.c.alturaCm)
-  void modo // los modos 'companeras' y 'mezcla' llegan en la siguiente tarea
-  return porAltura.map((e) => [e])
+  if (modo === 'bloques') return porAltura.map((e) => [e])
+  if (modo === 'mezcla') return porAltura.length ? [porAltura] : []
+  // companeras: componentes conexas del grafo "es compañera de" (en cualquier sentido).
+  const grupos: Entrada[][] = []
+  for (const e of porAltura) {
+    const conectados = grupos.filter((g) => g.some((x) => sonCompaneras(x.c, e.c)))
+    if (conectados.length === 0) { grupos.push([e]); continue }
+    const destino = conectados[0]
+    destino.push(e)
+    for (const otro of conectados.slice(1)) {
+      destino.push(...otro)
+      grupos.splice(grupos.indexOf(otro), 1)
+    }
+  }
+  return grupos
 }
 
 // Alterna las especies del grupo en round-robin hasta agotar sus plantas.
