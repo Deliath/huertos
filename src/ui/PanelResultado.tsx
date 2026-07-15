@@ -2,10 +2,18 @@ import { useRef } from 'react'
 import type { Propuesta } from '../app/proponer'
 import type { Bancal, Orientacion } from '../dominio/tipos'
 import { buscarCultivo } from '../datos/cultivos'
+import { cabeUnaMas, type ModoIntercalado } from '../dominio/distribucion'
 import { PlanoBancal } from './PlanoBancal'
 import { VistaCalendario } from './VistaCalendario'
 
-export function PanelResultado({ propuesta, bancales, orientacionNorte }: { propuesta: Propuesta; bancales: Bancal[]; orientacionNorte: Orientacion }) {
+export function PanelResultado({ propuesta, bancales, orientacionNorte, modoIntercalado, onModoIntercalado, onAjustarCantidad }: {
+  propuesta: Propuesta
+  bancales: Bancal[]
+  orientacionNorte: Orientacion
+  modoIntercalado: ModoIntercalado
+  onModoIntercalado: (modo: ModoIntercalado) => void
+  onAjustarCantidad: (bancalId: string, cultivoId: string, numPlantas: number) => void
+}) {
   const nombre = (id: string) => buscarCultivo(id)?.nombreComun ?? id
   const contenedores = useRef<Record<string, HTMLDivElement | null>>({})
 
@@ -29,16 +37,44 @@ export function PanelResultado({ propuesta, bancales, orientacionNorte }: { prop
     <div>
       <section>
         <h2>Tu huerto</h2>
+        <fieldset>
+          <legend>¿Intercalar especies?</legend>
+          {([['bloques', 'Sin intercalar'], ['companeras', 'Solo compañeras'], ['mezcla', 'Todas las compatibles']] as const).map(([valor, etiqueta]) => (
+            <label key={valor} style={{ marginRight: 12 }}>
+              <input type="radio" name="modo-intercalado" checked={modoIntercalado === valor} onChange={() => onModoIntercalado(valor)} /> {etiqueta}
+            </label>
+          ))}
+        </fieldset>
         {bancales.map((b) => {
           const col = propuesta.colocacion.bancales.find((x) => x.bancalId === b.id)
           return (
             <div key={b.id} ref={(el) => { contenedores.current[b.id] = el }}>
               <h3>{b.nombre}</h3>
-              <PlanoBancal bancal={b} asignaciones={col?.asignaciones ?? []} orientacionNorte={orientacionNorte} modoIntercalado="bloques" />
+              <PlanoBancal bancal={b} asignaciones={col?.asignaciones ?? []} orientacionNorte={orientacionNorte} modoIntercalado={modoIntercalado} />
               <div>
                 <button type="button" onClick={() => { void exportarPng(b) }}>Descargar PNG</button>
                 <button type="button" onClick={() => { void exportarPdf(b) }}>Descargar PDF</button>
               </div>
+              <ul aria-label={`Plantas en ${b.nombre}`}>
+                {(col?.asignaciones ?? []).map((a) => {
+                  const c = buscarCultivo(a.cultivoId)
+                  if (!c) return null
+                  return (
+                    <li key={a.cultivoId}>
+                      {c.icono} {c.nombreComun} — {c.distanciaPlantaCm} × {c.distanciaLineaCm} cm{' '}
+                      <button type="button" aria-label={`Quitar ${c.nombreComun} de ${b.nombre}`} disabled={a.numPlantas === 0}
+                        onClick={() => onAjustarCantidad(b.id, a.cultivoId, a.numPlantas - 1)}>−</button>
+                      <span> {a.numPlantas} </span>
+                      <button type="button" aria-label={`Añadir ${c.nombreComun} en ${b.nombre}`}
+                        disabled={!cabeUnaMas(b, col?.asignaciones ?? [], modoIntercalado, a.cultivoId)}
+                        onClick={() => onAjustarCantidad(b.id, a.cultivoId, a.numPlantas + 1)}>+</button>
+                    </li>
+                  )
+                })}
+              </ul>
+              {propuesta.recortes.filter((r) => r.bancalId === b.id).map((r) => (
+                <p key={r.cultivoId} role="alert">En {b.nombre} no caben {r.numPlantas} {nombre(r.cultivoId)} con las distancias requeridas.</p>
+              ))}
             </div>
           )
         })}

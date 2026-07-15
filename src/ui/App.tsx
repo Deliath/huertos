@@ -89,7 +89,8 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
 
       {estado.paso === 'resultado' && propuesta && (
         <div>
-          <PanelResultado propuesta={propuesta} bancales={estado.bancales} orientacionNorte={estado.orientacionNorte} />
+          {/* Apaño temporal: la Task 11 conecta modoIntercalado y los ajustes de cantidad al estado. */}
+          <PanelResultado propuesta={propuesta} bancales={estado.bancales} orientacionNorte={estado.orientacionNorte} modoIntercalado="bloques" onModoIntercalado={() => {}} onAjustarCantidad={() => {}} />
           <div>
             <h2>Ajustar (validación)</h2>
             <p>¿Quieres cambiar algo? Vuelve a las especies o los bancales y el huerto se recalcula solo.</p>
