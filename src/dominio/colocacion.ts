@@ -73,3 +73,19 @@ export function colocar(bancales: Bancal[], elecciones: EleccionEspecie[]): Resu
     noColocadas,
   }
 }
+
+// Overrides del usuario sobre el resultado de colocar(): bancalId → cultivoId → numPlantas.
+export type AjustesColocacion = Record<string, Record<string, number>>
+
+export function aplicarAjustes(colocacion: ResultadoColocacion, ajustes: AjustesColocacion): ResultadoColocacion {
+  return {
+    ...colocacion,
+    bancales: colocacion.bancales.map((b) => ({
+      ...b,
+      asignaciones: b.asignaciones.map((a) => {
+        const n = ajustes[b.bancalId]?.[a.cultivoId]
+        return n === undefined ? a : { ...a, numPlantas: Math.max(0, n) }
+      }),
+    })),
+  }
+}
