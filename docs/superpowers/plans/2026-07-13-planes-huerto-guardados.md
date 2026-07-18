@@ -41,7 +41,7 @@
 **Interfaces:**
 - Produces: `interface PlanHuerto`, `interface Almacen { guardar(plan: PlanHuerto): void; cargar(id: string): PlanHuerto | null; borrar(id: string): void; listar(): PlanHuerto[] }`, `crearAlmacenLocal(storage?: Storage): Almacen`.
 
-- [ ] **Step 1: Reescribir el test del almacén**
+- [x] **Step 1: Reescribir el test del almacén**
 
 Reemplaza TODO el contenido de `src/almacenamiento/almacen.test.ts`:
 
@@ -118,12 +118,12 @@ test('ignora claves de otros prefijos', () => {
 })
 ```
 
-- [ ] **Step 2: Ejecutar y ver que falla**
+- [x] **Step 2: Ejecutar y ver que falla**
 
 Run: `npx vitest run src/almacenamiento/almacen.test.ts`
 Expected: FAIL — `PlanHuerto` no exportado / `guardar` con firma antigua / `listar` no existe.
 
-- [ ] **Step 3: Reescribir el almacén**
+- [x] **Step 3: Reescribir el almacén**
 
 Reemplaza TODO el contenido de `src/almacenamiento/almacen.ts`:
 
@@ -202,12 +202,12 @@ export function crearAlmacenLocal(storage: Storage = localStorage): Almacen {
 }
 ```
 
-- [ ] **Step 4: Ejecutar y ver que pasa**
+- [x] **Step 4: Ejecutar y ver que pasa**
 
 Run: `npx vitest run src/almacenamiento/almacen.test.ts`
 Expected: PASS (6 tests).
 
-- [ ] **Step 5: Arreglar la llamada de guardado en App.tsx para que compile**
+- [x] **Step 5: Arreglar la llamada de guardado en App.tsx para que compile**
 
 En `src/ui/App.tsx`, el botón "Guardar" de la pantalla de resultados (dentro de `estado.paso === 'resultado'`) llama a la API vieja. Sustituye ESE botón por uno que construya un `PlanHuerto` (temporal; el guardado con nombre llega en Task 4):
 
@@ -220,12 +220,12 @@ En `src/ui/App.tsx`, el botón "Guardar" de la pantalla de resultados (dentro de
 })}>Guardar</button>
 ```
 
-- [ ] **Step 6: Verificar typecheck y suite completa**
+- [x] **Step 6: Verificar typecheck y suite completa**
 
 Run: `npx tsc -b && npm test`
 Expected: tsc sin errores; todos los tests verdes.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/almacenamiento/almacen.ts src/almacenamiento/almacen.test.ts src/ui/App.tsx
@@ -244,7 +244,7 @@ git commit -m "feat: PlanHuerto y almacen con listar/validacion de forma"
 - Consumes: `PlanHuerto` de `../almacenamiento/almacen`.
 - Produces: `EstadoApp` con `idGuardado: string | null`, `nombreGuardado: string | null`, `mesSiembra: number`. Acciones `{ tipo: 'empezar_plan'; mesSiembra: number }` y `{ tipo: 'cargar_plan'; plan: PlanHuerto }`.
 
-- [ ] **Step 1: Escribir los tests que fallan**
+- [x] **Step 1: Escribir los tests que fallan**
 
 Añade al final de `src/app/estado.test.ts`:
 
@@ -281,12 +281,12 @@ test('cargar_plan rehidrata el estado y aterriza en resultado', () => {
 })
 ```
 
-- [ ] **Step 2: Ejecutar y ver que falla**
+- [x] **Step 2: Ejecutar y ver que falla**
 
 Run: `npx vitest run src/app/estado.test.ts`
 Expected: FAIL — acciones `empezar_plan`/`cargar_plan` no existen; `mesSiembra`/`idGuardado`/`nombreGuardado` no están en el estado.
 
-- [ ] **Step 3: Implementar en `src/app/estado.ts`**
+- [x] **Step 3: Implementar en `src/app/estado.ts`**
 
 Añade el import al principio:
 
@@ -327,17 +327,17 @@ En el `switch` del reducer, añade dos casos:
     }
 ```
 
-- [ ] **Step 4: Ejecutar y ver que pasa**
+- [x] **Step 4: Ejecutar y ver que pasa**
 
 Run: `npx vitest run src/app/estado.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Verificar typecheck y suite completa**
+- [x] **Step 5: Verificar typecheck y suite completa**
 
 Run: `npx tsc -b && npm test`
 Expected: verde.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/app/estado.ts src/app/estado.test.ts
@@ -357,7 +357,7 @@ git commit -m "feat: estado con mesSiembra y acciones empezar_plan/cargar_plan"
 - Consumes: `PlanHuerto`, `Almacen.listar/cargar/borrar`, acciones `empezar_plan`/`cargar_plan`.
 - Produces: `PantallaInicio` con props `{ planes: PlanHuerto[]; onEmpezar: () => void; onAbrir: (id: string) => void; onBorrar: (id: string) => void }`. Helper exportado `subtituloPlan(plan: PlanHuerto): string`.
 
-- [ ] **Step 1: Escribir los tests que fallan**
+- [x] **Step 1: Escribir los tests que fallan**
 
 Reemplaza TODO el contenido de `src/ui/PantallaInicio.test.tsx`:
 
@@ -412,12 +412,12 @@ test('subtituloPlan incluye el mes de siembra', () => {
 })
 ```
 
-- [ ] **Step 2: Ejecutar y ver que falla**
+- [x] **Step 2: Ejecutar y ver que falla**
 
 Run: `npx vitest run src/ui/PantallaInicio.test.tsx`
 Expected: FAIL — `subtituloPlan` no exportado; `PantallaInicio` no acepta `planes`.
 
-- [ ] **Step 3: Implementar `src/ui/PantallaInicio.tsx`**
+- [x] **Step 3: Implementar `src/ui/PantallaInicio.tsx`**
 
 Reemplaza TODO el contenido:
 
@@ -477,12 +477,12 @@ export function PantallaInicio({
 }
 ```
 
-- [ ] **Step 4: Ejecutar y ver que pasa**
+- [x] **Step 4: Ejecutar y ver que pasa**
 
 Run: `npx vitest run src/ui/PantallaInicio.test.tsx`
 Expected: PASS (5 tests).
 
-- [ ] **Step 5: Cablear `src/ui/App.tsx`**
+- [x] **Step 5: Cablear `src/ui/App.tsx`**
 
 En `App`, tras crear el almacén, añade estado de planes y un refresco:
 
@@ -522,12 +522,12 @@ Pasa el mes de siembra al selector de especies (para que ajustar un plan cargado
 
 (El `mesActual={mesActual}` de `PasoUbicacion` se queda como está: resaltado del mes de hoy en el clima.)
 
-- [ ] **Step 6: Verificar typecheck y suite completa**
+- [x] **Step 6: Verificar typecheck y suite completa**
 
 Run: `npx tsc -b && npm test`
 Expected: verde. (Si algún test de `App`/humo renderiza la pantalla de inicio, ahora recibe `planes=[]` desde `almacen.listar()` sobre un `localStorage` de jsdom vacío → sin planes, comportamiento idéntico al actual.)
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/ui/PantallaInicio.tsx src/ui/PantallaInicio.test.tsx src/ui/App.tsx
@@ -546,7 +546,7 @@ git commit -m "feat: lista de planes en inicio, cargar aterriza en resultados"
 - Consumes: `estado.idGuardado`, `estado.nombreGuardado`, `estado.mesSiembra`, `almacen.guardar`, `refrescarPlanes`.
 - Produces: acción `{ tipo: 'set_guardado'; id: string; nombre: string }` en el reducer (para que reguardar siga actualizando el mismo id).
 
-- [ ] **Step 1: Añadir la acción `set_guardado` al reducer (con su test)**
+- [x] **Step 1: Añadir la acción `set_guardado` al reducer (con su test)**
 
 En `src/app/estado.test.ts`, añade:
 
@@ -574,7 +574,7 @@ y al `switch`:
 
 Run: `npx vitest run src/app/estado.test.ts` → PASS.
 
-- [ ] **Step 2: Escribir el test del flujo de guardado**
+- [x] **Step 2: Escribir el test del flujo de guardado**
 
 Añade a `src/ui/App.test.tsx` (mismo estilo que los tests de App existentes; ajusta el import de helpers si el fichero ya los tiene):
 
@@ -616,7 +616,7 @@ test('reguardar con el mismo nombre actualiza en vez de duplicar', async () => {
 
 Run: `npx vitest run src/ui/App.test.tsx` → FAIL (no hay campo "Nombre del plan").
 
-- [ ] **Step 3: Implementar el guardado con nombre en `src/ui/App.tsx`**
+- [x] **Step 3: Implementar el guardado con nombre en `src/ui/App.tsx`**
 
 Reemplaza el botón "Guardar" temporal (el de Task 1, dentro de `estado.paso === 'resultado'`) por un pequeño formulario controlado. Añade un estado local para el nombre y el aviso, cerca del inicio de `App`:
 
@@ -657,17 +657,17 @@ Sustituye el botón por:
             </div>
 ```
 
-- [ ] **Step 4: Ejecutar y ver que pasa**
+- [x] **Step 4: Ejecutar y ver que pasa**
 
 Run: `npx vitest run src/ui/App.test.tsx`
 Expected: PASS.
 
-- [ ] **Step 5: Verificar typecheck, lint y suite completa**
+- [x] **Step 5: Verificar typecheck, lint y suite completa**
 
 Run: `npx tsc -b && npm run lint && npm test`
 Expected: todo verde.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/ui/App.tsx src/app/estado.ts src/app/estado.test.ts src/ui/App.test.tsx

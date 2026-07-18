@@ -59,6 +59,7 @@ export function EditorBancales({ bancales, orientacionNorte, onAñadir, onBorrar
             bancal={{ id: 'preview', nombre: 'nuevo bancal', anchoM, largoM }}
             asignaciones={[]}
             orientacionNorte={orientacionNorte}
+            modoIntercalado="bloques"
             maxAnchoPx={anchoPxParaLadoLargo(anchoM, largoM, 260)}
           />
         </div>
@@ -67,7 +68,7 @@ export function EditorBancales({ bancales, orientacionNorte, onAñadir, onBorrar
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {bancales.map((b) => (
           <li key={b.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <PlanoBancal bancal={b} asignaciones={[]} orientacionNorte={orientacionNorte} maxAnchoPx={b.anchoM * pxPorMetro} />
+            <PlanoBancal bancal={b} asignaciones={[]} orientacionNorte={orientacionNorte} modoIntercalado="bloques" maxAnchoPx={b.anchoM * pxPorMetro} />
             <span>{b.nombre}: {b.anchoM} × {b.largoM} m</span>
             <button type="button" onClick={() => onBorrar(b.id)} aria-label={`Borrar ${b.nombre}`}>✕</button>
           </li>

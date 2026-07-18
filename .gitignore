@@ -29,3 +29,6 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Config local de Claude Code (permisos de sesión)
+.claude/settings.local.json

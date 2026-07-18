@@ -18,7 +18,7 @@ const elecciones: EleccionEspecie[] = [{ cultivoId: 'tomate', obligatoriedad: 'o
 
 test('los botones de descarga exportan el SVG del bancal a PNG y PDF', async () => {
   const propuesta = proponerHuerto(clima, suelo, 5, bancales, elecciones)
-  render(<PanelResultado propuesta={propuesta} bancales={bancales} orientacionNorte="norte" />)
+  render(<PanelResultado propuesta={propuesta} bancales={bancales} orientacionNorte="norte" modoIntercalado="bloques" onModoIntercalado={() => {}} onAjustarCantidad={() => {}} />)
 
   const usuario = userEvent.setup()
   await usuario.click(screen.getByRole('button', { name: 'Descargar PNG' }))

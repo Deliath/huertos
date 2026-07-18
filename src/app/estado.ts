@@ -1,5 +1,7 @@
 import type { Bancal, Orientacion, PerfilClima, PerfilSuelo, EleccionEspecie } from '../dominio/tipos'
 import type { PlanHuerto } from '../almacenamiento/almacen'
+import type { AjustesColocacion } from '../dominio/colocacion'
+import type { ModoIntercalado } from '../dominio/distribucion'
 
 export type Paso = 'inicio' | 'ubicacion' | 'bancales' | 'suelo' | 'especies' | 'resultado'
 
@@ -16,6 +18,8 @@ export interface EstadoApp {
   idGuardado: string | null
   nombreGuardado: string | null
   mesSiembra: number
+  modoIntercalado: ModoIntercalado
+  ajustes: AjustesColocacion
 }
 
 export type Accion =
@@ -31,11 +35,14 @@ export type Accion =
   | { tipo: 'empezar_plan'; mesSiembra: number }
   | { tipo: 'cargar_plan'; plan: PlanHuerto }
   | { tipo: 'set_guardado'; id: string; nombre: string }
+  | { tipo: 'set_modo_intercalado'; modo: ModoIntercalado }
+  | { tipo: 'ajustar_cantidad'; bancalId: string; cultivoId: string; numPlantas: number }
 
 export const estadoInicial: EstadoApp = {
   paso: 'inicio', modoUbicacion: null, coordenadas: null, zonaId: null,
   clima: null, suelo: null, orientacionNorte: 'norte', bancales: [], elecciones: [],
   idGuardado: null, nombreGuardado: null, mesSiembra: 0,
+  modoIntercalado: 'bloques', ajustes: {},
 }
 
 export function reducer(estado: EstadoApp, accion: Accion): EstadoApp {
@@ -49,7 +56,7 @@ export function reducer(estado: EstadoApp, accion: Accion): EstadoApp {
     case 'editar_bancal': return { ...estado, bancales: estado.bancales.map((b) => (b.id === accion.bancal.id ? accion.bancal : b)) }
     case 'borrar_bancal': return { ...estado, bancales: estado.bancales.filter((b) => b.id !== accion.id) }
     case 'set_elecciones': return { ...estado, elecciones: accion.elecciones }
-    case 'empezar_plan': return { ...estado, paso: 'ubicacion', mesSiembra: accion.mesSiembra }
+    case 'empezar_plan': return { ...estado, paso: 'ubicacion', mesSiembra: accion.mesSiembra, modoIntercalado: 'bloques', ajustes: {} }
     case 'cargar_plan': {
       const p = accion.plan
       return {
@@ -58,8 +65,14 @@ export function reducer(estado: EstadoApp, accion: Accion): EstadoApp {
         modoUbicacion: p.modoUbicacion, coordenadas: p.coordenadas, zonaId: p.zonaId,
         clima: p.clima, suelo: p.suelo, orientacionNorte: p.orientacionNorte,
         bancales: p.bancales, elecciones: p.elecciones,
+        modoIntercalado: p.modoIntercalado ?? 'bloques', ajustes: p.ajustes ?? {},
       }
     }
     case 'set_guardado': return { ...estado, idGuardado: accion.id, nombreGuardado: accion.nombre }
+    case 'set_modo_intercalado': return { ...estado, modoIntercalado: accion.modo }
+    case 'ajustar_cantidad': return {
+      ...estado,
+      ajustes: { ...estado.ajustes, [accion.bancalId]: { ...estado.ajustes[accion.bancalId], [accion.cultivoId]: accion.numPlantas } },
+    }
   }
 }

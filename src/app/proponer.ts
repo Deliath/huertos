@@ -1,6 +1,7 @@
 import type { PerfilClima, PerfilSuelo, Bancal, EleccionEspecie, ResultadoIdoneidad } from '../dominio/tipos'
 import { evaluarIdoneidad } from '../dominio/idoneidad'
-import { colocar, type ResultadoColocacion } from '../dominio/colocacion'
+import { colocar, aplicarAjustes, type ResultadoColocacion, type AjustesColocacion } from '../dominio/colocacion'
+import { distribuir, type ModoIntercalado } from '../dominio/distribucion'
 import { generarCalendario, type EntradaCalendario } from '../dominio/calendario'
 import { estimarCosecha, type EstimacionCosecha } from '../dominio/cosecha'
 import { evaluarSinergias, sugerirCompaneras, type ParejaSinergia } from '../dominio/sinergias'
@@ -14,9 +15,12 @@ export interface PropuestaCultivo {
   cosecha?: EstimacionCosecha
 }
 
+export interface Recorte { bancalId: string; cultivoId: string; numPlantas: number }
+
 export interface Propuesta {
   cultivos: PropuestaCultivo[]
   colocacion: ResultadoColocacion
+  recortes: Recorte[]
   sinergias: ParejaSinergia[]
   companerasSugeridas: string[]
   avisos: string[]
@@ -25,6 +29,7 @@ export interface Propuesta {
 export function proponerHuerto(
   clima: PerfilClima, suelo: PerfilSuelo, mesActual: number,
   bancales: Bancal[], elecciones: EleccionEspecie[],
+  ajustes: AjustesColocacion = {}, modoIntercalado: ModoIntercalado = 'bloques',
 ): Propuesta {
   // Descarta elecciones cuyo cultivo no exista en el catálogo (p. ej. datos guardados
   // de una versión anterior). Así las búsquedas posteriores en `idoneidades` no fallan.
@@ -37,7 +42,28 @@ export function proponerHuerto(
   }
 
   const aptas = eleccionesValidas.filter((e) => idoneidades.get(e.cultivoId)?.estado === 'apta')
-  const colocacion = colocar(bancales, aptas)
+  const conAjustes = aplicarAjustes(colocar(bancales, aptas), ajustes)
+
+  // Recorte geométrico: reduce cada asignación a lo que cabe con las distancias
+  // reales, para que plano, cosecha y calendario cuenten siempre lo mismo.
+  const recortes: Recorte[] = []
+  const colocacion: ResultadoColocacion = {
+    ...conAjustes,
+    bancales: conAjustes.bancales.map((bc) => {
+      const bancal = bancales.find((b) => b.id === bc.bancalId)
+      if (!bancal) return bc
+      const { noCaben } = distribuir(bancal, bc.asignaciones, modoIntercalado)
+      if (noCaben.length === 0) return bc
+      for (const nc of noCaben) recortes.push({ bancalId: bc.bancalId, cultivoId: nc.cultivoId, numPlantas: nc.numPlantas })
+      return {
+        ...bc,
+        asignaciones: bc.asignaciones.map((a) => {
+          const nc = noCaben.find((x) => x.cultivoId === a.cultivoId)
+          return nc ? { ...a, numPlantas: a.numPlantas - nc.numPlantas } : a
+        }),
+      }
+    }),
+  }
 
   const plantasPorCultivo = new Map<string, number>()
   for (const b of colocacion.bancales) {
@@ -71,6 +97,7 @@ export function proponerHuerto(
   return {
     cultivos,
     colocacion,
+    recortes,
     sinergias: evaluarSinergias(ids),
     companerasSugeridas: sugerirCompaneras(ids, 2),
     avisos,

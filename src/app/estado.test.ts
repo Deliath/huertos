@@ -58,3 +58,38 @@ test('set_guardado fija id y nombre guardados', () => {
   expect(s.idGuardado).toBe('abc')
   expect(s.nombreGuardado).toBe('Terraza')
 })
+
+test('set_modo_intercalado cambia el modo', () => {
+  const e = reducer(estadoInicial, { tipo: 'set_modo_intercalado', modo: 'mezcla' })
+  expect(e.modoIntercalado).toBe('mezcla')
+})
+
+test('ajustar_cantidad acumula overrides por bancal y cultivo', () => {
+  let e = reducer(estadoInicial, { tipo: 'ajustar_cantidad', bancalId: 'b1', cultivoId: 'tomate', numPlantas: 7 })
+  e = reducer(e, { tipo: 'ajustar_cantidad', bancalId: 'b1', cultivoId: 'lechuga', numPlantas: 3 })
+  expect(e.ajustes).toEqual({ b1: { tomate: 7, lechuga: 3 } })
+})
+
+test('empezar_plan resetea intercalado y ajustes', () => {
+  let e = reducer(estadoInicial, { tipo: 'set_modo_intercalado', modo: 'mezcla' })
+  e = reducer(e, { tipo: 'ajustar_cantidad', bancalId: 'b1', cultivoId: 'tomate', numPlantas: 7 })
+  e = reducer(e, { tipo: 'empezar_plan', mesSiembra: 4 })
+  expect(e.modoIntercalado).toBe('bloques')
+  expect(e.ajustes).toEqual({})
+})
+
+test('cargar_plan restaura intercalado y ajustes, con valores por defecto si faltan', () => {
+  const base = {
+    id: 'p1', nombre: 'P', guardadoEn: 1, mesSiembra: 3,
+    modoUbicacion: 'zona' as const, coordenadas: null, zonaId: 'z',
+    clima: { id: 'z', nombre: 'Z', tempMediaMensual: Array(12).fill(15), tempMinMensual: Array(12).fill(5), mesUltimaHelada: -1, mesPrimeraHelada: -1 },
+    suelo: { textura: 'franco' as const, ph: 6.5, drenaje: 'bueno' as const },
+    orientacionNorte: 'norte' as const, bancales: [], elecciones: [],
+  }
+  const con = reducer(estadoInicial, { tipo: 'cargar_plan', plan: { ...base, modoIntercalado: 'companeras', ajustes: { b1: { tomate: 2 } } } })
+  expect(con.modoIntercalado).toBe('companeras')
+  expect(con.ajustes).toEqual({ b1: { tomate: 2 } })
+  const sin = reducer(estadoInicial, { tipo: 'cargar_plan', plan: base })
+  expect(sin.modoIntercalado).toBe('bloques')
+  expect(sin.ajustes).toEqual({})
+})

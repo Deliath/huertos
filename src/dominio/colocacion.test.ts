@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { colocar } from './colocacion'
+import { colocar, aplicarAjustes } from './colocacion'
 import type { Bancal, EleccionEspecie } from './tipos'
 
 const bancalGrande: Bancal = { id: 'b1', nombre: 'Bancal 1', anchoM: 2, largoM: 3 } // 6 m²
@@ -47,4 +47,32 @@ test('una opcional sin bancal compatible se registra en noColocadas', () => {
   ]
   const r = colocar([b1], elecciones)
   expect(r.noColocadas).toContain('judia')
+})
+
+test('aplicarAjustes sobrescribe numPlantas de asignaciones existentes', () => {
+  const colocacion = {
+    bancales: [{ bancalId: 'b1', asignaciones: [{ cultivoId: 'tomate', numPlantas: 6 }] }],
+    avisos: [], noColocadas: [],
+  }
+  const resultado = aplicarAjustes(colocacion, { b1: { tomate: 2 } })
+  expect(resultado.bancales[0].asignaciones[0].numPlantas).toBe(2)
+})
+
+test('aplicarAjustes ignora bancales y cultivos que no están en la colocación', () => {
+  const colocacion = {
+    bancales: [{ bancalId: 'b1', asignaciones: [{ cultivoId: 'tomate', numPlantas: 6 }] }],
+    avisos: [], noColocadas: [],
+  }
+  const resultado = aplicarAjustes(colocacion, { b99: { tomate: 1 }, b1: { lechuga: 5 } })
+  expect(resultado.bancales[0].asignaciones).toEqual([{ cultivoId: 'tomate', numPlantas: 6 }])
+})
+
+test('aplicarAjustes no muta la entrada y no baja de cero', () => {
+  const colocacion = {
+    bancales: [{ bancalId: 'b1', asignaciones: [{ cultivoId: 'tomate', numPlantas: 6 }] }],
+    avisos: [], noColocadas: [],
+  }
+  const resultado = aplicarAjustes(colocacion, { b1: { tomate: -3 } })
+  expect(resultado.bancales[0].asignaciones[0].numPlantas).toBe(0)
+  expect(colocacion.bancales[0].asignaciones[0].numPlantas).toBe(6)
 })

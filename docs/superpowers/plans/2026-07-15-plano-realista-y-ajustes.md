@@ -38,7 +38,7 @@
 
 Datos del catálogo usados en los tests (de `src/datos/cultivos.ts`): lechuga dp=25 dl=30 h=25; tomate dp=50 dl=60 h=150; zanahoria dp=8 dl=25 h=30; cebolla dp=12 dl=25 h=35 (dp=`distanciaPlantaCm`, dl=`distanciaLineaCm`, h=`alturaCm`).
 
-- [ ] **Step 1: Escribir los tests en rojo**
+- [x] **Step 1: Escribir los tests en rojo**
 
 ```ts
 // src/dominio/distribucion.test.ts
@@ -125,12 +125,12 @@ test('ignora cultivos desconocidos y cantidades a cero', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/dominio/distribucion.test.ts`
 Expected: FAIL — `Cannot find module './distribucion'` (o similar).
 
-- [ ] **Step 3: Implementación mínima (solo `bloques`; la estructura de grupos ya queda lista para la Task 2)**
+- [x] **Step 3: Implementación mínima (solo `bloques`; la estructura de grupos ya queda lista para la Task 2)**
 
 ```ts
 // src/dominio/distribucion.ts
@@ -214,12 +214,12 @@ export function distribuir(bancal: Bancal, asignaciones: AsignacionCultivo[], mo
 }
 ```
 
-- [ ] **Step 4: Verificar que pasan**
+- [x] **Step 4: Verificar que pasan**
 
 Run: `npx vitest run src/dominio/distribucion.test.ts`
 Expected: PASS (8 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/dominio/distribucion.ts src/dominio/distribucion.test.ts
@@ -238,7 +238,7 @@ git commit -m "feat: distribución geométrica de plantas por filas (modo bloque
 - Consumes: lo definido en Task 1.
 - Produces: `distribuir` acepta `'companeras'` y `'mezcla'` con la semántica del spec. Sin cambios de firma.
 
-- [ ] **Step 1: Añadir tests en rojo** (al final de `src/dominio/distribucion.test.ts`)
+- [x] **Step 1: Añadir tests en rojo** (al final de `src/dominio/distribucion.test.ts`)
 
 ```ts
 test('mezcla: alterna las especies round-robin dentro de la fila', () => {
@@ -296,12 +296,12 @@ test('companeras sin relación entre sí se comporta como bloques', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/dominio/distribucion.test.ts`
 Expected: FAIL los 4 tests nuevos (hoy `agrupar` trata todo como bloques).
 
-- [ ] **Step 3: Implementar `agrupar` completo** (sustituir la función en `src/dominio/distribucion.ts`)
+- [x] **Step 3: Implementar `agrupar` completo** (sustituir la función en `src/dominio/distribucion.ts`)
 
 ```ts
 function sonCompaneras(a: Cultivo, b: Cultivo): boolean {
@@ -333,12 +333,12 @@ function agrupar(entradas: Entrada[], modo: ModoIntercalado): Entrada[][] {
 
 Y eliminar el `void modo` del cuerpo anterior.
 
-- [ ] **Step 4: Verificar que pasan todos**
+- [x] **Step 4: Verificar que pasan todos**
 
 Run: `npx vitest run src/dominio/distribucion.test.ts`
 Expected: PASS (12 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/dominio/distribucion.ts src/dominio/distribucion.test.ts
@@ -356,7 +356,7 @@ git commit -m "feat: modos de intercalado companeras y mezcla en la distribució
 **Interfaces:**
 - Produces (usado por Task 10): `export function cabeUnaMas(bancal: Bancal, asignaciones: AsignacionCultivo[], modo: ModoIntercalado, cultivoId: string): boolean`
 
-- [ ] **Step 1: Tests en rojo** (al final de `src/dominio/distribucion.test.ts`; añadir `cabeUnaMas` al import de `./distribucion`)
+- [x] **Step 1: Tests en rojo** (al final de `src/dominio/distribucion.test.ts`; añadir `cabeUnaMas` al import de `./distribucion`)
 
 ```ts
 test('cabeUnaMas: true cuando hay sitio para una planta más', () => {
@@ -374,12 +374,12 @@ test('cabeUnaMas: funciona con una especie aún sin asignación', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/dominio/distribucion.test.ts`
 Expected: FAIL — `cabeUnaMas is not a function` (o no exportada).
 
-- [ ] **Step 3: Implementar** (al final de `src/dominio/distribucion.ts`)
+- [x] **Step 3: Implementar** (al final de `src/dominio/distribucion.ts`)
 
 ```ts
 // Prueba a colocar una planta más de la especie dada; la UI lo usa para el botón «+».
@@ -392,12 +392,12 @@ export function cabeUnaMas(bancal: Bancal, asignaciones: AsignacionCultivo[], mo
 }
 ```
 
-- [ ] **Step 4: Verificar que pasan**
+- [x] **Step 4: Verificar que pasan**
 
 Run: `npx vitest run src/dominio/distribucion.test.ts`
 Expected: PASS (15 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/dominio/distribucion.ts src/dominio/distribucion.test.ts
@@ -417,7 +417,7 @@ git commit -m "feat: cabeUnaMas para validar el límite del botón de añadir"
   - `export type AjustesColocacion = Record<string, Record<string, number>>` — `bancalId → cultivoId → numPlantas`
   - `export function aplicarAjustes(colocacion: ResultadoColocacion, ajustes: AjustesColocacion): ResultadoColocacion`
 
-- [ ] **Step 1: Tests en rojo** (al final de `src/dominio/colocacion.test.ts`; añadir `aplicarAjustes` al import de `./colocacion`)
+- [x] **Step 1: Tests en rojo** (al final de `src/dominio/colocacion.test.ts`; añadir `aplicarAjustes` al import de `./colocacion`)
 
 ```ts
 test('aplicarAjustes sobrescribe numPlantas de asignaciones existentes', () => {
@@ -449,12 +449,12 @@ test('aplicarAjustes no muta la entrada y no baja de cero', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/dominio/colocacion.test.ts`
 Expected: FAIL — `aplicarAjustes` no existe.
 
-- [ ] **Step 3: Implementar** (al final de `src/dominio/colocacion.ts`)
+- [x] **Step 3: Implementar** (al final de `src/dominio/colocacion.ts`)
 
 ```ts
 // Overrides del usuario sobre el resultado de colocar(): bancalId → cultivoId → numPlantas.
@@ -474,12 +474,12 @@ export function aplicarAjustes(colocacion: ResultadoColocacion, ajustes: Ajustes
 }
 ```
 
-- [ ] **Step 4: Verificar que pasan**
+- [x] **Step 4: Verificar que pasan**
 
 Run: `npx vitest run src/dominio/colocacion.test.ts`
 Expected: PASS (los existentes + 3 nuevos).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/dominio/colocacion.ts src/dominio/colocacion.test.ts
@@ -501,7 +501,7 @@ git commit -m "feat: aplicarAjustes para overrides de cantidades del usuario"
   - `Propuesta` gana `recortes: Recorte[]`.
   - Firma nueva (parámetros opcionales, compatible con los llamadores actuales): `proponerHuerto(clima, suelo, mesActual, bancales, elecciones, ajustes: AjustesColocacion = {}, modoIntercalado: ModoIntercalado = 'bloques'): Propuesta`
 
-- [ ] **Step 1: Tests en rojo** (al final de `src/app/proponer.test.ts`, reutilizando el estilo de fixtures del archivo: `climaDeZona('mediterraneo_litoral')`, `sueloManual('franco', 6.5)`, mes 5, bancal `{ id: 'b1', nombre: 'B1', anchoM: 2, largoM: 3 }`, elección tomate obligatoria/media — si el archivo ya define estas constantes, reutilizarlas)
+- [x] **Step 1: Tests en rojo** (al final de `src/app/proponer.test.ts`, reutilizando el estilo de fixtures del archivo: `climaDeZona('mediterraneo_litoral')`, `sueloManual('franco', 6.5)`, mes 5, bancal `{ id: 'b1', nombre: 'B1', anchoM: 2, largoM: 3 }`, elección tomate obligatoria/media — si el archivo ya define estas constantes, reutilizarlas)
 
 ```ts
 test('los ajustes cambian las cantidades y la cosecha estimada', () => {
@@ -533,12 +533,12 @@ test('un ajuste que no cabe se recorta a lo que cabe geométricamente', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/app/proponer.test.ts`
 Expected: FAIL — `recortes` undefined y los ajustes no aplican.
 
-- [ ] **Step 3: Implementar en `src/app/proponer.ts`**
+- [x] **Step 3: Implementar en `src/app/proponer.ts`**
 
 Añadir imports:
 
@@ -599,12 +599,12 @@ export function proponerHuerto(
 
 Y añadir `recortes` al objeto de retorno.
 
-- [ ] **Step 4: Verificar que pasan todos los tests del archivo y del proyecto**
+- [x] **Step 4: Verificar que pasan todos los tests del archivo y del proyecto**
 
 Run: `npx vitest run src/app/proponer.test.ts && npm test`
 Expected: PASS todo (la firma es retrocompatible).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/app/proponer.ts src/app/proponer.test.ts
@@ -623,7 +623,7 @@ git commit -m "feat: proponerHuerto aplica ajustes y recorta a lo que cabe geom�
 - Consumes: `ModoIntercalado` (Task 1), `AjustesColocacion` (Task 4).
 - Produces (usado por Tasks 7, 11): `PlanHuerto` gana `modoIntercalado?: ModoIntercalado` y `ajustes?: AjustesColocacion`. `esPlan` NO cambia (campos opcionales → los planes viejos siguen validando). El archivo de test ya tiene los helpers `storageFalso()` y `plan(over: Partial<PlanHuerto>)` — reutilizarlos.
 
-- [ ] **Step 1: Tests en rojo** (al final de `src/almacenamiento/almacen.test.ts`)
+- [x] **Step 1: Tests en rojo** (al final de `src/almacenamiento/almacen.test.ts`)
 
 ```ts
 test('guarda y recupera modoIntercalado y ajustes', () => {
@@ -643,12 +643,12 @@ test('un plan guardado sin los campos nuevos sigue cargando', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/almacenamiento/almacen.test.ts`
 Expected: FAIL por tipos — `modoIntercalado` y `ajustes` no existen en `PlanHuerto`.
 
-- [ ] **Step 3: Implementar en `src/almacenamiento/almacen.ts`**
+- [x] **Step 3: Implementar en `src/almacenamiento/almacen.ts`**
 
 Imports:
 
@@ -668,12 +668,12 @@ En `PlanHuerto`, tras `elecciones`:
 
 `esPlan` no se toca.
 
-- [ ] **Step 4: Verificar que pasan**
+- [x] **Step 4: Verificar que pasan**
 
 Run: `npx vitest run src/almacenamiento/almacen.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/almacenamiento/almacen.ts src/almacenamiento/almacen.test.ts
@@ -692,7 +692,7 @@ git commit -m "feat: PlanHuerto guarda modo de intercalado y ajustes (opcionales
 - Consumes: `ModoIntercalado` (Task 1), `AjustesColocacion` (Task 4), campos opcionales de `PlanHuerto` (Task 6).
 - Produces (usado por Task 11): campos `modoIntercalado: ModoIntercalado` y `ajustes: AjustesColocacion` en `EstadoApp`; acciones `{ tipo: 'set_modo_intercalado'; modo: ModoIntercalado }` y `{ tipo: 'ajustar_cantidad'; bancalId: string; cultivoId: string; numPlantas: number }`.
 
-- [ ] **Step 1: Tests en rojo** (al final de `src/app/estado.test.ts`)
+- [x] **Step 1: Tests en rojo** (al final de `src/app/estado.test.ts`)
 
 ```ts
 test('set_modo_intercalado cambia el modo', () => {
@@ -731,12 +731,12 @@ test('cargar_plan restaura intercalado y ajustes, con valores por defecto si fal
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/app/estado.test.ts`
 Expected: FAIL (acciones y campos inexistentes; error de tipos al compilar el test).
 
-- [ ] **Step 3: Implementar en `src/app/estado.ts`**
+- [x] **Step 3: Implementar en `src/app/estado.ts`**
 
 Imports nuevos:
 
@@ -775,12 +775,12 @@ En `empezar_plan`: `return { ...estado, paso: 'ubicacion', mesSiembra: accion.me
 
 En `cargar_plan`, dentro del objeto devuelto: `modoIntercalado: p.modoIntercalado ?? 'bloques', ajustes: p.ajustes ?? {},`
 
-- [ ] **Step 4: Verificar que pasan**
+- [x] **Step 4: Verificar que pasan**
 
 Run: `npx vitest run src/app/estado.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/app/estado.ts src/app/estado.test.ts
@@ -801,7 +801,7 @@ git commit -m "feat: estado con modo de intercalado y ajustes de cantidades"
   - `export interface Cota { cultivoId: string; orientacion: 'horizontal' | 'vertical'; x1Cm: number; y1Cm: number; x2Cm: number; y2Cm: number; etiqueta: string }`
   - `export function calcularCotas(plantas: PlantaPosicionada[]): Cota[]` — por especie, como mucho una cota horizontal (el par más cercano dentro de una misma fila) y una vertical (el par más cercano entre filas distintas); la etiqueta es la distancia medida, p. ej. `'25 cm'`.
 
-- [ ] **Step 1: Tests en rojo**
+- [x] **Step 1: Tests en rojo**
 
 ```ts
 // src/ui/cotas.test.ts
@@ -833,12 +833,12 @@ test('una especie con una sola planta no lleva cotas', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/ui/cotas.test.ts`
 Expected: FAIL — módulo inexistente.
 
-- [ ] **Step 3: Implementar**
+- [x] **Step 3: Implementar**
 
 ```ts
 // src/ui/cotas.ts
@@ -882,12 +882,12 @@ export function calcularCotas(plantas: PlantaPosicionada[]): Cota[] {
 }
 ```
 
-- [ ] **Step 4: Verificar que pasan**
+- [x] **Step 4: Verificar que pasan**
 
 Run: `npx vitest run src/ui/cotas.test.ts`
 Expected: PASS (3 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/ui/cotas.ts src/ui/cotas.test.ts
@@ -907,7 +907,7 @@ git commit -m "feat: cálculo de cotas de distancias a partir de las posiciones"
 - Consumes: `distribuir`, `ModoIntercalado` (Task 1); `calcularCotas` (Task 8).
 - Produces (usado por Task 10): `PlanoBancal` gana la prop obligatoria `modoIntercalado: ModoIntercalado`. Las marcas siguen llevando `data-marca`; las cotas llevan `data-cota`.
 
-- [ ] **Step 1: Actualizar/añadir tests en rojo** (reemplazar el contenido de `src/ui/PlanoBancal.test.tsx`)
+- [x] **Step 1: Actualizar/añadir tests en rojo** (reemplazar el contenido de `src/ui/PlanoBancal.test.tsx`)
 
 ```tsx
 // @vitest-environment jsdom
@@ -944,12 +944,12 @@ test('muestra cotas con la distancia entre plantas', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/ui/PlanoBancal.test.tsx`
 Expected: FAIL (prop inexistente, sin cotas, posiciones de rejilla uniforme).
 
-- [ ] **Step 3: Reescribir `src/ui/PlanoBancal.tsx`**
+- [x] **Step 3: Reescribir `src/ui/PlanoBancal.tsx`**
 
 ```tsx
 import type { Bancal, Orientacion } from '../dominio/tipos'
@@ -1013,13 +1013,13 @@ export function PlanoBancal(props: {
 }
 ```
 
-- [ ] **Step 4: Borrar la rejilla uniforme**
+- [x] **Step 4: Borrar la rejilla uniforme**
 
 ```bash
 rm src/ui/plano-geometria.ts src/ui/plano-geometria.test.ts
 ```
 
-- [ ] **Step 5: Verificar** — el resto del proyecto aún no compila del todo porque `PanelResultado` no pasa la prop nueva; pasarla ya con el valor fijo `"bloques"` en `src/ui/PanelResultado.tsx` (línea del `<PlanoBancal …>`) como apaño temporal que la Task 10 sustituye:
+- [x] **Step 5: Verificar** — el resto del proyecto aún no compila del todo porque `PanelResultado` no pasa la prop nueva; pasarla ya con el valor fijo `"bloques"` en `src/ui/PanelResultado.tsx` (línea del `<PlanoBancal …>`) como apaño temporal que la Task 10 sustituye:
 
 ```tsx
 <PlanoBancal bancal={b} asignaciones={col?.asignaciones ?? []} orientacionNorte={orientacionNorte} modoIntercalado="bloques" />
@@ -1028,7 +1028,7 @@ rm src/ui/plano-geometria.ts src/ui/plano-geometria.test.ts
 Run: `npx vitest run src/ui/PlanoBancal.test.tsx && npm test`
 Expected: PASS todo.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A src/ui
@@ -1059,7 +1059,7 @@ export function PanelResultado(props: {
 })
 ```
 
-- [ ] **Step 1: Actualizar los tests existentes y añadir los nuevos**
+- [x] **Step 1: Actualizar los tests existentes y añadir los nuevos**
 
 En `src/ui/PanelResultado.export.test.tsx`, añadir a la llamada `render` las props nuevas:
 
@@ -1135,12 +1135,12 @@ test('muestra el aviso de recorte cuando no caben las plantas pedidas', () => {
 })
 ```
 
-- [ ] **Step 2: Verificar que fallan**
+- [x] **Step 2: Verificar que fallan**
 
 Run: `npx vitest run src/ui/PanelResultado.test.tsx`
 Expected: FAIL (props y elementos inexistentes).
 
-- [ ] **Step 3: Implementar en `src/ui/PanelResultado.tsx`**
+- [x] **Step 3: Implementar en `src/ui/PanelResultado.tsx`**
 
 Imports nuevos:
 
@@ -1189,12 +1189,12 @@ Y antes del `bancales.map`, dentro de la sección «Tu huerto», el selector:
 </fieldset>
 ```
 
-- [ ] **Step 4: Verificar que pasan (incluido el test de exportación)**
+- [x] **Step 4: Verificar que pasan (incluido el test de exportación)**
 
 Run: `npx vitest run src/ui/PanelResultado.test.tsx src/ui/PanelResultado.export.test.tsx`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/ui/PanelResultado.tsx src/ui/PanelResultado.test.tsx src/ui/PanelResultado.export.test.tsx
@@ -1212,7 +1212,7 @@ git commit -m "feat: leyenda con ajustes de cantidad, selector de intercalado y 
 **Interfaces:**
 - Consumes: todo lo anterior. No produce interfaces nuevas.
 
-- [ ] **Step 1: Test en rojo** (al final de `src/ui/App.test.tsx`)
+- [x] **Step 1: Test en rojo** (al final de `src/ui/App.test.tsx`)
 
 ```tsx
 test('ajustar cantidad con + actualiza la leyenda y se guarda con el plan', async () => {
@@ -1233,12 +1233,12 @@ test('ajustar cantidad con + actualiza la leyenda y se guarda con el plan', asyn
 })
 ```
 
-- [ ] **Step 2: Verificar que falla**
+- [x] **Step 2: Verificar que falla**
 
 Run: `npx vitest run src/ui/App.test.tsx`
 Expected: FAIL (App no pasa las props nuevas → error de tipos/compilación).
 
-- [ ] **Step 3: Implementar en `src/ui/App.tsx`**
+- [x] **Step 3: Implementar en `src/ui/App.tsx`**
 
 `useMemo` de la propuesta (sustituir el existente, `src/ui/App.tsx:36-39`):
 
@@ -1266,7 +1266,7 @@ En `almacen.guardar({ … })` (`src/ui/App.tsx:103-108`), añadir al objeto:
 modoIntercalado: estado.modoIntercalado, ajustes: estado.ajustes,
 ```
 
-- [ ] **Step 4: Verificación final completa**
+- [x] **Step 4: Verificación final completa**
 
 Run: `npm test`
 Expected: PASS toda la suite.
@@ -1277,7 +1277,7 @@ Expected: sin errores.
 Run: `npm run build`
 Expected: build correcto (`tsc -b` sin errores de tipos).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/ui/App.tsx src/ui/App.test.tsx
