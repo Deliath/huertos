@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { distribuir, cabeUnaMas } from './distribucion'
+import { distribuir, cabeUnaMas, rellenarHuecos } from './distribucion'
 import type { Bancal } from './tipos'
 
 const b2x2: Bancal = { id: 'b1', nombre: 'B1', anchoM: 2, largoM: 2 }
@@ -60,6 +60,23 @@ test('las filas que desbordan el largo van a noCaben', () => {
   const { plantas, noCaben } = distribuir(corto, [{ cultivoId: 'lechuga', numPlantas: 10 }], 'bloques')
   expect(plantas).toHaveLength(8)
   expect(noCaben).toEqual([{ cultivoId: 'lechuga', numPlantas: 2 }])
+})
+
+test('una fila que no cabe no arrastra a las filas más bajas posteriores', () => {
+  const b5x5: Bancal = { id: 'b10', nombre: 'B10', anchoM: 5, largoM: 5 }
+  // tomate 3 filas (y=30..150) y pimiento 4 filas (y=210..360). La fila de
+  // calabacín (línea 100) ya no cabe, pero la de lechuga (línea 30) sí: debe
+  // apilarse sobre la última fila colocada (y=410), no tras el hueco fantasma.
+  const { plantas, noCaben } = distribuir(b5x5, [
+    { cultivoId: 'tomate', numPlantas: 30 },
+    { cultivoId: 'pimiento', numPlantas: 48 },
+    { cultivoId: 'calabacin', numPlantas: 6 },
+    { cultivoId: 'lechuga', numPlantas: 20 },
+  ], 'bloques')
+  expect(noCaben).toEqual([{ cultivoId: 'calabacin', numPlantas: 6 }])
+  const ysLechuga = plantas.filter((p) => p.cultivoId === 'lechuga').map((p) => p.yCm)
+  expect(ysLechuga).toHaveLength(20)
+  expect(new Set(ysLechuga)).toEqual(new Set([410]))
 })
 
 test('es determinista y no superpone plantas', () => {
@@ -132,6 +149,41 @@ test('companeras sin relación entre sí se comporta como bloques', () => {
     { cultivoId: 'cebolla', numPlantas: 2 },
   ], 'companeras')
   expect(conCompaneras).toEqual(conBloques)
+})
+
+// Escenario de la captura Bug-distribucion.png: bancal 5×4.5 m tras recortar
+// el calabacín (4 plantas, 32 000 cm² liberados); queda una banda libre al sur.
+const b5x45: Bancal = { id: 'b11', nombre: 'B11', anchoM: 5, largoM: 4.5 }
+const trasRecorte = [
+  { cultivoId: 'tomate', numPlantas: 30 },
+  { cultivoId: 'pimiento', numPlantas: 48 },
+  { cultivoId: 'calabacin', numPlantas: 0 },
+]
+const liberadas = [{ cultivoId: 'calabacin', numPlantas: 4 }]
+
+test('rellenarHuecos: añade filas completas con el área liberada por el recorte', () => {
+  // Una fila de tomate (10 × 3000 = 30 000 cm²) entra en el presupuesto y cabe
+  // geométricamente; una de pimiento (24 000 cm²) ya no tiene presupuesto.
+  const res = rellenarHuecos(b5x45, trasRecorte, 'bloques', liberadas, new Set())
+  expect(res).toEqual([
+    { cultivoId: 'tomate', numPlantas: 40 },
+    { cultivoId: 'pimiento', numPlantas: 48 },
+    { cultivoId: 'calabacin', numPlantas: 0 },
+  ])
+  expect(distribuir(b5x45, res, 'bloques').noCaben).toHaveLength(0)
+})
+
+test('rellenarHuecos: respeta las especies excluidas (ajustadas a mano)', () => {
+  const res = rellenarHuecos(b5x45, trasRecorte, 'bloques', liberadas, new Set(['tomate']))
+  expect(res).toEqual([
+    { cultivoId: 'tomate', numPlantas: 30 },
+    { cultivoId: 'pimiento', numPlantas: 60 },
+    { cultivoId: 'calabacin', numPlantas: 0 },
+  ])
+})
+
+test('rellenarHuecos: sin área liberada no añade nada', () => {
+  expect(rellenarHuecos(b5x45, trasRecorte, 'bloques', [], new Set())).toEqual(trasRecorte)
 })
 
 test('cabeUnaMas: true cuando hay sitio para una planta más', () => {

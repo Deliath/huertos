@@ -79,20 +79,62 @@ export function distribuir(bancal: Bancal, asignaciones: AsignacionCultivo[], mo
     }
   }
 
-  // Posición vertical de cada fila; las que desbordan el largo van a noCaben.
+  // Posición vertical de cada fila; una fila que desborda el largo va a noCaben
+  // sin consumir espacio, para que las filas siguientes (más bajas) puedan
+  // apilarse sobre la última que sí cupo.
   const plantas: PlantaPosicionada[] = []
   let y = 0
-  for (let i = 0; i < filas.length; i++) {
-    const f = filas[i]
-    y = i === 0 ? f.maxLineaCm / 2 : y + Math.max(filas[i - 1].maxLineaCm, f.maxLineaCm)
-    const cabe = y + f.maxLineaCm / 2 <= largoCm
-    for (const p of f.plantas) {
-      if (cabe) plantas.push({ cultivoId: p.c.id, icono: p.c.icono, xCm: Math.round(p.xCm), yCm: Math.round(y) })
-      else anotar(noCaben, p.c.id)
+  let previa: Fila | null = null
+  for (const f of filas) {
+    const yFila = previa === null ? f.maxLineaCm / 2 : y + Math.max(previa.maxLineaCm, f.maxLineaCm)
+    if (yFila + f.maxLineaCm / 2 > largoCm) {
+      for (const p of f.plantas) anotar(noCaben, p.c.id)
+      continue
     }
+    y = yFila
+    previa = f
+    for (const p of f.plantas) plantas.push({ cultivoId: p.c.id, icono: p.c.icono, xCm: Math.round(p.xCm), yCm: Math.round(y) })
   }
 
   return { plantas, noCaben: [...noCaben].map(([cultivoId, numPlantas]) => ({ cultivoId, numPlantas })) }
+}
+
+// Reparte el área de las plantas recortadas (`liberadas`) entre las especies ya
+// asignadas: añade filas completas mientras quede presupuesto de área y la fila
+// quepa geométricamente. Solo redistribuye lo liberado — el espacio que colocar()
+// dejó libre a propósito (pesos bajos) no se toca — y salta las especies con
+// ajuste manual (`excluidos`).
+export function rellenarHuecos(
+  bancal: Bancal, asignaciones: AsignacionCultivo[], modo: ModoIntercalado,
+  liberadas: AsignacionCultivo[], excluidos: Set<string>,
+): AsignacionCultivo[] {
+  const anchoCm = bancal.anchoM * 100
+  let presupuestoCm2 = 0
+  for (const l of liberadas) {
+    const c = buscarCultivo(l.cultivoId)
+    if (c) presupuestoCm2 += l.numPlantas * c.distanciaPlantaCm * c.distanciaLineaCm
+  }
+
+  let actual = asignaciones
+  let mejora = true
+  while (mejora) {
+    mejora = false
+    for (const a of actual) {
+      if (excluidos.has(a.cultivoId)) continue
+      const c = buscarCultivo(a.cultivoId)
+      if (!c) continue
+      const porFila = Math.floor(anchoCm / c.distanciaPlantaCm)
+      const areaFilaCm2 = porFila * c.distanciaPlantaCm * c.distanciaLineaCm
+      if (porFila <= 0 || areaFilaCm2 > presupuestoCm2) continue
+      const candidata = actual.map((x) => (x.cultivoId === a.cultivoId ? { ...x, numPlantas: x.numPlantas + porFila } : x))
+      if (distribuir(bancal, candidata, modo).noCaben.length === 0) {
+        actual = candidata
+        presupuestoCm2 -= areaFilaCm2
+        mejora = true
+      }
+    }
+  }
+  return actual
 }
 
 // Prueba a colocar una planta más de la especie dada; la UI lo usa para el botón «+».

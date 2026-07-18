@@ -61,6 +61,42 @@ test('sin ajustes que desborden no hay recortes', () => {
   expect(propuesta.recortes).toEqual([])
 })
 
+test('el área de una especie recortada se reofrece a las demás (captura Bug-distribucion)', () => {
+  // Bancal 5×4.5 m, tomate/pimiento/calabacín «mucha»: colocar() da 30/48/4,
+  // pero la fila de calabacín (línea 100) no cabe y se recorta entera. Su área
+  // debe reaprovecharse: cabe una fila más de tomate (30 → 40) y el plano
+  // resultante no deja plantas fuera.
+  const bancales: Bancal[] = [{ id: 'b1', nombre: 'B1', anchoM: 5, largoM: 4.5 }]
+  const elecciones: EleccionEspecie[] = [
+    { cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'mucha' },
+    { cultivoId: 'pimiento', obligatoriedad: 'obligatoria', cantidad: 'mucha' },
+    { cultivoId: 'calabacin', obligatoriedad: 'obligatoria', cantidad: 'mucha' },
+  ]
+  const p = proponerHuerto(clima, suelo, 5, bancales, elecciones)
+  expect(p.recortes).toEqual([{ bancalId: 'b1', cultivoId: 'calabacin', numPlantas: 4 }])
+  expect(p.colocacion.bancales[0].asignaciones).toEqual([
+    { cultivoId: 'tomate', numPlantas: 40 },
+    { cultivoId: 'pimiento', numPlantas: 48 },
+    { cultivoId: 'calabacin', numPlantas: 0 },
+  ])
+})
+
+test('el relleno no toca las especies ajustadas a mano', () => {
+  const bancales: Bancal[] = [{ id: 'b1', nombre: 'B1', anchoM: 5, largoM: 4.5 }]
+  const elecciones: EleccionEspecie[] = [
+    { cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'mucha' },
+    { cultivoId: 'pimiento', obligatoriedad: 'obligatoria', cantidad: 'mucha' },
+    { cultivoId: 'calabacin', obligatoriedad: 'obligatoria', cantidad: 'mucha' },
+  ]
+  // Con el tomate fijado a mano en 30, la fila liberada va al pimiento (48 → 60).
+  const p = proponerHuerto(clima, suelo, 5, bancales, elecciones, { b1: { tomate: 30 } })
+  expect(p.colocacion.bancales[0].asignaciones).toEqual([
+    { cultivoId: 'tomate', numPlantas: 30 },
+    { cultivoId: 'pimiento', numPlantas: 60 },
+    { cultivoId: 'calabacin', numPlantas: 0 },
+  ])
+})
+
 test('un ajuste que no cabe se recorta a lo que cabe geométricamente', () => {
   const bancales = [{ id: 'b1', nombre: 'B1', anchoM: 2, largoM: 3 }]
   const elecciones: EleccionEspecie[] = [{ cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'media' }]

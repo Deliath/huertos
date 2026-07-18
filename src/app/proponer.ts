@@ -1,7 +1,7 @@
 import type { PerfilClima, PerfilSuelo, Bancal, EleccionEspecie, ResultadoIdoneidad } from '../dominio/tipos'
 import { evaluarIdoneidad } from '../dominio/idoneidad'
 import { colocar, aplicarAjustes, type ResultadoColocacion, type AjustesColocacion } from '../dominio/colocacion'
-import { distribuir, type ModoIntercalado } from '../dominio/distribucion'
+import { distribuir, rellenarHuecos, type ModoIntercalado } from '../dominio/distribucion'
 import { generarCalendario, type EntradaCalendario } from '../dominio/calendario'
 import { estimarCosecha, type EstimacionCosecha } from '../dominio/cosecha'
 import { evaluarSinergias, sugerirCompaneras, type ParejaSinergia } from '../dominio/sinergias'
@@ -55,13 +55,14 @@ export function proponerHuerto(
       const { noCaben } = distribuir(bancal, bc.asignaciones, modoIntercalado)
       if (noCaben.length === 0) return bc
       for (const nc of noCaben) recortes.push({ bancalId: bc.bancalId, cultivoId: nc.cultivoId, numPlantas: nc.numPlantas })
-      return {
-        ...bc,
-        asignaciones: bc.asignaciones.map((a) => {
-          const nc = noCaben.find((x) => x.cultivoId === a.cultivoId)
-          return nc ? { ...a, numPlantas: a.numPlantas - nc.numPlantas } : a
-        }),
-      }
+      const recortadas = bc.asignaciones.map((a) => {
+        const nc = noCaben.find((x) => x.cultivoId === a.cultivoId)
+        return nc ? { ...a, numPlantas: a.numPlantas - nc.numPlantas } : a
+      })
+      // El área recortada se reofrece al resto de especies del bancal por filas
+      // completas, sin tocar las que el usuario haya ajustado a mano.
+      const ajustadas = new Set(Object.keys(ajustes[bc.bancalId] ?? {}))
+      return { ...bc, asignaciones: rellenarHuecos(bancal, recortadas, modoIntercalado, noCaben, ajustadas) }
     }),
   }
 

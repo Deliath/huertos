@@ -28,7 +28,7 @@ test('la leyenda muestra cantidad y marco de plantación por especie', () => {
   render(<PanelResultado propuesta={propuesta} {...propsBase} />)
   const leyenda = within(screen.getByRole('list', { name: /Plantas en B1/i }))
   expect(leyenda.getByText(/50 × 60 cm/)).toBeInTheDocument() // marco del tomate
-  expect(leyenda.getByText('6')).toBeInTheDocument() // 6 tomateras en 2×3 m
+  expect(leyenda.getByText('4')).toBeInTheDocument() // una fila completa de 4 en 2×3 m
 })
 
 test('el botón + pide una planta más y el − una menos', async () => {
@@ -36,9 +36,9 @@ test('el botón + pide una planta más y el − una menos', async () => {
   const onAjustarCantidad = vi.fn()
   render(<PanelResultado propuesta={propuesta} {...propsBase} onAjustarCantidad={onAjustarCantidad} />)
   await userEvent.click(screen.getByRole('button', { name: /Añadir Tomate/i }))
-  expect(onAjustarCantidad).toHaveBeenCalledWith('b1', 'tomate', 7)
-  await userEvent.click(screen.getByRole('button', { name: /Quitar Tomate/i }))
   expect(onAjustarCantidad).toHaveBeenCalledWith('b1', 'tomate', 5)
+  await userEvent.click(screen.getByRole('button', { name: /Quitar Tomate/i }))
+  expect(onAjustarCantidad).toHaveBeenCalledWith('b1', 'tomate', 3)
 })
 
 test('el botón + se deshabilita cuando no cabe ni una planta más', () => {
