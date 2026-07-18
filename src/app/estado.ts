@@ -55,7 +55,9 @@ export function reducer(estado: EstadoApp, accion: Accion): EstadoApp {
     case 'añadir_bancal': return { ...estado, bancales: [...estado.bancales, accion.bancal] }
     case 'editar_bancal': return { ...estado, bancales: estado.bancales.map((b) => (b.id === accion.bancal.id ? accion.bancal : b)) }
     case 'borrar_bancal': return { ...estado, bancales: estado.bancales.filter((b) => b.id !== accion.id) }
-    case 'set_elecciones': return { ...estado, elecciones: accion.elecciones }
+    // Cambiar las especies descarta los ajustes manuales: la propuesta se
+    // recalcula de cero en vez de arrastrar cantidades fijadas a mano.
+    case 'set_elecciones': return { ...estado, elecciones: accion.elecciones, ajustes: {} }
     case 'empezar_plan': return { ...estado, paso: 'ubicacion', mesSiembra: accion.mesSiembra, modoIntercalado: 'bloques', ajustes: {} }
     case 'cargar_plan': {
       const p = accion.plan

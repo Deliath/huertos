@@ -70,6 +70,12 @@ test('ajustar_cantidad acumula overrides por bancal y cultivo', () => {
   expect(e.ajustes).toEqual({ b1: { tomate: 7, lechuga: 3 } })
 })
 
+test('set_elecciones descarta los ajustes manuales para recalcular de cero', () => {
+  let e = reducer(estadoInicial, { tipo: 'ajustar_cantidad', bancalId: 'b1', cultivoId: 'tomate', numPlantas: 7 })
+  e = reducer(e, { tipo: 'set_elecciones', elecciones: [{ cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'media' }] })
+  expect(e.ajustes).toEqual({})
+})
+
 test('empezar_plan resetea intercalado y ajustes', () => {
   let e = reducer(estadoInicial, { tipo: 'set_modo_intercalado', modo: 'mezcla' })
   e = reducer(e, { tipo: 'ajustar_cantidad', bancalId: 'b1', cultivoId: 'tomate', numPlantas: 7 })

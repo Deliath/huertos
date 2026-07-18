@@ -84,7 +84,7 @@ Acciones nuevas:
 - `{ tipo: 'set_modo_intercalado'; modo: ModoIntercalado }`
 - `{ tipo: 'ajustar_cantidad'; bancalId: string; cultivoId: string; numPlantas: number }` — fija el override (la UI envía el valor ya validado: ≥ 0 y que cabe).
 
-`empezar_plan` resetea ambos campos a sus valores por defecto. `cargar_plan` los restaura del plan (por defecto si el plan no los trae).
+`empezar_plan` resetea ambos campos a sus valores por defecto. `cargar_plan` los restaura del plan (por defecto si el plan no los trae). `set_elecciones` descarta los `ajustes`: cambiar las especies recalcula la propuesta de cero en vez de arrastrar cantidades fijadas a mano (revisión 2026-07-18).
 
 ### `app/proponer.ts`
 
@@ -150,3 +150,4 @@ Al ser opcionales, `esPlan` no cambia y los planes ya guardados cargan sin migra
 
 - **2026-07-18 (`da37509`)** — `colocar()` redondea la estimación por área a filas completas (`porFila = ⌊ancho/distanciaPlanta⌋`), manteniendo una fila parcial solo si no llega a una entera. Evita filas casi vacías que robaban su hueco de línea a los cultivos siguientes. Deja sin efecto el punto «`colocar()` no se modifica» de las decisiones originales.
 - **2026-07-18 (`d92019f`)** — dos arreglos del bug del hueco libre al sur (captura `Bug-distribucion.png`): en `distribuir()`, una fila que no cabe ya no consume espacio vertical (antes arrastraba fuera a las filas más bajas posteriores); y nueva `rellenarHuecos()`, aplicada por `proponerHuerto` tras el recorte, que reparte el área liberada en filas completas entre las especies restantes (presupuesto limitado al área recortada; respeta los ajustes manuales).
+- **2026-07-18** — `set_elecciones` descarta los ajustes manuales: al volver a «Ajustar especies» y cambiar las elecciones, la propuesta se recalcula de cero (antes los overrides de +/− persistían y "clavaban" cantidades, además de excluir esas especies del relleno).
