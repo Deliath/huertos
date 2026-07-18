@@ -47,6 +47,9 @@ export interface ResultadoDistribucion {
 
 export function distribuir(bancal: Bancal, asignaciones: AsignacionCultivo[], modo: ModoIntercalado): ResultadoDistribucion
 export function cabeUnaMas(bancal: Bancal, asignaciones: AsignacionCultivo[], modo: ModoIntercalado, cultivoId: string): boolean
+// Revisión 2026-07-18: reparte el área liberada por el recorte en filas completas
+// de las especies restantes (ver «Revisiones»).
+export function rellenarHuecos(bancal: Bancal, asignaciones: AsignacionCultivo[], modo: ModoIntercalado, liberadas: AsignacionCultivo[], excluidos: Set<string>): AsignacionCultivo[]
 ```
 
 Reglas de colocación:
@@ -63,7 +66,7 @@ Modos de intercalado:
 - `companeras`: solo se mezclan dentro de las mismas filas las especies declaradas compañeras entre sí (según `companeras` del catálogo, en cualquiera de los dos sentidos); las demás siguen en bloques. Dentro de un grupo mezclado, las plantas se alternan de forma round-robin entre las especies del grupo.
 - `mezcla`: todas las especies del bancal se alternan round-robin (los antagonistas ya no coinciden en un bancal porque `colocar()` los separa). El orden alto→norte se conserva a nivel de grupo: en `mezcla` todo el bancal es un grupo, así que este criterio no aplica dentro de él.
 
-Si las plantas asignadas no caben con las distancias reales (la heurística de área de `colocar()` puede ser optimista), `distribuir` coloca las que quepan —en el orden de recorrido— y devuelve el resto en `noCaben`.
+Si las plantas asignadas no caben con las distancias reales (la heurística de área de `colocar()` puede ser optimista), `distribuir` coloca las que quepan —en el orden de recorrido— y devuelve el resto en `noCaben`. Una fila que desborda el largo no consume espacio vertical: la siguiente fila (normalmente de una especie más baja) se apila sobre la última que sí cupo (revisión 2026-07-18).
 
 `cabeUnaMas` se implementa probando `distribuir` con una planta más de la especie dada y comprobando que `noCaben` queda vacío.
 
@@ -87,7 +90,7 @@ Acciones nuevas:
 
 - `proponerHuerto()` gana dos parámetros opcionales: `ajustes` y `modoIntercalado` (por defecto `'bloques'`).
 - Función pura nueva `aplicarAjustes(colocacion, ajustes): ResultadoColocacion` (en `dominio/colocacion.ts`): devuelve una copia de la colocación con los `numPlantas` sobrescritos donde haya override. Un override solo aplica si el cultivo ya está asignado a ese bancal (no crea asignaciones nuevas).
-- `proponerHuerto` la aplica justo después de `colocar()` y, a continuación, hace el recorte geométrico: ejecuta `distribuir` por bancal con el modo activo y reduce cada `numPlantas` a lo que realmente cabe (según `noCaben`). El recuento de plantas, la cosecha estimada y el calendario salen ya con las cantidades ajustadas y recortadas, sin tocar su lógica interna.
+- `proponerHuerto` la aplica justo después de `colocar()` y, a continuación, hace el recorte geométrico: ejecuta `distribuir` por bancal con el modo activo y reduce cada `numPlantas` a lo que realmente cabe (según `noCaben`). Tras el recorte, `rellenarHuecos` reofrece el área liberada al resto de especies del bancal en filas completas, sin tocar las especies con ajuste manual ni el espacio que `colocar()` deja libre a propósito con pesos bajos (revisión 2026-07-18). El recuento de plantas, la cosecha estimada y el calendario salen ya con las cantidades ajustadas, recortadas y rellenadas, sin tocar su lógica interna.
 - Así el plano y la cosecha siempre cuentan lo mismo: las plantas que no caben no se dibujan ni se cosechan, y generan un aviso (ver UI). El usuario puede bajar la cantidad con «−» hasta que todo quepa y desaparezca el aviso.
 
 ## Persistencia
@@ -127,10 +130,10 @@ Al ser opcionales, `esPlan` no cambia y los planes ya guardados cargan sin migra
 
 ## Testing (TDD)
 
-- `dominio/distribucion.test.ts`: respeto de distancias dentro de fila y entre filas (incluidas fronteras entre especies), margen al borde, altas al norte en `bloques` y `companeras`, sin solapamientos, los tres modos (agrupación, mezcla solo de compañeras, round-robin), `noCaben` cuando no hay sitio, `cabeUnaMas`, determinismo.
+- `dominio/distribucion.test.ts`: respeto de distancias dentro de fila y entre filas (incluidas fronteras entre especies), margen al borde, altas al norte en `bloques` y `companeras`, sin solapamientos, los tres modos (agrupación, mezcla solo de compañeras, round-robin), `noCaben` cuando no hay sitio, una fila descartada no arrastra a las siguientes, `rellenarHuecos` (presupuesto, exclusiones, sin área liberada), `cabeUnaMas`, determinismo.
 - `dominio/colocacion.test.ts`: `aplicarAjustes` (sobrescribe, ignora bancales/cultivos inexistentes, no muta la entrada).
 - `app/estado.test.ts`: acciones nuevas, reset en `empezar_plan`, restauración en `cargar_plan` (con y sin campos en el plan).
-- `app/proponer.test.ts`: la cosecha estimada refleja los ajustes; el recorte geométrico reduce cantidades y produce `recortes`.
+- `app/proponer.test.ts`: la cosecha estimada refleja los ajustes; el recorte geométrico reduce cantidades y produce `recortes`; el área recortada se reofrece a las demás especies sin tocar las ajustadas a mano.
 - `almacenamiento/almacen.test.ts`: ida y vuelta con los campos nuevos; carga de planes antiguos sin ellos.
 - `ui/PanelResultado.test.tsx`: el stepper cambia la cantidad, el plano y la cosecha; «+» deshabilitado cuando no cabe; radios de intercalado cambian el modo.
 - `ui/PlanoBancal.test.tsx`: el SVG contiene las plantas en posiciones reales y las cotas con las medidas correctas.
@@ -141,4 +144,9 @@ Al ser opcionales, `esPlan` no cambia y los planes ya guardados cargan sin migra
 - Arrastre de plantas individuales o edición de posiciones.
 - Mover especies entre bancales manualmente.
 - Modo de intercalado por bancal (el selector es global).
-- Cambios en el algoritmo `colocar()`.
+- Cambios en el algoritmo `colocar()` (revisado después: ver «Revisiones»).
+
+## Revisiones
+
+- **2026-07-18 (`da37509`)** — `colocar()` redondea la estimación por área a filas completas (`porFila = ⌊ancho/distanciaPlanta⌋`), manteniendo una fila parcial solo si no llega a una entera. Evita filas casi vacías que robaban su hueco de línea a los cultivos siguientes. Deja sin efecto el punto «`colocar()` no se modifica» de las decisiones originales.
+- **2026-07-18 (`d92019f`)** — dos arreglos del bug del hueco libre al sur (captura `Bug-distribucion.png`): en `distribuir()`, una fila que no cabe ya no consume espacio vertical (antes arrastraba fuera a las filas más bajas posteriores); y nueva `rellenarHuecos()`, aplicada por `proponerHuerto` tras el recorte, que reparte el área liberada en filas completas entre las especies restantes (presupuesto limitado al área recortada; respeta los ajustes manuales).
