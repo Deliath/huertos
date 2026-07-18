@@ -118,11 +118,12 @@ test('un plan guardado reproduce el mismo resultado sin importar el mes actual',
 
 test('ajustar cantidad con + actualiza la leyenda y se guarda con el plan', async () => {
   await llegarAResultados()
-  // 6 tomateras por defecto en un bancal de 2×3 m.
+  // 4 tomateras por defecto en un bancal de 2×3 m: la propuesta redondea a
+  // filas completas (caben 4 por fila) en vez de dejar una fila a medias.
   const leyenda = within(screen.getByRole('list', { name: /Plantas en/i }))
-  expect(leyenda.getByText('6')).toBeInTheDocument()
+  expect(leyenda.getByText('4')).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: /Añadir Tomate/i }))
-  expect(leyenda.getByText('7')).toBeInTheDocument()
+  expect(leyenda.getByText('5')).toBeInTheDocument()
 
   await userEvent.click(screen.getByRole('radio', { name: /Todas las compatibles/i }))
 
@@ -130,5 +131,5 @@ test('ajustar cantidad con + actualiza la leyenda y se guarda con el plan', asyn
   await userEvent.click(screen.getByRole('button', { name: /Guardar plan/i }))
   const plan = crearAlmacenLocal().listar().find((p) => p.nombre === 'Con ajustes')!
   expect(plan.modoIntercalado).toBe('mezcla')
-  expect(Object.values(plan.ajustes!)[0]).toEqual({ tomate: 7 })
+  expect(Object.values(plan.ajustes!)[0]).toEqual({ tomate: 5 })
 })

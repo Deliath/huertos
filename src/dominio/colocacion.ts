@@ -51,7 +51,13 @@ export function colocar(bancales: Bancal[], elecciones: EleccionEspecie[]): Resu
     // Área objetivo proporcional al peso, acotada al área libre.
     const fraccion = PESO[e.cantidad] / 6 // 1..3 sobre un máximo de referencia 6
     const areaObjetivo = Math.min(destino.areaLibreCm2, areaCm2(destino.bancal) * fraccion)
-    const numPlantas = Math.floor(areaObjetivo / areaPorPlanta(c))
+    const estimacion = Math.floor(areaObjetivo / areaPorPlanta(c))
+    // Redondeado a filas completas: la estimación por área deja filas casi vacías
+    // en el plano (p. ej. 41 tomateras → 4 filas de 10 y una de 1) que roban su
+    // hueco de línea entero a los cultivos siguientes. Si no llega ni a una fila,
+    // una fila parcial es mejor que nada.
+    const porFila = Math.floor((destino.bancal.anchoM * 100) / c.distanciaPlantaCm)
+    const numPlantas = estimacion >= porFila && porFila > 0 ? Math.floor(estimacion / porFila) * porFila : estimacion
 
     if (numPlantas <= 0) {
       if (e.obligatoriedad === 'obligatoria') {

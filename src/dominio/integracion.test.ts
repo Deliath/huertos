@@ -3,9 +3,29 @@ import { climaDeZona } from './clima'
 import { sueloManual } from './suelo'
 import { sugerirEspecies } from './sugerencia'
 import { colocar } from './colocacion'
+import { distribuir } from './distribucion'
 import { estimarCosecha } from './cosecha'
 import { buscarCultivo } from '../datos/cultivos'
 import type { Bancal } from './tipos'
+
+test('regresión: en 5×5 m con tomate y pimiento no quedan filas casi vacías y se aprovecha el largo', () => {
+  const b: Bancal = { id: 'b1', nombre: 'Bancal 1', anchoM: 5, largoM: 5 }
+  const colocacion = colocar([b], [
+    { cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'mucha' },
+    { cultivoId: 'pimiento', obligatoriedad: 'obligatoria', cantidad: 'mucha' },
+  ])
+  const { plantas, noCaben } = distribuir(b, colocacion.bancales[0].asignaciones, 'bloques')
+
+  // Antes: 41 tomates dejaban una 5.ª fila con 1 solo tomate, cuyo hueco de 60 cm
+  // impedía colocar dos filas más de pimientos (26 recortados).
+  const filas = new Map<number, string[]>()
+  for (const p of plantas) filas.set(p.yCm, [...(filas.get(p.yCm) ?? []), p.cultivoId])
+  const filasTomate = [...filas.values()].filter((f) => f[0] === 'tomate')
+  const filasPimiento = [...filas.values()].filter((f) => f[0] === 'pimiento')
+  for (const f of filasTomate) expect(f).toHaveLength(10) // sin filas sueltas
+  expect(filasPimiento).toHaveLength(5) // caben 5 filas de 12 pimientos
+  expect(noCaben).toEqual([])
+})
 
 test('flujo completo de extremo a extremo: clima+suelo → sugerencia → colocación → cosecha', () => {
   const clima = climaDeZona('mediterraneo_litoral')

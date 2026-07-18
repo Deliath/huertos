@@ -23,6 +23,24 @@ test('dibuja una marca por planta en su posición real', () => {
   expect(xs[2] - xs[1]).toBe(25)
 })
 
+test('amplía el viewBox para que las etiquetas de las cotas no queden cortadas', () => {
+  // 10 lechugas en 2×1 m: dos filas, con la cota vertical pegada al borde izquierdo.
+  const estrecho: Bancal = { id: 'b2', nombre: 'B2', anchoM: 2, largoM: 1 }
+  const { container } = render(
+    <PlanoBancal bancal={estrecho} asignaciones={[{ cultivoId: 'lechuga', numPlantas: 10 }]} orientacionNorte="norte" modoIntercalado="bloques" />,
+  )
+  const [x, , ancho] = container.querySelector('svg')!.getAttribute('viewBox')!.split(' ').map(Number)
+  expect(x).toBeLessThan(0) // hueco a la izquierda para la etiqueta
+  expect(x + ancho).toBeGreaterThanOrEqual(200) // el bancal sigue entero a la vista
+})
+
+test('sin cotas el viewBox es exactamente el bancal', () => {
+  const { container } = render(
+    <PlanoBancal bancal={bancal} asignaciones={[]} orientacionNorte="norte" modoIntercalado="bloques" />,
+  )
+  expect(container.querySelector('svg')!.getAttribute('viewBox')).toBe('0 0 200 200')
+})
+
 test('muestra cotas con la distancia entre plantas', () => {
   const { container } = render(
     <PlanoBancal bancal={bancal} asignaciones={[{ cultivoId: 'lechuga', numPlantas: 4 }]} orientacionNorte="norte" modoIntercalado="bloques" />,

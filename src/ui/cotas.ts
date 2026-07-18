@@ -10,6 +10,33 @@ export interface Cota {
   etiqueta: string
 }
 
+// Geometría del dibujo de cotas, compartida con PlanoBancal: separación de la
+// línea de cota respecto a las plantas, tamaño de fuente y ancho estimado por
+// carácter de la etiqueta (todo en cm del plano).
+export const SEPARACION_COTA_CM = 12
+export const FUENTE_COTA_CM = 9
+const ANCHO_CARACTER_CM = 5.5
+
+// Rectángulo que ocupan líneas, marcas y etiquetas de las cotas. El plano lo usa
+// para ampliar su viewBox y que las etiquetas junto a los bordes no se corten.
+export function cajaCotas(cotas: Cota[]): { minXCm: number; minYCm: number; maxXCm: number } {
+  let minX = 0
+  let minY = 0
+  let maxX = 0
+  for (const c of cotas) {
+    const anchoEtiqueta = c.etiqueta.length * ANCHO_CARACTER_CM
+    if (c.orientacion === 'horizontal') {
+      const centro = (c.x1Cm + c.x2Cm) / 2
+      minX = Math.min(minX, centro - anchoEtiqueta / 2)
+      maxX = Math.max(maxX, centro + anchoEtiqueta / 2)
+      minY = Math.min(minY, c.y1Cm - SEPARACION_COTA_CM - 3 - FUENTE_COTA_CM)
+    } else {
+      minX = Math.min(minX, c.x1Cm - SEPARACION_COTA_CM - 4 - anchoEtiqueta)
+    }
+  }
+  return { minXCm: minX, minYCm: minY, maxXCm: maxX }
+}
+
 // Por especie: una cota horizontal (par más cercano en la misma fila) y una
 // vertical (par más cercano entre filas). La etiqueta es la distancia medida.
 export function calcularCotas(plantas: PlantaPosicionada[]): Cota[] {

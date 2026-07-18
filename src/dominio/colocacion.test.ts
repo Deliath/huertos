@@ -25,6 +25,24 @@ test('las obligatorias reservan sitio; una opcional se recorta antes en bancal p
   expect(calabacin?.numPlantas ?? 0).toBe(0) // se recorta la opcional
 })
 
+test('redondea a filas completas para no dejar filas casi vacías en el plano', () => {
+  const b: Bancal = { id: 'b1', nombre: 'B1', anchoM: 5, largoM: 5 }
+  const elecciones: EleccionEspecie[] = [{ cultivoId: 'tomate', obligatoriedad: 'obligatoria', cantidad: 'mucha' }]
+  const r = colocar([b], elecciones)
+  // Por área pura saldrían 41 tomateras: 4 filas de 10 y una fila con 1 sola.
+  // La última fila solo se propone si se llena → 40.
+  expect(r.bancales[0].asignaciones[0].numPlantas).toBe(40)
+})
+
+test('si no llega ni a una fila completa mantiene la estimación por área', () => {
+  const mini: Bancal = { id: 'b2', nombre: 'Mini', anchoM: 0.5, largoM: 0.5 }
+  const elecciones: EleccionEspecie[] = [{ cultivoId: 'lechuga', obligatoriedad: 'obligatoria', cantidad: 'mucha' }]
+  const r = colocar([mini], elecciones)
+  // En 50×50 cm caben 2 lechugas por fila pero el área objetivo solo da para 1;
+  // una fila parcial es mejor que nada.
+  expect(r.bancales[0].asignaciones[0].numPlantas).toBe(1)
+})
+
 test('no coloca dos antagonistas en el mismo bancal', () => {
   const b1: Bancal = { id: 'b1', nombre: 'B1', anchoM: 1, largoM: 1 }
   const b2: Bancal = { id: 'b2', nombre: 'B2', anchoM: 1, largoM: 1 }

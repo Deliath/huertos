@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { calcularCotas } from './cotas'
+import { calcularCotas, cajaCotas } from './cotas'
 import { distribuir } from '../dominio/distribucion'
 import type { Bancal } from '../dominio/tipos'
 
@@ -17,6 +17,19 @@ test('dos filas de lechugas añaden la cota vertical entre líneas', () => {
   const cotas = calcularCotas(plantas)
   const vertical = cotas.find((c) => c.orientacion === 'vertical')!
   expect(vertical.etiqueta).toBe('30 cm')
+})
+
+test('cajaCotas reserva hueco a la izquierda para la etiqueta de la cota vertical', () => {
+  const b: Bancal = { id: 'b4', nombre: 'B4', anchoM: 2, largoM: 1 }
+  const { plantas } = distribuir(b, [{ cultivoId: 'lechuga', numPlantas: 10 }], 'bloques')
+  const caja = cajaCotas(calcularCotas(plantas))
+  // La cota vertical se dibuja a la izquierda de la primera columna (x=12) y su
+  // etiqueta «30 cm» sobresale del borde del bancal.
+  expect(caja.minXCm).toBeLessThan(0)
+})
+
+test('cajaCotas sin cotas no reserva ningún hueco', () => {
+  expect(cajaCotas([])).toEqual({ minXCm: 0, minYCm: 0, maxXCm: 0 })
 })
 
 test('una especie con una sola planta no lleva cotas', () => {
