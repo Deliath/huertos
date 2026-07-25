@@ -20,7 +20,7 @@ Queda fuera: rediseño visual, analítica de uso, dominio propio, backend y cuen
 | Decisión | Valor |
 |---|---|
 | Alojamiento | GitHub Pages |
-| URL | `https://<usuario>.github.io/huertos/` |
+| URL | `https://Deliath.github.io/huertos/` |
 | Visibilidad del repo | Público (GitHub Pages con cuenta gratuita lo exige) |
 | Nombre del repo | `huertos` |
 | Rama publicada | `main` (se renombra `master` → `main`) |
@@ -33,8 +33,8 @@ Queda fuera: rediseño visual, analítica de uso, dominio propio, backend y cuen
 
 Estos pasos los da la usuaria, no se pueden automatizar desde aquí:
 
-1. **Cuenta de GitHub** y su nombre de usuario, que es lo que fija la URL final (`https://<usuario>.github.io/huertos/`) y por tanto no puede quedar sin decidir antes de configurar `base`.
-2. **Autenticación para hacer push** (clave SSH o token personal). El repo local ya tiene identidad configurada: `Eva <r.garcia.carmona@gmail.com>`.
+1. **Cuenta de GitHub** y su nombre de usuario, que es lo que fija la URL final (`https://Deliath.github.io/huertos/`) y por tanto no puede quedar sin decidir antes de configurar `base`.
+2. **Autenticación para hacer push** (clave SSH o token personal). El repo local ya tiene identidad configurada: `Eva <vamayanez@gmail.com>`.
 3. **Activar Pages** en el repo, con origen «GitHub Actions».
 
 ## 4. Arquitectura del despliegue
@@ -50,7 +50,7 @@ push a main
    │
    └─▶ Trabajo «desplegar»  ── deploy-pages
                                   │
-                                  └─▶ https://<usuario>.github.io/huertos/
+                                  └─▶ https://Deliath.github.io/huertos/
 ```
 
 ### 4.1 Compilación
