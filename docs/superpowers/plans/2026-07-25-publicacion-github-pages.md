@@ -17,7 +17,7 @@ Aplican a todas las tareas.
 - **Node 22.** Entorno local: v22.23.1, npm 10.9.8. El workflow usa `actions/setup-node` con `node-version: 22`.
 - **URL de publicación:** `https://Deliath.github.io/huertos/`. **`base` de Vite:** `'/huertos/'`.
 - **Repositorio:** `Deliath/huertos`, **público**, rama publicada **`main`** (hoy la rama local se llama `master`).
-- **Identidad de git:** `Eva <vamayanez@gmail.com>`. Ya está configurada y todo el historial reescrito con ella.
+- **Identidad de git:** ya configurada, y todo el historial reescrito con ella. Se publica con la dirección de anonimato de GitHub (`<id>+<usuario>@users.noreply.github.com`), que conserva la autoría y la atribución en el perfil sin exponer el correo real.
 - **Licencias:** código MIT (`LICENSE` en la raíz); contenido CC BY-NC 4.0.
 - **Sin analítica y sin dominio propio.**
 - **Todo el texto de interfaz, comentarios y mensajes de commit en español.**
@@ -1148,29 +1148,34 @@ git log --all -p | grep -inE 'api[_-]?key|secret|password|token|Bearer [A-Za-z0-
 
 Esperado: sin resultados, o solo coincidencias inocuas (por ejemplo la palabra «token» en un comentario). Revisar una a una las que salgan. Si apareciera un secreto real, **parar** y avisar antes de subir nada.
 
-- [ ] **Paso 3: Renombrar la rama y añadir el remoto**
+- [ ] **Paso 3: Añadir el remoto**
+
+La rama ya se llama `main`: se renombró al empezar el proyecto, porque no necesitaba autenticación.
 
 ```bash
-git branch -m master main
 git remote add origin https://github.com/Deliath/huertos.git
 git remote -v
 ```
 
 Esperado: `origin` apuntando a `https://github.com/Deliath/huertos.git` para fetch y push, **sin ningún token en la URL** (el token vive en `~/.git-credentials`, no en `.git/config`).
 
-- [ ] **Paso 4: Subir**
+- [ ] **Paso 4: [usuaria] Activar Pages — antes de subir**
+
+En `https://github.com/Deliath/huertos` → Settings → Pages → *Build and deployment* → Source: **GitHub Actions**.
+
+**El orden importa.** `actions/configure-pages` consulta la API de Pages y falla si el repositorio no lo tiene activado. Si se sube primero, el push dispara el workflow, este llega a ese paso con Pages aún sin activar y el primer despliegue —justo el que sirve para comprobar que todo el montaje funciona— sale en rojo por un motivo que no tiene nada que ver con el código.
+
+Si se ha subido antes por lo que sea, no hay que deshacer nada: se activa Pages y se relanza el workflow a mano desde la pestaña Actions, que para eso el disparador `workflow_dispatch` está puesto.
+
+- [ ] **Paso 5: Subir**
 
 ```bash
 git push -u origin main
 ```
 
-Esperado: sube los 90 y pico commits y deja `main` siguiendo a `origin/main`.
+Esperado: sube los más de cien commits y deja `main` siguiendo a `origin/main`.
 
 Si falla con `refusing to allow a Personal Access Token to create or update workflow`, es que al token le falta el permiso **Workflows: Read and write**: añadírselo en Settings → Developer settings → Personal access tokens, sin regenerarlo, y repetir el push.
-
-- [ ] **Paso 5: [usuaria] Activar Pages**
-
-En `https://github.com/Deliath/huertos` → Settings → Pages → *Build and deployment* → Source: **GitHub Actions**.
 
 - [ ] **Paso 6: Ver el primer despliegue**
 
