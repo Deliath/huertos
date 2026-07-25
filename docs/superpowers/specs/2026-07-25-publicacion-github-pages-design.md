@@ -152,14 +152,26 @@ Solución: un pie de página con las atribuciones, junto al aviso de privacidad 
 
 Medido en el entorno de desarrollo actual, `npm test` **termina con código 1**. El detalle importa porque de esto depende todo el despliegue:
 
-- **Ningún test falla.** En la mejor de dos ejecuciones pasaron 144 tests de 30 archivos.
+- **Ningún test falla.** Cuando consiguen ejecutarse, los 156 pasan.
 - **Lo que falla es arrancar los procesos de trabajo de Vitest:** `[vitest-pool]: Failed to start forks worker` … `Timeout waiting for worker to respond`. Afecta solo a los archivos de test de interfaz, que son los 14 que piden entorno `jsdom` con `// @vitest-environment jsdom`.
-- **El proyecto tiene 36 archivos de test.** En la mejor ejecución solo se ejecutaron 30: los 6 restantes no llegaron a arrancar. En otra ejecución fueron 29 archivos y 125 tests. Es decir, **el número de tests que se ejecutan varía entre ejecuciones**, y los que no arrancan no se distinguen a simple vista de los que pasan.
+- **El número de archivos que llegan a ejecutarse varía entre ejecuciones** (29, 30, 31 de 36 en tres intentos), y los que no arrancan no se distinguen a simple vista de los que pasan: el resumen dice «passed» sobre los que sí corrieron.
 - **Causa probable:** arrancar 14 entornos `jsdom` en procesos separados es muy costoso (más de 300 s acumulados de *setup*) y este entorno de desarrollo no da para tanto. Los ejecutores de GitHub Actions son más rápidos, así que puede que allí pase sin más — pero **el plan no debe apoyarse en esa suposición**.
 
-**`pool: 'threads'` no lo resuelve.** Medido: con hilos en lugar de procesos la ejecución sigue terminando en 1, con 31 archivos de 36 y 5 arranques fallidos (frente a 30 y 6 con procesos). Mejora marginal, no solución.
+**La cifra real de la suite son 36 archivos y 156 tests.** Las ejecuciones «verdes» anteriores se dejaban hasta 31 tests sin ejecutar sin avisar de ello.
 
-Tratamiento en el plan, como primera tarea y antes de tocar el despliegue: reducir el paralelismo entre archivos (`fileParallelism: false` o un `maxWorkers` bajo), que ataca la hipótesis de que el problema es la competencia por CPU al levantar muchos entornos `jsdom` a la vez, y no el tipo de trabajador. Si tampoco basta, ampliar el margen de arranque de los trabajadores. **Criterio de aceptación: `npm test` termina en 0 y ejecuta los 36 archivos, de forma repetible en tres ejecuciones seguidas.**
+Medidas tomadas, todas en este mismo entorno:
+
+| Configuración | Archivos | Tests | Salida | Duración |
+|---|---|---|---|---|
+| Por defecto (`forks`, en paralelo) | 30 de 36 | 144 | **1** | 181 s |
+| `pool: 'threads'`, en paralelo | 31 de 36 | 149 | **1** | 173 s |
+| `pool: 'threads'`, sin paralelismo entre archivos | **36 de 36** | **156** | **0** | 1.049 s |
+
+**Conclusión: la causa es la competencia por CPU al levantar muchos entornos `jsdom` a la vez, no el tipo de trabajador.** Quitar el paralelismo entre archivos lo arregla del todo, pero multiplica por seis la duración (17,5 minutos), lo que es demasiado castigo para el ciclo de desarrollo local.
+
+Tratamiento en el plan, como primera tarea y antes de tocar el despliegue: buscar el punto medio, acotando el número de trabajadores simultáneos (`maxWorkers` bajo, p. ej. 2) en lugar de serializar del todo, y quedarse con la configuración más rápida que cumpla el criterio. `fileParallelism: false` queda como red de seguridad si no se encuentra un valor fiable.
+
+**Criterio de aceptación: `npm test` termina en 0 y ejecuta los 36 archivos y los 156 tests, de forma repetible en tres ejecuciones seguidas.**
 
 ## 8. Verificación
 
