@@ -1,3 +1,6 @@
+// Contenido bajo CC BY-NC 4.0, no código MIT:
+// https://creativecommons.org/licenses/by-nc/4.0/deed.es
+
 import type { Cultivo } from '../dominio/tipos'
 
 export const CULTIVOS: Cultivo[] = [

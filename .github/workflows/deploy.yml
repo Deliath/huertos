@@ -35,8 +35,12 @@ jobs:
       - name: Pasar el linter
         run: npm run lint
 
-      - name: Ejecutar los tests
-        run: npm test
+      # npm test por sí solo no basta: si Vitest no consigue arrancar un
+      # proceso de trabajo, el archivo afectado no se ejecuta y el resumen no
+      # lo distingue de los que sí pasaron. verificar-suite.sh compara el
+      # número de archivos ejecutados con los que hay en disco.
+      - name: Ejecutar los tests y verificar que la suite se ejecutó entera
+        run: bash scripts/verificar-suite.sh 1
 
       - name: Compilar
         run: npm run build

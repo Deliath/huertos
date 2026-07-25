@@ -40,10 +40,12 @@ Otros comandos:
 
 Este repositorio tiene dos licencias distintas, según la parte:
 
-- **El código** (todo lo que hay en `src/`, `scripts/` y la configuración) se
-  publica bajo la licencia **MIT**. Ver [`LICENSE`](LICENSE).
-- **El contenido** (el catálogo de cultivos, los datos curados de zonas
-  climáticas y los textos de la interfaz) se publica bajo
+- **El código** (todo `src/` salvo los dos archivos de datos indicados abajo,
+  más `scripts/` y la configuración) se publica bajo la licencia **MIT**. Ver
+  [`LICENSE`](LICENSE).
+- **El contenido** (el catálogo de cultivos en `src/datos/cultivos.ts`, los
+  datos curados de zonas climáticas en `src/datos/zonas-climaticas.ts` y los
+  textos de la interfaz) se publica bajo
   **[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.es)**:
   se puede reutilizar citando la fuente, pero no con fines comerciales.
 

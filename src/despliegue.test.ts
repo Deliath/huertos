@@ -15,8 +15,10 @@ test('el despliegue verifica antes de publicar', () => {
   expect(yml).toContain('npm run lint')
   expect(yml).toContain('npm test')
   expect(yml).toContain('npm run build')
-  // Publicar solo si la verificación pasó.
-  expect(yml).toContain('needs: verificar')
+  // Publicar solo si la verificación pasó, y que sea justo el trabajo
+  // "desplegar" el que dependa de "verificar" (no que la cadena esté
+  // huérfana en cualquier otro sitio del archivo).
+  expect(yml).toMatch(/desplegar:[\s\S]*needs: verificar/)
 })
 
 test('el despliegue usa los permisos mínimos y la misma versión de Node que el desarrollo', () => {
