@@ -13,7 +13,10 @@ test('el despliegue verifica antes de publicar', () => {
   const yml = workflow()
   expect(yml).toContain('npm ci')
   expect(yml).toContain('npm run lint')
-  expect(yml).toContain('npm test')
+  // No basta con "npm test" a secas: no distingue un archivo de test que
+  // falló al arrancar de uno que pasó. Se exige la comprobación que sí lo
+  // detecta.
+  expect(yml).toContain('bash scripts/verificar-suite.sh')
   expect(yml).toContain('npm run build')
   // Publicar solo si la verificación pasó, y que sea justo el trabajo
   // "desplegar" el que dependa de "verificar" (no que la cadena esté
