@@ -22,15 +22,17 @@ test('el generador reúne los avisos de licencia de las dependencias de producci
   expect(texto).toContain('dompurify')
 })
 
-test('un paquete sin archivo de licencia aparece igualmente, con su identificador', () => {
+test('reconoce los archivos de licencia con nombre no estándar', () => {
   const destino = mkdtempSync(join(tmpdir(), 'licencias-'))
   execFileSync('node', ['scripts/generar-licencias.mjs', destino])
   const texto = readFileSync(join(destino, 'third-party-licenses.txt'), 'utf8')
 
-  // stackblur-canvas se declara MIT en su package.json pero no incluye el
-  // archivo. Omitirlo sería peor que anotar la carencia.
+  // stackblur-canvas guarda su licencia en LICENSE-MIT.txt. Un patrón que solo
+  // acepte «LICENSE» o «LICENSE.» lo da por ausente y publica un enlace
+  // genérico en lugar del aviso de copyright que MIT obliga a reproducir.
   expect(texto).toContain('stackblur-canvas')
-  expect(texto).toMatch(/stackblur-canvas[\s\S]{0,400}no incluye un archivo de licencia/)
+  expect(texto).toContain('Copyright (c) 2010 Mario Klingemann')
+  expect(texto).not.toMatch(/stackblur-canvas[\s\S]{0,400}no incluye un archivo de licencia/)
 })
 
 test('no se incluyen las dependencias de desarrollo, que no se distribuyen', () => {

@@ -37,7 +37,10 @@ function textoLicencia(ruta) {
   } catch {
     return null
   }
-  const archivo = entradas.find((n) => /^(licen[cs]e|copying)(\.|$)/i.test(n))
+  // El separador tras «license» puede ser un punto, un guion o un espacio:
+  // stackblur-canvas la guarda en LICENSE-MIT.txt. Anclar solo al punto deja
+  // fuera avisos de copyright que hay obligación de reproducir.
+  const archivo = entradas.find((n) => /^(licen[cs]e|copying)([-_.\s]|$)/i.test(n))
   return archivo ? readFileSync(join(RAIZ, ruta, archivo), 'utf8').trimEnd() : null
 }
 
