@@ -1,0 +1,117 @@
+<h2>¿Qué dirección visual te encaja para la web?</h2>
+<p class="subtitle">Misma pantalla de inicio, tres personalidades distintas. Fíjate en el tono (¿artesanal o de app?), la tipografía y el color. Puedes hacer clic en la que más te guste.</p>
+
+<div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))">
+
+  <!-- ================= A: CUADERNO DE CAMPO ================= -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0; background:#F4EEE2">
+      <div style="font-family: Georgia, 'Times New Roman', serif; color:#33291F; background:#F4EEE2; padding:18px 20px 22px">
+
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #C9BCA3; padding-bottom:10px; margin-bottom:16px">
+          <div style="display:flex; align-items:center; gap:8px">
+            <span style="font-size:18px">🌱</span>
+            <span style="font-weight:700; letter-spacing:.06em; text-transform:uppercase; font-size:12px; color:#5C6B3C">Huertos</span>
+          </div>
+          <span style="font-size:11px; color:#8A7B63">Cuaderno de campo</span>
+        </div>
+
+        <div style="font-size:25px; line-height:1.15; margin-bottom:8px">Planifica tu huerto</div>
+        <div style="font-size:13px; line-height:1.5; color:#5F5344; margin-bottom:18px">
+          Dinos dónde estás y qué te gustaría cultivar, y te propondremos qué plantar, dónde y cuándo.
+        </div>
+
+        <div style="font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#8A7B63; margin-bottom:8px">Mis planes</div>
+        <div style="background:#FBF8F1; border:1px solid #DDD2BC; border-left:4px solid #7D8C4E; border-radius:3px; padding:11px 12px; margin-bottom:18px; box-shadow:1px 1px 0 #E4DAC6">
+          <div style="font-weight:700; font-size:14px">Huerto de la casa</div>
+          <div style="font-size:11px; color:#8A7B63; margin-top:2px">2 bancales · 8,4 m² · siembra en marzo</div>
+        </div>
+
+        <div style="background:#5C6B3C; color:#F8F5EC; text-align:center; padding:11px; border-radius:3px; font-size:14px; letter-spacing:.02em">
+          Crear mi huerto
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · Cuaderno de campo</h3>
+      <p>Cálido y artesanal. Papel crema, tipografía con serifa, verdes oliva y tierras. Se siente como un libro de horticultura de toda la vida.</p>
+    </div>
+  </div>
+
+  <!-- ================= B: APP LIMPIA ================= -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0; background:#F1F5F0">
+      <div style="font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color:#16241C; background:#F1F5F0; padding:18px 20px 22px">
+
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px">
+          <div style="width:26px; height:26px; border-radius:8px; background:#16A34A; display:flex; align-items:center; justify-content:center; font-size:14px">🌱</div>
+          <span style="font-weight:650; font-size:14px">Huertos</span>
+        </div>
+
+        <div style="font-size:24px; font-weight:700; letter-spacing:-.02em; line-height:1.15; margin-bottom:6px">Planifica tu huerto</div>
+        <div style="font-size:13px; line-height:1.5; color:#4B5D51; margin-bottom:18px">
+          Dinos dónde estás y qué te gustaría cultivar, y te propondremos qué plantar, dónde y cuándo.
+        </div>
+
+        <div style="font-size:11px; font-weight:600; color:#4B5D51; margin-bottom:8px">Mis planes</div>
+        <div style="background:#fff; border:1px solid #DCE5DD; border-radius:12px; padding:12px; margin-bottom:8px; box-shadow:0 1px 2px rgba(16,40,24,.06)">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div>
+              <div style="font-weight:600; font-size:14px">Huerto de la casa</div>
+              <div style="font-size:11px; color:#7A8B7F; margin-top:2px">2 bancales · 8,4 m² · marzo</div>
+            </div>
+            <span style="font-size:11px; color:#16A34A; font-weight:600">Abrir</span>
+          </div>
+        </div>
+
+        <div style="background:#16A34A; color:#fff; text-align:center; padding:12px; border-radius:10px; font-size:14px; font-weight:600; margin-top:14px; box-shadow:0 2px 6px rgba(22,163,74,.28)">
+          Crear mi huerto
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · App limpia</h3>
+      <p>Moderno y neutro. Tarjetas blancas, esquinas redondeadas, verde vivo de acento, tipografía del sistema. Es el lenguaje que la gente ya conoce del móvil.</p>
+    </div>
+  </div>
+
+  <!-- ================= C: EDITORIAL BOTÁNICO ================= -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0; background:#FCFCFA">
+      <div style="font-family: 'Iowan Old Style', Georgia, serif; color:#11150F; background:#FCFCFA; padding:18px 20px 22px">
+
+        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px">
+          <span style="font-family: system-ui, sans-serif; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:#11150F">Huertos</span>
+          <span style="font-family: system-ui, sans-serif; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#9A9A90">01 / 06</span>
+        </div>
+        <div style="height:2px; background:#11150F; margin-bottom:20px"></div>
+
+        <div style="font-size:31px; line-height:1.05; letter-spacing:-.01em; margin-bottom:12px">Planifica<br>tu huerto</div>
+        <div style="font-family: system-ui, sans-serif; font-size:12px; line-height:1.6; color:#5A5A50; margin-bottom:22px; max-width:30ch">
+          Dinos dónde estás y qué te gustaría cultivar. Te propondremos qué plantar, dónde y cuándo.
+        </div>
+
+        <div style="border-top:1px solid #E2E2DA; padding-top:10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:baseline">
+          <span style="font-size:14px">Huerto de la casa</span>
+          <span style="font-family: system-ui, sans-serif; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#9A9A90">Abrir →</span>
+        </div>
+        <div style="border-top:1px solid #E2E2DA; padding-top:10px; font-family: system-ui, sans-serif; font-size:11px; color:#9A9A90; margin-bottom:22px">
+          2 bancales · 8,4 m² · siembra en marzo
+        </div>
+
+        <div style="display:inline-block; border:1.5px solid #11150F; padding:10px 20px; font-family: system-ui, sans-serif; font-size:12px; letter-spacing:.08em; text-transform:uppercase">
+          Crear mi huerto
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · Editorial botánico</h3>
+      <p>Sobrio y con carácter. Mucho blanco, titulares grandes con serifa, filetes finos, botones de contorno. Se lee como una buena revista de jardinería.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top:26px">
+  <p class="subtitle">Ninguna es definitiva: si te gusta una base pero quieres el color o la tipografía de otra, dímelo y la mezclo. También podemos ver cualquiera de ellas aplicada a la pantalla del plano del bancal, que es la más visual de todas.</p>
+</div>

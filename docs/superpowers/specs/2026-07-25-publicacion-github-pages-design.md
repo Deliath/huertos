@@ -1,0 +1,140 @@
+# Diseño — Publicación de Huertos en GitHub Pages
+
+**Fecha:** 2026-07-25
+**Estado:** Diseño aprobado por el usuario — listo para plan de implementación
+
+## 1. Propósito
+
+Poner la web de Huertos en Internet, accesible por HTTPS para cualquiera, con despliegue automático en cada cambio. Hoy el proyecto solo existe en el equipo de desarrollo: no hay `remote` de git, así que publicar resuelve además la falta de copia de seguridad fuera del equipo.
+
+## 2. Alcance
+
+Este documento cubre **solo la publicación**. La mejora visual es un proyecto aparte, con su propia spec y su propio plan (ver §8), y se decidió abordarla después: teniendo el despliegue automático montado, cada avance del rediseño se publica solo al hacer push y puede revisarse en un móvil real.
+
+Queda fuera: rediseño visual, analítica de uso, dominio propio, backend y cuentas de usuario.
+
+## 3. Decisiones tomadas
+
+| Decisión | Valor |
+|---|---|
+| Alojamiento | GitHub Pages |
+| URL | `https://<usuario>.github.io/huertos/` |
+| Visibilidad del repo | Público (GitHub Pages con cuenta gratuita lo exige) |
+| Nombre del repo | `huertos` |
+| Rama publicada | `main` (se renombra `master` → `main`) |
+| Licencia del código | MIT |
+| Licencia del contenido | CC BY-NC 4.0 (sin cambios respecto a hoy) |
+| Analítica | Ninguna |
+| Dominio propio | No por ahora; se puede añadir después sin rehacer nada |
+
+## 3.1 Requisitos previos (fuera del código)
+
+Estos pasos los da la usuaria, no se pueden automatizar desde aquí:
+
+1. **Cuenta de GitHub** y su nombre de usuario, que es lo que fija la URL final (`https://<usuario>.github.io/huertos/`) y por tanto no puede quedar sin decidir antes de configurar `base`.
+2. **Autenticación para hacer push** (clave SSH o token personal). El repo local ya tiene identidad configurada: `Eva <r.garcia.carmona@gmail.com>`.
+3. **Activar Pages** en el repo, con origen «GitHub Actions».
+
+## 4. Arquitectura del despliegue
+
+```
+push a main
+   │
+   ├─▶ Trabajo «verificar»  ── npm ci → npm run lint → npm test → npm run build
+   │                              └─ upload-pages-artifact (dist/)
+   │                              │
+   │                              └─ si algo falla: no se publica nada
+   │                                 (la versión anterior sigue en pie)
+   │
+   └─▶ Trabajo «desplegar»  ── deploy-pages
+                                  │
+                                  └─▶ https://<usuario>.github.io/huertos/
+```
+
+### 4.1 Compilación
+
+`vite.config.ts` añade `base: '/huertos/'`. Es lo que hace que los recursos se pidan a `/huertos/assets/…` en lugar de a la raíz del dominio, porque la web cuelga de un subdirectorio. No afecta a `npm run dev` ni a los tests: `base` solo interviene en el build.
+
+Si en el futuro se añade un dominio propio, la web pasaría a la raíz y `base` volvería a `'/'`.
+
+### 4.2 Workflow
+
+Un único archivo, `.github/workflows/deploy.yml`, con dos trabajos encadenados:
+
+- **`verificar`** — `npm ci`, `npm run lint`, `npm test`, `npm run build`. Sube `dist/` como artefacto de Pages.
+- **`desplegar`** — depende de `verificar`; ejecuta `deploy-pages`.
+
+Detalles:
+
+- **Disparadores:** `push` a `main` y `workflow_dispatch` (para republicar a mano).
+- **Permisos mínimos:** `contents: read`, `pages: write`, `id-token: write`.
+- **`concurrency`** con grupo `pages` y `cancel-in-progress: false`, para que dos pushes seguidos no se pisen.
+- **Node:** `actions/setup-node` con Node 22, la misma versión mayor que se usa en desarrollo (local: v22.23.1), y caché de npm.
+
+### 4.3 Consecuencia importante
+
+Los tests pasan a ser **la puerta del despliegue**. Un test roto deja de ser una molestia local y bloquea la publicación. Esto es deliberado: es la protección que evita publicar una web rota.
+
+Por eso la suite tiene que ser fiable antes de montar el workflow. Hoy no lo es (§6.1) y estabilizarla es la primera tarea del plan.
+
+## 5. Compatibilidades verificadas
+
+Comprobado sobre el código actual, no supuesto:
+
+- **No hay router.** El asistente cambia de paso con estado de React (`app/estado.ts`), no con URLs. No hay rutas profundas, así que no hace falta el truco de `404.html` que necesitan las SPA con router en GitHub Pages.
+- **El CSS de Leaflet va empaquetado**, no de un CDN (`import 'leaflet/dist/leaflet.css'` en `src/ui/MapaSelector.tsx`). La CSP estricta declarada en `index.html` (`default-src 'self'` más las APIs de clima, suelo, geocodificación y tiles) funciona tal cual en GitHub Pages, que sirve siempre por HTTPS.
+- **La búsqueda de direcciones se lanza al enviar el formulario**, no en cada pulsación (`src/ui/PasoUbicacion.tsx`, `onSubmit`). Eso cumple la política de uso de Nominatim, que prohíbe expresamente el autocompletado por tecla. Publicar no incumple sus condiciones.
+- **El `<script src="/src/main.tsx">` absoluto de `index.html`** lo reescribe Vite en el build aplicando `base`; no hay que tocarlo a mano.
+
+## 6. Riesgos y cómo se tratan
+
+| Riesgo | Tratamiento |
+|---|---|
+| **Iconos del marcador de Leaflet.** Leaflet deduce la ruta de sus imágenes de marcador a partir del CSS, y eso se rompe con frecuencia al empaquetar con un `base` distinto de la raíz. | Verificación explícita en la web publicada: abrir el mapa y comprobar que el marcador aparece al pinchar. Si falla, configurar el icono por defecto de Leaflet importando las imágenes como módulos. |
+| **Rutas rotas por el base path** que solo se ven en producción. | `npm run build && npm run preview` en local antes de subir, que sirve con el `base` real. |
+| **Límites de las APIs de terceros** (Open-Meteo, SoilGrids/ISRIC, Nominatim) al haber usuarios reales. | Ninguna acción ahora: el uso es una petición por acción del usuario y sin autocompletado. Queda anotado como cosa a vigilar si la web recibe tráfico apreciable. |
+| **Repo público con historial.** | Revisar antes de subir que el historial no contiene claves ni datos personales. No hay ninguna clave de API en el proyecto: las tres APIs usadas son gratuitas y sin clave. |
+| **La suite de tests es inestable y hoy falla.** Ver §6.1. | Estabilizarla **antes** de convertirla en la puerta del despliegue. Es la primera tarea del plan. |
+
+### 6.1 La suite de tests, medida
+
+Medido en el entorno de desarrollo actual, `npm test` **termina con código 1**. El detalle importa porque de esto depende todo el despliegue:
+
+- **Ningún test falla.** En la mejor de dos ejecuciones pasaron 144 tests de 30 archivos.
+- **Lo que falla es arrancar los procesos de trabajo de Vitest:** `[vitest-pool]: Failed to start forks worker` … `Timeout waiting for worker to respond`. Afecta solo a los archivos de test de interfaz, que son los 14 que piden entorno `jsdom` con `// @vitest-environment jsdom`.
+- **El proyecto tiene 36 archivos de test.** En la mejor ejecución solo se ejecutaron 30: los 6 restantes no llegaron a arrancar. En otra ejecución fueron 29 archivos y 125 tests. Es decir, **el número de tests que se ejecutan varía entre ejecuciones**, y los que no arrancan no se distinguen a simple vista de los que pasan.
+- **Causa probable:** arrancar 14 entornos `jsdom` en procesos separados es muy costoso (más de 300 s acumulados de *setup*) y este entorno de desarrollo no da para tanto. Los ejecutores de GitHub Actions son más rápidos, así que puede que allí pase sin más — pero **el plan no debe apoyarse en esa suposición**.
+
+Tratamiento en el plan, como primera tarea y antes de tocar el despliegue: reproducir el fallo, probar `pool: 'threads'` en `vitest.config.ts` (arranque más barato que procesos separados) y, si hace falta, ampliar el margen de arranque de los trabajadores. **Criterio de aceptación: `npm test` termina en 0 y ejecuta los 36 archivos, de forma repetible en tres ejecuciones seguidas.**
+
+## 7. Verificación
+
+**Antes de publicar** (local): `npm run lint`, `npm test`, `npm run build`, `npm run preview` y recorrido completo del asistente sobre la vista previa.
+
+**Después de publicar** (sobre la URL real, en escritorio y en móvil):
+
+1. La página carga y muestra la pantalla de inicio.
+2. El mapa muestra los tiles de OpenStreetMap y **el marcador aparece al pinchar**.
+3. La búsqueda por dirección devuelve resultados.
+4. Con ubicación precisa se obtienen clima y suelo por coordenadas.
+5. El resultado dibuja el plano de los bancales con sus cotas.
+6. Se guarda un plan, se recarga la página y el plan sigue ahí.
+7. Las descargas de PNG y de PDF funcionan.
+8. No hay errores de CSP en la consola del navegador.
+
+## 8. Punto de partida del proyecto 2 (rediseño visual)
+
+Decisiones ya validadas con maquetas, para no repetir el trabajo de exploración:
+
+- **Dirección visual: «App limpia».** Superficies blancas sobre fondo verde muy pálido, esquinas redondeadas, sombras suaves, verde de acento. Se descartaron una dirección cálida de cuaderno de campo y otra editorial con serifa.
+- **Tipografía: la pila del sistema** (`system-ui, -apple-system, 'Segoe UI', sans-serif`). Decisión explícita del usuario. Ventaja añadida: ninguna fuente que descargar y ningún cambio en la CSP.
+- **Contraste.** El verde vivo `#16A34A` no alcanza el contraste mínimo para texto ni para botón relleno con texto blanco. Se reserva para elementos decorativos (fondo del logo, barra de progreso) y se usa un verde oscuro (`#166534` o similar) para texto, bordes y botones. Los valores definitivos se fijan en la spec del proyecto 2.
+- **Armazón:** cabecera con logo, miga de pan del asistente con barra de progreso, y contenido en tarjetas.
+- **Pantalla de resultado:** el bancal como tarjeta con cabecera (nombre, medidas, número de plantas) y botones de descarga; plano a la izquierda y leyenda editable a la derecha, apilándose en móvil; avisos de recorte como caja destacada; calendario, cosecha y sinergias como tarjetas en rejilla.
+- **Plano — cambio funcional acordado:** hoy `src/ui/PlanoBancal.tsx` dibuja todos los iconos con `fontSize={16}`, es decir 16 cm en las unidades del plano, sea cual sea el cultivo. Con un bancal de 5 × 5 m y cebollas a 10 cm de separación los iconos se solapan y el bloque queda ilegible. **El icono debe escalarse a la separación del cultivo** (`min(distanciaPlantaCm, distanciaLineaCm)` por un factor, con un mínimo legible). Se descartaron dibujar los cultivos densos como puntos y añadir ampliar/desplazar al plano.
+
+Maquetas aprobadas, en `docs/superpowers/specs/assets/`:
+
+- `2026-07-25-direcciones-visuales.html` — las tres direcciones exploradas.
+- `2026-07-25-maqueta-estilo-b-resultado.html` — resultado con un bancal de 2,40 × 1,20 m.
+- `2026-07-25-maqueta-estilo-b-bancales-5x5.html` — dos bancales de 5 × 5 m, 403 plantas, con los iconos ya escalados.

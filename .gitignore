@@ -32,3 +32,6 @@ lerna-debug.log*
 
 # Config local de Claude Code (permisos de sesión)
 .claude/settings.local.json
+
+# Estado local de superpowers (maquetas del acompañante visual)
+.superpowers/
