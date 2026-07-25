@@ -1,0 +1,60 @@
+name: Desplegar en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Permite volver a publicar a mano desde la pestaña Actions.
+  workflow_dispatch:
+
+# Permisos mínimos: leer el código y publicar en Pages, nada más.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Dos push seguidos no deben pisarse. No se cancela el que esté en curso para
+# no dejar un despliegue a medias.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Pasar el linter
+        run: npm run lint
+
+      - name: Ejecutar los tests
+        run: npm test
+
+      - name: Compilar
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - name: Subir dist/ como artefacto de Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  desplegar:
+    needs: verificar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - name: Publicar
+        id: despliegue
+        uses: actions/deploy-pages@v4
