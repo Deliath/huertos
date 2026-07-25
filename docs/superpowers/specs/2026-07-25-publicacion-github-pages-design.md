@@ -9,7 +9,9 @@ Poner la web de Huertos en Internet, accesible por HTTPS para cualquiera, con de
 
 ## 2. Alcance
 
-Este documento cubre **solo la publicación**. La mejora visual es un proyecto aparte, con su propia spec y su propio plan (ver §8), y se decidió abordarla después: teniendo el despliegue automático montado, cada avance del rediseño se publica solo al hacer push y puede revisarse en un móvil real.
+Este documento cubre **solo la publicación**. La mejora visual es un proyecto aparte, con su propia spec y su propio plan (ver §9), y se decidió abordarla después: teniendo el despliegue automático montado, cada avance del rediseño se publica solo al hacer push y puede revisarse en un móvil real.
+
+Sí entran aquí, aunque toquen la interfaz, las dos obligaciones legales que nacen de publicar: los avisos de licencia de terceros y la atribución de las fuentes de datos (§6.3).
 
 Queda fuera: rediseño visual, analítica de uso, dominio propio, backend y cuentas de usuario.
 
@@ -27,7 +29,7 @@ Queda fuera: rediseño visual, analítica de uso, dominio propio, backend y cuen
 | Analítica | Ninguna |
 | Dominio propio | No por ahora; se puede añadir después sin rehacer nada |
 
-## 3.1 Requisitos previos (fuera del código)
+### 3.1 Requisitos previos (fuera del código)
 
 Estos pasos los da la usuaria, no se pueden automatizar desde aquí:
 
@@ -75,7 +77,7 @@ Detalles:
 
 Los tests pasan a ser **la puerta del despliegue**. Un test roto deja de ser una molestia local y bloquea la publicación. Esto es deliberado: es la protección que evita publicar una web rota.
 
-Por eso la suite tiene que ser fiable antes de montar el workflow. Hoy no lo es (§6.1) y estabilizarla es la primera tarea del plan.
+Por eso la suite tiene que ser fiable antes de montar el workflow. Hoy no lo es (§7.1) y estabilizarla es la primera tarea del plan.
 
 ## 5. Compatibilidades verificadas
 
@@ -86,7 +88,57 @@ Comprobado sobre el código actual, no supuesto:
 - **La búsqueda de direcciones se lanza al enviar el formulario**, no en cada pulsación (`src/ui/PasoUbicacion.tsx`, `onSubmit`). Eso cumple la política de uso de Nominatim, que prohíbe expresamente el autocompletado por tecla. Publicar no incumple sus condiciones.
 - **El `<script src="/src/main.tsx">` absoluto de `index.html`** lo reescribe Vite en el build aplicando `base`; no hay que tocarlo a mano.
 
-## 6. Riesgos y cómo se tratan
+## 6. Licencias y atribución
+
+Comprobado sobre las versiones instaladas en `node_modules`, no de memoria.
+
+### 6.1 Dependencias que se distribuyen al usuario
+
+Acaban dentro de `dist/` y por tanto se entregan a cada visitante:
+
+| Paquete | Versión | Licencia |
+|---|---|---|
+| `react`, `react-dom` | 19.2.7 | MIT |
+| `jspdf` | 4.2.1 | MIT |
+| `leaflet` | 1.9.4 | BSD-2-Clause |
+| `react-leaflet` | 5.0.0 | **Hippocratic-2.1** |
+
+Las herramientas de desarrollo (vite, vitest, oxlint, jsdom, testing-library, tipos) son MIT y TypeScript es Apache-2.0; no se distribuyen, así que no imponen obligaciones sobre la web publicada.
+
+**Ninguna impide licenciar el código propio como MIT.** Ninguna es copyleft.
+
+### 6.2 El caso de react-leaflet
+
+`react-leaflet` 5.0.0 no es MIT: usa la **Hippocratic License 2.1**, que no está aprobada por la OSI y añade condiciones que MIT no tiene (cumplimiento de principios de derechos humanos, arbitraje bajo las Reglas de La Haya, e indemnización al autor).
+
+Consecuencias reales para este proyecto:
+
+- **No contagia.** No es copyleft; el código propio puede seguir siendo MIT.
+- **Riesgo práctico nulo** para un planificador de huertos gratuito.
+- **Sí conviene dejarlo escrito**, porque muchos departamentos legales rechazan esta licencia de plano. Si algún día alguien quisiera reutilizar el proyecto en un contexto empresarial, este es el punto que lo bloquearía, y la salida sería sustituir `react-leaflet` por Leaflet directamente (que es BSD-2).
+
+### 6.3 Obligaciones que hoy se incumplen
+
+Dos, y las dos nacen precisamente de publicar. Se incluyen en el plan de este proyecto.
+
+**a) Avisos de licencia de terceros.** MIT, BSD-2-Clause e Hippocratic-2.1 exigen las tres que quien recibe una copia del software reciba también el texto de la licencia y el aviso de copyright. El `dist/` incluye código de todas ellas y se entrega a cada visitante, así que la obligación aplica. Hoy no hay ningún aviso. Solución: generar un `third-party-licenses.txt` durante el build y enlazarlo desde el pie de página.
+
+**b) Atribución de las fuentes de datos.** Hoy solo se atribuyen los tiles de OpenStreetMap (`attribution="© OpenStreetMap"` en `src/ui/MapaSelector.tsx`). Faltan tres, y las tres la exigen:
+
+| Fuente | Licencia de los datos |
+|---|---|
+| Open-Meteo (clima por coordenadas) | CC BY 4.0 |
+| SoilGrids / ISRIC (suelo por coordenadas) | CC BY 4.0 |
+| Nominatim (búsqueda de direcciones) | ODbL (datos de OpenStreetMap) |
+
+Solución: un pie de página con las atribuciones, junto al aviso de privacidad y la licencia del contenido que ya existen. El diseño visual definitivo de ese pie corresponde al proyecto 2; aquí se implementa con el estilo actual y allí se reviste.
+
+### 6.4 Licencias del proyecto
+
+- **Código:** MIT, en un archivo `LICENSE` en la raíz.
+- **Contenido** (catálogo de cultivos, textos, datos curados de zonas climáticas): CC BY-NC 4.0, como hasta ahora. Se deja indicado en el `README` para que la distinción entre ambas quede clara en un repo público.
+
+## 7. Riesgos y cómo se tratan
 
 | Riesgo | Tratamiento |
 |---|---|
@@ -94,9 +146,9 @@ Comprobado sobre el código actual, no supuesto:
 | **Rutas rotas por el base path** que solo se ven en producción. | `npm run build && npm run preview` en local antes de subir, que sirve con el `base` real. |
 | **Límites de las APIs de terceros** (Open-Meteo, SoilGrids/ISRIC, Nominatim) al haber usuarios reales. | Ninguna acción ahora: el uso es una petición por acción del usuario y sin autocompletado. Queda anotado como cosa a vigilar si la web recibe tráfico apreciable. |
 | **Repo público con historial.** | Revisar antes de subir que el historial no contiene claves ni datos personales. No hay ninguna clave de API en el proyecto: las tres APIs usadas son gratuitas y sin clave. |
-| **La suite de tests es inestable y hoy falla.** Ver §6.1. | Estabilizarla **antes** de convertirla en la puerta del despliegue. Es la primera tarea del plan. |
+| **La suite de tests es inestable y hoy falla.** Ver §7.1. | Estabilizarla **antes** de convertirla en la puerta del despliegue. Es la primera tarea del plan. |
 
-### 6.1 La suite de tests, medida
+### 7.1 La suite de tests, medida
 
 Medido en el entorno de desarrollo actual, `npm test` **termina con código 1**. El detalle importa porque de esto depende todo el despliegue:
 
@@ -105,9 +157,11 @@ Medido en el entorno de desarrollo actual, `npm test` **termina con código 1**.
 - **El proyecto tiene 36 archivos de test.** En la mejor ejecución solo se ejecutaron 30: los 6 restantes no llegaron a arrancar. En otra ejecución fueron 29 archivos y 125 tests. Es decir, **el número de tests que se ejecutan varía entre ejecuciones**, y los que no arrancan no se distinguen a simple vista de los que pasan.
 - **Causa probable:** arrancar 14 entornos `jsdom` en procesos separados es muy costoso (más de 300 s acumulados de *setup*) y este entorno de desarrollo no da para tanto. Los ejecutores de GitHub Actions son más rápidos, así que puede que allí pase sin más — pero **el plan no debe apoyarse en esa suposición**.
 
-Tratamiento en el plan, como primera tarea y antes de tocar el despliegue: reproducir el fallo, probar `pool: 'threads'` en `vitest.config.ts` (arranque más barato que procesos separados) y, si hace falta, ampliar el margen de arranque de los trabajadores. **Criterio de aceptación: `npm test` termina en 0 y ejecuta los 36 archivos, de forma repetible en tres ejecuciones seguidas.**
+**`pool: 'threads'` no lo resuelve.** Medido: con hilos en lugar de procesos la ejecución sigue terminando en 1, con 31 archivos de 36 y 5 arranques fallidos (frente a 30 y 6 con procesos). Mejora marginal, no solución.
 
-## 7. Verificación
+Tratamiento en el plan, como primera tarea y antes de tocar el despliegue: reducir el paralelismo entre archivos (`fileParallelism: false` o un `maxWorkers` bajo), que ataca la hipótesis de que el problema es la competencia por CPU al levantar muchos entornos `jsdom` a la vez, y no el tipo de trabajador. Si tampoco basta, ampliar el margen de arranque de los trabajadores. **Criterio de aceptación: `npm test` termina en 0 y ejecuta los 36 archivos, de forma repetible en tres ejecuciones seguidas.**
+
+## 8. Verificación
 
 **Antes de publicar** (local): `npm run lint`, `npm test`, `npm run build`, `npm run preview` y recorrido completo del asistente sobre la vista previa.
 
@@ -121,8 +175,9 @@ Tratamiento en el plan, como primera tarea y antes de tocar el despliegue: repro
 6. Se guarda un plan, se recarga la página y el plan sigue ahí.
 7. Las descargas de PNG y de PDF funcionan.
 8. No hay errores de CSP en la consola del navegador.
+9. El pie muestra las atribuciones de Open-Meteo, SoilGrids/ISRIC y OpenStreetMap, y el enlace a los avisos de licencia de terceros abre un archivo que contiene los textos de MIT, BSD-2-Clause e Hippocratic-2.1.
 
-## 8. Punto de partida del proyecto 2 (rediseño visual)
+## 9. Punto de partida del proyecto 2 (rediseño visual)
 
 Decisiones ya validadas con maquetas, para no repetir el trabajo de exploración:
 
