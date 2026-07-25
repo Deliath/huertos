@@ -9,7 +9,7 @@ import { EditorBancales } from './EditorBancales'
 import { PasoSuelo } from './PasoSuelo'
 import { SelectorEspecies } from './SelectorEspecies'
 import { PanelResultado } from './PanelResultado'
-import { AvisoPrivacidad } from './AvisoPrivacidad'
+import { PieAtribuciones } from './PieAtribuciones'
 
 export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
   const [estado, dispatch] = useReducer(reducer, estadoInicial)
@@ -122,7 +122,7 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
         </div>
       )}
 
-      <AvisoPrivacidad />
+      <PieAtribuciones />
     </main>
   )
 }
