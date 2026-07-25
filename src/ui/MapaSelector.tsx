@@ -3,6 +3,9 @@ import { useState } from 'react'
 import type { LatLngTuple } from 'leaflet'
 import type { LeafletMouseEvent } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { configurarIconoPorDefecto } from './iconos-leaflet'
+
+configurarIconoPorDefecto()
 
 function Clicks({ onSeleccion }: { onSeleccion: (lat: number, lon: number) => void }) {
   const [pos, setPos] = useState<[number, number] | null>(null)
