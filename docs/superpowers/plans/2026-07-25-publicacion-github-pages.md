@@ -826,9 +826,20 @@ import { configurarIconoPorDefecto } from './iconos-leaflet'
 test('el marcador por defecto apunta a las imágenes empaquetadas', () => {
   configurarIconoPorDefecto()
   const opciones = Icon.Default.prototype.options
-  expect(opciones.iconUrl).toMatch(/marker-icon/)
-  expect(opciones.iconRetinaUrl).toMatch(/marker-icon-2x/)
-  expect(opciones.shadowUrl).toMatch(/marker-shadow/)
+
+  // Vite incrusta como `data:` los recursos de menos de 4 KB, y las tres
+  // imágenes de marcador lo son (4.548 bytes entre las tres). En el build la
+  // URL es un `data:` URI; en el entorno de test, la ruta del archivo. Las dos
+  // formas sirven —y la `data:` es de hecho inmune al base path—, así que el
+  // test acepta ambas en lugar de afirmar algo que solo es cierto en uno.
+  expect(opciones.iconUrl).toMatch(/marker-icon\.png|^data:image\//)
+  expect(opciones.iconRetinaUrl).toMatch(/marker-icon-2x\.png|^data:image\//)
+  expect(opciones.shadowUrl).toMatch(/marker-shadow\.png|^data:image\//)
+
+  // Con URLs `data:` los nombres de archivo desaparecen, así que esto es lo
+  // que impide que un copiar-pegar asigne la misma imagen a las tres.
+  const urls = [opciones.iconUrl, opciones.iconRetinaUrl, opciones.shadowUrl]
+  expect(new Set(urls).size).toBe(3)
 })
 ```
 
@@ -901,12 +912,35 @@ configurarIconoPorDefecto()
 ```bash
 npm run lint
 npm run build
-npm run preview
 ```
 
-En `http://localhost:4173/huertos/`, entrar en el paso de ubicación, elegir ubicación precisa y **pinchar en el mapa**: debe aparecer el marcador azul con su sombra. En la pestaña Red, las tres imágenes deben pedirse a `/huertos/assets/…` y responder 200.
+Las tres imágenes **no** aparecen en `dist/assets/`: pesan 4.548 bytes entre las
+tres y Vite incrusta como `data:` todo lo que baja de 4 KB. Eso es lo que
+interesa aquí, porque una URL `data:` no depende del base path en absoluto —no
+hay ruta que resolver ni petición que hacer—, así que el marcador no puede
+romperse por ese motivo. La CSP ya permite `data:` en `img-src`.
+
+La comprobación, entonces, es que las tres viajan dentro del JavaScript y son
+distintas entre sí:
+
+```bash
+grep -o 'data:image/png;base64,[A-Za-z0-9+/=]\{60\}' dist/assets/*.js | sort -u | wc -l
+```
+
+Esperado: **3** o más (3 son las de marcador; puede haber otras del propio
+Leaflet).
+
+Comprobar además que la aplicación sigue sirviéndose bien:
+
+```bash
+npm run preview
+curl -s http://localhost:4173/huertos/ | head -20
+```
 
 Detener la vista previa con Ctrl-C.
+
+La comprobación visual de que el marcador aparece al pinchar en el mapa se hace
+sobre la web publicada, en el punto 2 de la lista de la tarea 8.
 
 - [ ] **Paso 7: Commit**
 
