@@ -1,7 +1,7 @@
 # Diseño — Publicación de Huertos en GitHub Pages
 
 **Fecha:** 2026-07-25
-**Estado:** Diseño aprobado por el usuario — listo para plan de implementación
+**Estado:** Implementado — publicado en https://Deliath.github.io/huertos/
 
 ## 1. Propósito
 
