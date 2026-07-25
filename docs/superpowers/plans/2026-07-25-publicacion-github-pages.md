@@ -752,17 +752,37 @@ por:
 import { PieAtribuciones } from './PieAtribuciones'
 ```
 
-y la línea 125:
+y colocar el pie **fuera de `<main>`**. Un `<footer>` solo adopta el rol de
+región `contentinfo` si no desciende de `<main>`, y las atribuciones de todo el
+sitio no son contenido principal. Para eso, envolver lo que hoy devuelve `App`
+en un `<div>` que se queda con el estilo de centrado, dejando `<main>` sin
+estilo propio: el resultado visual es idéntico.
+
+Es decir, la estructura de `return` pasa de:
 
 ```tsx
+  return (
+    <main style={{ maxWidth: 760, margin: '0 auto', padding: 16 }}>
+      {/* … cuerpo … */}
       <AvisoPrivacidad />
+    </main>
+  )
 ```
 
-por:
+a:
 
 ```tsx
+  return (
+    <div style={{ maxWidth: 760, margin: '0 auto', padding: 16 }}>
+      <main>
+        {/* … el mismo cuerpo, sin ningún otro cambio … */}
+      </main>
       <PieAtribuciones />
+    </div>
+  )
 ```
+
+El cuerpo se reindenta un nivel, pero no cambia en nada más.
 
 - [ ] **Paso 6: Ejecutar la suite entera**
 
