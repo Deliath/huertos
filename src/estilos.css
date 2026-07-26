@@ -503,5 +503,8 @@ a { color: var(--verde); }
   .contenido { padding: var(--espacio-4) var(--espacio-3) var(--espacio-5); }
   .rejilla { grid-template-columns: 1fr; }
   .bancal-plano,
-  .bancal-leyenda { flex-basis: 100%; }
+  .bancal-leyenda {
+    flex-basis: 100%;
+    min-width: 0;
+  }
 }
