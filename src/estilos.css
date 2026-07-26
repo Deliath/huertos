@@ -427,6 +427,39 @@ a { color: var(--verde); }
   overflow: hidden;
 }
 
+.cultivo {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-m);
+  padding: var(--espacio-3);
+}
+
+.cultivo:has(input:checked) {
+  border-color: var(--verde);
+  background: var(--superficie-tenue);
+}
+
+.cultivo-nombre {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cultivo-ajustes {
+  display: flex;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-2);
+}
+
+.cultivo-ajustes .selector {
+  font-size: 13px;
+  padding: 5px 8px;
+}
+
+.rejilla-cultivos { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+
 /* ─────────────── MÓVIL ─────────────── */
 @media (max-width: 720px) {
   .contenido { padding: var(--espacio-4) var(--espacio-3) var(--espacio-5); }

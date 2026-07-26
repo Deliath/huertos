@@ -23,22 +23,27 @@ export function SelectorEspecies({ elecciones, onCambio, clima, suelo, mesActual
   }
 
   return (
-    <div>
-      <button type="button" onClick={() => onCambio(sugerirEspecies(clima, suelo, mesActual, superficieM2))}>
+    <div className="contenido-estrecho">
+      <h2 className="titulo-pantalla">¿Qué quieres cultivar?</h2>
+      <p className="subtitulo-pantalla">Marca lo que te apetezca, o deja que te propongamos una selección para tu clima y tu superficie.</p>
+
+      <button type="button" className="boton boton-contorno" style={{ marginBottom: 'var(--espacio-4)' }} onClick={() => onCambio(sugerirEspecies(clima, suelo, mesActual, superficieM2))}>
         Hazme tú una sugerencia
       </button>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+
+      <ul className="lista-limpia rejilla rejilla-cultivos">
         {CULTIVOS.map((c) => {
           const eleccion = porId.get(c.id)
           return (
-            <li key={c.id}>
-              <label>
+            <li key={c.id} className="cultivo">
+              <label className="cultivo-nombre">
                 <input type="checkbox" checked={!!eleccion} onChange={() => alternar(c.id)} aria-label={c.nombreComun} />
-                {c.icono} {c.nombreComun}
+                <span>{c.icono} {c.nombreComun}</span>
               </label>
               {eleccion && (
-                <span>
+                <div className="cultivo-ajustes">
                   <select
+                    className="selector"
                     aria-label={`Obligatoriedad de ${c.nombreComun}`}
                     value={eleccion.obligatoriedad}
                     onChange={(ev) => actualizar(c.id, { obligatoriedad: ev.target.value as Obligatoriedad })}
@@ -47,6 +52,7 @@ export function SelectorEspecies({ elecciones, onCambio, clima, suelo, mesActual
                     <option value="obligatoria">Obligatoria</option>
                   </select>
                   <select
+                    className="selector"
                     aria-label={`Cantidad de ${c.nombreComun}`}
                     value={eleccion.cantidad}
                     onChange={(ev) => actualizar(c.id, { cantidad: ev.target.value as NivelCantidad })}
@@ -55,7 +61,7 @@ export function SelectorEspecies({ elecciones, onCambio, clima, suelo, mesActual
                     <option value="media">Media</option>
                     <option value="mucha">Mucha</option>
                   </select>
-                </span>
+                </div>
               )}
             </li>
           )

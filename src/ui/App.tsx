@@ -93,7 +93,7 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
                 elecciones={estado.elecciones} onCambio={(e) => dispatch({ tipo: 'set_elecciones', elecciones: e })}
                 clima={estado.clima} suelo={estado.suelo} mesActual={estado.mesSiembra} superficieM2={superficieM2}
               />
-              <button type="button" disabled={estado.elecciones.length === 0} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'resultado' })}>Ver mi huerto</button>
+              <button type="button" className="boton boton-primario" disabled={estado.elecciones.length === 0} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'resultado' })}>Ver mi huerto</button>
             </div>
           )}
 
