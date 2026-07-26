@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proyecto 2 · Sección 1: sistema de estilos y armazón</title>
+<style>
+  :root {
+    --fondo: #F1F5F0;
+    --superficie: #FFFFFF;
+    --superficie-tenue: #FAFCFA;
+    --texto: #16241C;
+    --texto-medio: #4B5D51;
+    --texto-tenue: #5E6E64;
+    --borde: #DCE5DD;
+    --borde-suave: #EDF2EE;
+    --borde-verde: #C6DFCB;
+    --verde: #166534;
+    --verde-vivo: #16A34A;
+    --pista: #E3EBE4;
+    --radio-s: 8px;
+    --radio-m: 10px;
+    --radio-l: 14px;
+    --sombra: 0 1px 2px rgba(16,40,24,.06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 64px;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .envoltorio { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 24px; letter-spacing: -.02em; margin: 0 0 6px; }
+  h2 { font-size: 17px; letter-spacing: -.01em; margin: 40px 0 4px; }
+  .guia { color: var(--texto-medio); font-size: 14px; margin: 0 0 16px; max-width: 68ch; }
+  .nota { color: var(--texto-tenue); font-size: 13px; }
+  .bloque {
+    background: var(--superficie);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-l);
+    box-shadow: var(--sombra);
+    padding: 18px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 460px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--borde-suave); vertical-align: middle; }
+  th { color: var(--texto-tenue); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  tr:last-child td { border-bottom: none; }
+  code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 12.5px; }
+  .muestra { width: 34px; height: 22px; border-radius: 6px; border: 1px solid rgba(16,40,24,.14); display: inline-block; vertical-align: middle; }
+  .ok { color: var(--verde); font-weight: 650; }
+  .mal { color: #A02222; font-weight: 650; }
+  .dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .etiqueta-cmp { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-tenue); margin-bottom: 8px; }
+  .marco { border: 1px solid var(--borde); border-radius: var(--radio-l); overflow: hidden; background: var(--superficie); box-shadow: var(--sombra); }
+  .marco-barra { background: var(--superficie-tenue); border-bottom: 1px solid var(--borde-suave); padding: 7px 12px; font-size: 11px; font-weight: 600; color: var(--texto-tenue); letter-spacing: .04em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="envoltorio">
+
+<h1>Proyecto 2 · Sección 1</h1>
+<p class="guia">El sistema de estilos y el armazón, para que los veas antes de aprobar la sección. Esta página <strong>ya está pintada con los tokens que propongo</strong>: el fondo, las tarjetas, los bordes y los tamaños de letra que estás leyendo son los mismos que llevaría la app.</p>
+
+<!-- ══════════════ 1. PALETA ══════════════ -->
+<h2>1. Paleta</h2>
+<p class="guia">Los valores salen de las maquetas que ya aprobaste. La columna de contraste es la relación frente al fondo sobre el que se usa cada color; el mínimo para texto es 4,5:1.</p>
+
+<div class="bloque">
+<table>
+  <thead><tr><th></th><th>Token</th><th>Valor</th><th>Uso</th><th>Contraste</th></tr></thead>
+  <tbody>
+    <tr><td><span class="muestra" style="background:#F1F5F0"></span></td><td><code>--fondo</code></td><td><code>#F1F5F0</code></td><td>fondo de página</td><td class="nota">—</td></tr>
+    <tr><td><span class="muestra" style="background:#FFFFFF"></span></td><td><code>--superficie</code></td><td><code>#FFFFFF</code></td><td>tarjetas</td><td class="nota">—</td></tr>
+    <tr><td><span class="muestra" style="background:#FAFCFA"></span></td><td><code>--superficie-tenue</code></td><td><code>#FAFCFA</code></td><td>zona del plano</td><td class="nota">—</td></tr>
+    <tr><td><span class="muestra" style="background:#16241C"></span></td><td><code>--texto</code></td><td><code>#16241C</code></td><td>texto principal</td><td class="ok">16,1:1</td></tr>
+    <tr><td><span class="muestra" style="background:#4B5D51"></span></td><td><code>--texto-medio</code></td><td><code>#4B5D51</code></td><td>texto secundario</td><td class="ok">7,0:1</td></tr>
+    <tr><td><span class="muestra" style="background:#5E6E64"></span></td><td><code>--texto-tenue</code></td><td><code>#5E6E64</code></td><td>metadatos</td><td class="ok">5,4:1</td></tr>
+    <tr><td><span class="muestra" style="background:#DCE5DD"></span></td><td><code>--borde</code></td><td><code>#DCE5DD</code></td><td>borde de tarjeta</td><td class="nota">—</td></tr>
+    <tr><td><span class="muestra" style="background:#EDF2EE"></span></td><td><code>--borde-suave</code></td><td><code>#EDF2EE</code></td><td>separadores internos</td><td class="nota">—</td></tr>
+    <tr><td><span class="muestra" style="background:#C6DFCB"></span></td><td><code>--borde-verde</code></td><td><code>#C6DFCB</code></td><td>borde de botón</td><td class="nota">—</td></tr>
+    <tr><td><span class="muestra" style="background:#166534"></span></td><td><code>--verde</code></td><td><code>#166534</code></td><td>texto, bordes y botones</td><td class="ok">7,1:1</td></tr>
+    <tr><td><span class="muestra" style="background:#16A34A"></span></td><td><code>--verde-vivo</code></td><td><code>#16A34A</code></td><td><strong>solo decorativo</strong></td><td class="mal">3,3:1</td></tr>
+    <tr><td><span class="muestra" style="background:#E3EBE4"></span></td><td><code>--pista</code></td><td><code>#E3EBE4</code></td><td>progreso y segmentado</td><td class="nota">—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>2. El gris que hay que corregir</h2>
+<p class="guia">Las maquetas usan <code>#7A8B7F</code> para todos los metadatos. Se queda en 3,6:1 y no llega al mínimo. Propongo <code>#5E6E64</code>. Mira si notas la diferencia:</p>
+
+<div class="dos">
+  <div class="marco">
+    <div class="marco-barra">Maqueta · #7A8B7F · 3,6:1</div>
+    <div style="padding:14px 16px">
+      <div style="font-weight:650; font-size:15px">Bancal sur</div>
+      <div style="font-size:12px; color:#7A8B7F; margin-top:2px">2,40 × 1,20 m · 2,9 m² · 21 plantas</div>
+      <div style="font-size:12px; color:#7A8B7F; margin-top:10px">Siembra en marzo · clima mediterráneo interior</div>
+    </div>
+  </div>
+  <div class="marco">
+    <div class="marco-barra">Propuesta · #5E6E64 · 5,4:1</div>
+    <div style="padding:14px 16px">
+      <div style="font-weight:650; font-size:15px">Bancal sur</div>
+      <div style="font-size:12px; color:#5E6E64; margin-top:2px">2,40 × 1,20 m · 2,9 m² · 21 plantas</div>
+      <div style="font-size:12px; color:#5E6E64; margin-top:10px">Siembra en marzo · clima mediterráneo interior</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 3. TIPOGRAFÍA ══════════════ -->
+<h2>3. Tamaños de letra</h2>
+<p class="guia">La maqueta usa 13px de cuerpo y 11px de metadatos. Propongo subirlo. Las maquetas se miran de cerca en un marco pequeño; una app real a 13px se lee mal en móvil.</p>
+
+<div class="dos">
+  <div class="marco">
+    <div class="marco-barra">Maqueta · cuerpo 13 / meta 11</div>
+    <div style="padding:14px 16px">
+      <div style="font-size:20px; font-weight:700; letter-spacing:-.02em">Tu huerto</div>
+      <div style="font-size:11px; color:#5E6E64; margin-top:2px">2 bancales · 8,4 m²</div>
+      <p style="font-size:13px; color:#4B5D51; margin:10px 0 0">¿Quieres cambiar algo? Vuelve a las especies o a los bancales desde la parte de arriba y el huerto se recalcula solo.</p>
+      <p style="font-size:11px; color:#5E6E64; margin:8px 0 0">Estimaciones orientativas; dependen del cuidado y del año.</p>
+    </div>
+  </div>
+  <div class="marco">
+    <div class="marco-barra">Propuesta · cuerpo 15 / meta 12</div>
+    <div style="padding:14px 16px">
+      <div style="font-size:22px; font-weight:700; letter-spacing:-.02em">Tu huerto</div>
+      <div style="font-size:12px; color:#5E6E64; margin-top:2px">2 bancales · 8,4 m²</div>
+      <p style="font-size:15px; color:#4B5D51; margin:10px 0 0">¿Quieres cambiar algo? Vuelve a las especies o a los bancales desde la parte de arriba y el huerto se recalcula solo.</p>
+      <p style="font-size:12px; color:#5E6E64; margin:8px 0 0">Estimaciones orientativas; dependen del cuidado y del año.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 4. ARMAZÓN ══════════════ -->
+<h2>4. El armazón</h2>
+<p class="guia">Cabecera, miga de pan navegable y barra de progreso. <strong>Los pasos ya completados son pulsables</strong> (subrayados al pasar por encima), el actual está en verde y en negrita, y los que aún no has hecho salen apagados y no responden al clic. Pruébalo: pasa el ratón por «Ubicación» y luego por «Especies».</p>
+
+<div class="marco" style="margin-bottom:14px">
+  <div class="marco-barra">Paso 3 de 5 · el asistente a media faena</div>
+  <div style="background:var(--fondo); padding-bottom:20px">
+
+    <div style="background:#fff; border-bottom:1px solid var(--borde); padding:12px 20px">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
+        <div style="width:26px; height:26px; border-radius:8px; background:var(--verde-vivo); display:flex; align-items:center; justify-content:center; font-size:14px">🌱</div>
+        <span style="font-weight:650; font-size:15px">Huertos</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--texto-tenue); flex-wrap:wrap">
+        <a href="#" style="color:var(--verde); text-decoration:none; border-radius:4px" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Ubicación</a>
+        <span style="color:#C3D2C6">›</span>
+        <a href="#" style="color:var(--verde); text-decoration:none" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Bancales</a>
+        <span style="color:#C3D2C6">›</span>
+        <span style="color:var(--verde); font-weight:650">Suelo</span>
+        <span style="color:#C3D2C6">›</span>
+        <span style="color:#9FB0A4">Especies</span>
+        <span style="color:#C3D2C6">›</span>
+        <span style="color:#9FB0A4">Tu huerto</span>
+      </div>
+      <div style="height:3px; background:var(--pista); border-radius:2px; margin-top:8px">
+        <div style="height:3px; width:60%; background:var(--verde-vivo); border-radius:2px"></div>
+      </div>
+    </div>
+
+    <div style="padding:18px 20px 0; max-width:720px">
+      <div style="font-size:22px; font-weight:700; letter-spacing:-.02em; margin-bottom:2px">¿Cómo es tu suelo?</div>
+      <div style="font-size:13px; color:var(--texto-medio); margin-bottom:14px">Lo hemos estimado a partir de tu ubicación. Puedes corregirlo si lo conoces.</div>
+      <div style="background:#fff; border:1px solid var(--borde); border-radius:var(--radio-l); box-shadow:var(--sombra); padding:16px">
+        <div style="font-size:13px; font-weight:600; color:var(--texto-medio); margin-bottom:10px">Textura</div>
+        <div style="display:inline-flex; background:var(--pista); border-radius:9px; padding:3px; flex-wrap:wrap">
+          <span style="font-size:13px; padding:6px 12px; border-radius:7px; color:var(--texto-medio)">Arenoso</span>
+          <span style="font-size:13px; padding:6px 12px; border-radius:7px; background:#fff; color:var(--texto); font-weight:600; box-shadow:0 1px 2px rgba(16,40,24,.10)">Franco</span>
+          <span style="font-size:13px; padding:6px 12px; border-radius:7px; color:var(--texto-medio)">Arcilloso</span>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px">
+          <span style="font-size:13px; font-weight:600; color:#fff; background:var(--verde); border-radius:var(--radio-s); padding:8px 16px">Siguiente</span>
+          <span style="font-size:13px; font-weight:600; color:var(--verde); border:1px solid var(--borde-verde); border-radius:var(--radio-s); padding:8px 16px">Atrás</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p class="guia"><strong>Consecuencia:</strong> como la miga ya sirve para volver atrás, desaparecen del resultado los botones «Ajustar especies» y «Ajustar bancales». El guardado se queda donde está hoy, como tarjeta al pie del resultado.</p>
+
+<!-- ══════════════ 5. BOTONES ══════════════ -->
+<h2>5. Botones y foco</h2>
+<p class="guia">Tres variantes, todas con el verde oscuro. Dale al tabulador para ver el anillo de foco, que hoy no existe.</p>
+
+<div class="bloque">
+  <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+    <button style="font-family:inherit; font-size:14px; font-weight:600; color:#fff; background:var(--verde); border:1px solid var(--verde); border-radius:var(--radio-s); padding:9px 18px; cursor:pointer">Ver mi huerto</button>
+    <button style="font-family:inherit; font-size:14px; font-weight:600; color:var(--verde); background:#fff; border:1px solid var(--borde-verde); border-radius:var(--radio-s); padding:9px 18px; cursor:pointer">Descargar PDF</button>
+    <button style="font-family:inherit; font-size:14px; font-weight:600; color:var(--texto-medio); background:transparent; border:1px solid transparent; border-radius:var(--radio-s); padding:9px 14px; cursor:pointer">Borrar plan</button>
+    <button disabled style="font-family:inherit; font-size:14px; font-weight:600; color:#9FB0A4; background:#F4F7F4; border:1px solid var(--borde); border-radius:var(--radio-s); padding:9px 18px">Siguiente</button>
+  </div>
+  <p class="nota" style="margin:12px 0 0">Relleno · contorno · plano · desactivado. El anillo de foco es <code>outline: 2px solid var(--verde)</code> con 2px de separación.</p>
+</div>
+
+<!-- ══════════════ 6. ESPACIADO ══════════════ -->
+<h2>6. Espaciado y radios</h2>
+<div class="bloque">
+<table>
+  <thead><tr><th>Token</th><th>Valor</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>--espacio-1</code></td><td>4px</td><td><span style="display:inline-block; height:12px; width:4px; background:var(--verde-vivo); border-radius:2px"></span></td></tr>
+    <tr><td><code>--espacio-2</code></td><td>8px</td><td><span style="display:inline-block; height:12px; width:8px; background:var(--verde-vivo); border-radius:2px"></span></td></tr>
+    <tr><td><code>--espacio-3</code></td><td>12px</td><td><span style="display:inline-block; height:12px; width:12px; background:var(--verde-vivo); border-radius:2px"></span></td></tr>
+    <tr><td><code>--espacio-4</code></td><td>16px</td><td><span style="display:inline-block; height:12px; width:16px; background:var(--verde-vivo); border-radius:2px"></span></td></tr>
+    <tr><td><code>--espacio-5</code></td><td>24px</td><td><span style="display:inline-block; height:12px; width:24px; background:var(--verde-vivo); border-radius:2px"></span></td></tr>
+    <tr><td><code>--espacio-6</code></td><td>32px</td><td><span style="display:inline-block; height:12px; width:32px; background:var(--verde-vivo); border-radius:2px"></span></td></tr>
+    <tr><td><code>--radio-s / m / l</code></td><td>8 / 10 / 14px</td><td>
+      <span style="display:inline-block; width:22px; height:22px; background:var(--pista); border-radius:8px; margin-right:5px"></span>
+      <span style="display:inline-block; width:22px; height:22px; background:var(--pista); border-radius:10px; margin-right:5px"></span>
+      <span style="display:inline-block; width:22px; height:22px; background:var(--pista); border-radius:14px"></span>
+    </td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="guia" style="margin-top:32px">Si algo de esto no te encaja —el gris, los tamaños, el ancho, el comportamiento de la miga— dímelo y lo cambio antes de escribir la spec.</p>
+
+</div>
+</body>
+</html>
