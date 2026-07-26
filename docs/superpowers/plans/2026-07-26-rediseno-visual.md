@@ -1990,19 +1990,16 @@ Tres ejecuciones a ~8,5 minutos cada una: unos 25 minutos. **Lanzarlo en segundo
 
 Esperado: «La suite es fiable: 3 de 3 ejecuciones correctas». El guion compara los archivos ejecutados con los que hay en disco; ahora hay **16** archivos de test (los 14 de antes más `tamano-icono.test.ts` y `MigaPasos.test.tsx`) y el guion los cuenta solo, no hay nada que actualizar.
 
-- [ ] **Paso 8: Commit y despliegue**
+- [ ] **Paso 8: Commit**
 
 ```bash
 git add src/ui/PieAtribuciones.tsx src/ui/AvisoPrivacidad.tsx src/estilos.css
 git commit -m "feat: revestir el pie de atribuciones y cerrar el rediseño"
-git push
 ```
 
-El push despliega solo. **Avisar al usuario de que ya puede revisar https://Deliath.github.io/huertos/**, que es donde se juzga lo puramente visual: aquí no hay navegador.
+**Sin `git push`.** El trabajo va en la rama `feat/rediseno-visual`, y el despliegue solo se dispara al empujar a `main`. Fusionar y publicar es una decisión de la usuaria, que se le presenta al terminar la revisión final de toda la rama. Nadie despliega por su cuenta.
 
-- [ ] **Paso 9: Recordarle el recorrido pendiente**
-
-Sigue abierto desde el proyecto 1 el recorrido de verificación de la §8 de la spec de publicación, y en particular el punto 2: entrar en el paso de ubicación, elegir ubicación precisa y pinchar en el mapa para ver si aparece el marcador. Nadie lo ha comprobado nunca. Ahora que el usuario va a mirar la web de todas formas, es el momento de pedírselo.
+Queda pendiente, para cuando se publique: el recorrido de verificación de la §8 de la spec de publicación del proyecto 1, y en particular su punto 2 —entrar en el paso de ubicación, elegir ubicación precisa y pinchar en el mapa para ver si sale el marcador—, que no ha comprobado nadie nunca porque aquí no hay navegador. Es cosa del coordinador recordárselo a la usuaria, no de esta tarea.
 
 ---
 
