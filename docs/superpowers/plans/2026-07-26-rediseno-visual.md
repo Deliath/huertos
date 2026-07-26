@@ -14,7 +14,7 @@ Se aplican a **todas** las tareas:
 
 - **Todo en español**: texto de interfaz, comentarios de código, nombres de clases CSS, mensajes de commit. Excepción: el texto de la licencia MIT.
 - **Ninguna dependencia nueva.** Nada que obligue a tocar la CSP de `index.html`.
-- **Ningún color literal fuera de `:root`**, salvo en `PlanoBancal.tsx` y `tamano-icono.ts` (§7.2 de la spec).
+- **Ningún color literal fuera de `:root`**, con dos excepciones y ninguna más: las constantes `COLOR_*` de `PlanoBancal.tsx` (§7.2 de la spec: el SVG se exporta aislado y perdería las clases) y el azul `#1a5aa8` de las heladas en `ResumenClima.tsx` (es un color con significado, ya existía y contrasta 6,1:1).
 - **El SVG del plano se estila con atributos de presentación en línea, nunca con clases.** `exportar.ts` clona y serializa el nodo aislado; con clases, el PNG y el PDF saldrían sin color.
 - **Los controles siguen siendo elementos nativos.** Un control «segmentado» es un `<fieldset>` con `<legend>` e `<input type="radio">` reales; cambia el aspecto, no la semántica.
 - **Contraste mínimo 4,5:1** para todo texto. `--verde-vivo` (`#16A34A`, 3,3:1) solo para elementos decorativos: nunca texto ni fondo de texto.
