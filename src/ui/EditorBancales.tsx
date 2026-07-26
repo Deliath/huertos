@@ -40,37 +40,66 @@ export function EditorBancales({ bancales, orientacionNorte, onAñadir, onBorrar
   }
 
   return (
-    <div>
-      <label>Orientación:
-        <select value={orientacionNorte} onChange={(e) => onOrientacion(e.target.value as Orientacion)}>
-          {ORIENTACIONES.map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
-      </label>
-      <div>
-        <label>Ancho (m)<input type="number" min="0" step="0.1" value={ancho} onChange={(e) => setAncho(e.target.value)} /></label>
-        <label>Largo (m)<input type="number" min="0" step="0.1" value={largo} onChange={(e) => setLargo(e.target.value)} /></label>
-        <button type="button" onClick={añadir}>Añadir bancal</button>
+    <div className="contenido-estrecho">
+      <h2 className="titulo-pantalla">Tus bancales</h2>
+      <p className="subtitulo-pantalla">Añade cada bancal con sus medidas. Verás una vista previa a escala.</p>
+
+      <div className="tarjeta">
+        <div className="tarjeta-cuerpo">
+          <fieldset className="grupo-segmentado" style={{ marginBottom: 'var(--espacio-4)' }}>
+            <legend>¿Hacia dónde está el norte?</legend>
+            <div className="segmentado">
+              {ORIENTACIONES.map((o) => (
+                <label key={o} className="segmentado-opcion">
+                  <input
+                    type="radio" name="orientacion-norte" value={o}
+                    checked={orientacionNorte === o}
+                    onChange={() => onOrientacion(o)}
+                  />
+                  {o}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="fila">
+            <label className="campo">Ancho (m)
+              <input className="entrada" type="number" min="0" step="0.1" value={ancho} onChange={(e) => setAncho(e.target.value)} />
+            </label>
+            <label className="campo">Largo (m)
+              <input className="entrada" type="number" min="0" step="0.1" value={largo} onChange={(e) => setLargo(e.target.value)} />
+            </label>
+            <button type="button" className="boton boton-contorno" onClick={añadir}>Añadir bancal</button>
+          </div>
+
+          {previewValido && (
+            <div style={{ marginTop: 'var(--espacio-4)' }}>
+              <h4 className="meta">Vista previa</h4>
+              <PlanoBancal
+                bancal={{ id: 'preview', nombre: 'nuevo bancal', anchoM, largoM }}
+                asignaciones={[]}
+                orientacionNorte={orientacionNorte}
+                modoIntercalado="bloques"
+                maxAnchoPx={anchoPxParaLadoLargo(anchoM, largoM, 260)}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
-      {previewValido && (
-        <div>
-          <h4>Vista previa</h4>
-          <PlanoBancal
-            bancal={{ id: 'preview', nombre: 'nuevo bancal', anchoM, largoM }}
-            asignaciones={[]}
-            orientacionNorte={orientacionNorte}
-            modoIntercalado="bloques"
-            maxAnchoPx={anchoPxParaLadoLargo(anchoM, largoM, 260)}
-          />
-        </div>
-      )}
-
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+      <ul className="lista-limpia">
         {bancales.map((b) => (
-          <li key={b.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <PlanoBancal bancal={b} asignaciones={[]} orientacionNorte={orientacionNorte} modoIntercalado="bloques" maxAnchoPx={b.anchoM * pxPorMetro} />
-            <span>{b.nombre}: {b.anchoM} × {b.largoM} m</span>
-            <button type="button" onClick={() => onBorrar(b.id)} aria-label={`Borrar ${b.nombre}`}>✕</button>
+          <li key={b.id} className="tarjeta">
+            <div className="tarjeta-cabecera">
+              <div className="fila">
+                <PlanoBancal bancal={b} asignaciones={[]} orientacionNorte={orientacionNorte} modoIntercalado="bloques" maxAnchoPx={b.anchoM * pxPorMetro} />
+                <div>
+                  <div className="tarjeta-titulo">{b.nombre}</div>
+                  <div className="meta">{b.anchoM} × {b.largoM} m</div>
+                </div>
+              </div>
+              <button type="button" className="boton boton-plano boton-icono" onClick={() => onBorrar(b.id)} aria-label={`Borrar ${b.nombre}`}>✕</button>
+            </div>
           </li>
         ))}
       </ul>

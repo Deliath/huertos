@@ -76,7 +76,7 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
                 onBorrar={(id) => dispatch({ tipo: 'borrar_bancal', id })}
                 onOrientacion={(o) => dispatch({ tipo: 'set_orientacion', orientacion: o })}
               />
-              <button type="button" disabled={estado.bancales.length === 0} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'suelo' })}>Siguiente</button>
+              <button type="button" className="boton boton-primario" disabled={estado.bancales.length === 0} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'suelo' })}>Siguiente</button>
             </div>
           )}
 
