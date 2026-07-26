@@ -472,6 +472,17 @@ a { color: var(--verde); }
 }
 
 .mes-actual { font-weight: 700; }
+.mes-normal { font-weight: 400; }
+
+/* En las celdas del cuerpo (sin regla de font-weight propia) .mes-actual y
+ * .mes-normal de arriba ya deciden el peso sin competencia. Pero en la
+ * cabecera, `.tabla thead th` (una clase + dos tipos, especificidad 0-1-2) le
+ * gana a una clase sola (0-1-0): sin este refuerzo, tanto `.mes-actual` como
+ * `.mes-normal` perderían siempre contra los 600 de `.tabla thead th` y el
+ * mes actual dejaría de resaltar. Se repite aquí con la especificidad que
+ * necesita para ganar en ese contexto. */
+.tabla thead th.mes-actual { font-weight: 700; }
+.tabla thead th.mes-normal { font-weight: 400; }
 
 .tabla caption {
   caption-side: bottom;

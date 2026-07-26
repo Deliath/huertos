@@ -24,7 +24,7 @@ export function ResumenClima({ clima, mesActual }: { clima: PerfilClima; mesActu
                 <th
                   key={m}
                   scope="col"
-                  className={i === mesActual ? 'mes-actual' : undefined}
+                  className={i === mesActual ? 'mes-actual' : 'mes-normal'}
                   data-helada={conHelada[i] ? 'true' : undefined}
                   aria-current={i === mesActual ? 'date' : undefined}
                   title={conHelada[i] ? 'Riesgo de helada' : undefined}
