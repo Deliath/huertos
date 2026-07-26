@@ -27,7 +27,7 @@ export function PasoSuelo({ sueloAuto, onElegir }: { sueloAuto: PerfilSuelo | nu
       {!sueloAuto && (
         <div className="tarjeta">
           <div className="tarjeta-cuerpo">
-            <h3 className="tarjeta-titulo">¿No sabes qué suelo tienes? Averígualo así</h3>
+            <h2 className="tarjeta-titulo">¿No sabes qué suelo tienes? Averígualo así</h2>
             {GUIA_EXPERIMENTACION.map((g) => (
               <details key={g.titulo} style={{ marginTop: 'var(--espacio-2)' }}>
                 <summary>{g.titulo}</summary>

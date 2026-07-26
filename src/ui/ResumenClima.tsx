@@ -11,7 +11,7 @@ export function ResumenClima({ clima, mesActual }: { clima: PerfilClima; mesActu
 
   return (
     <section>
-      <h3 className="tarjeta-titulo">Clima detectado</h3>
+      <h2 className="tarjeta-titulo">Clima detectado</h2>
       <div className="envoltorio-tabla">
         <table className="tabla">
           <caption>

@@ -19,7 +19,7 @@ export function EditorSuelo({ inicial, onCambio }: { inicial: PerfilSuelo | null
 
   return (
     <section>
-      <h3 className="tarjeta-titulo">Tu suelo</h3>
+      <h2 className="tarjeta-titulo">Tu suelo</h2>
       <label className="campo">Tipo de suelo{' '}
         <select
           className="selector"

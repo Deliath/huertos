@@ -75,7 +75,7 @@ export function EditorBancales({ bancales, orientacionNorte, onAñadir, onBorrar
 
           {previewValido && (
             <div style={{ marginTop: 'var(--espacio-4)' }}>
-              <h3 className="meta">Vista previa</h3>
+              <h2 className="meta">Vista previa</h2>
               <PlanoBancal
                 bancal={{ id: 'preview', nombre: 'nuevo bancal', anchoM, largoM }}
                 asignaciones={[]}
