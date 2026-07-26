@@ -227,10 +227,18 @@ fallar, antes de darlo por bueno.
 ## 10. Pendiente heredado
 
 `postcss` arrastra una vulnerabilidad alta (path traversal al cargar mapas de
-código). Se dejó sin arreglar al cerrar el proyecto 1 porque el proyecto no
-tenía ni un archivo CSS. Este proyecto introduce CSS, así que entra: se ejecuta
-`npm audit fix` **en la primera tarea, antes de crear `src/estilos.css`**, y se
-comprueba que `npm audit` baja a cero.
+código). Se dejó sin arreglar al cerrar el proyecto 1 con el argumento de que el
+proyecto no tenía ningún archivo CSS.
+
+**Ese argumento era falso:** `MapaSelector.tsx` importa `leaflet/dist/leaflet.css`
+desde antes, y el build ya emitía un `dist/assets/MapaSelector-*.css`. Es decir,
+postcss ya estaba procesando CSS de terceros, que es justo el caso que describe
+el aviso. Sigue sin ser explotable —el CSS es el de una dependencia fijada, no
+uno que traiga el usuario—, pero la razón para aplazarlo no se sostenía.
+
+Ahora ya hay arreglo disponible: se ejecuta `npm audit fix` **en la primera
+tarea, antes de crear `src/estilos.css`**, y se comprueba que `npm audit` baja a
+cero.
 
 ## 11. Riesgos
 
