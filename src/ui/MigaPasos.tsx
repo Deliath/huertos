@@ -2,7 +2,7 @@ import type { Paso } from '../app/estado'
 
 // El asistente, en orden. 'inicio' queda fuera a propósito: es la portada, no
 // un paso, y desde ella no hay miga que enseñar.
-export const PASOS_ASISTENTE: { paso: Paso; etiqueta: string }[] = [
+const PASOS_ASISTENTE: { paso: Paso; etiqueta: string }[] = [
   { paso: 'ubicacion', etiqueta: 'Ubicación' },
   { paso: 'bancales', etiqueta: 'Bancales' },
   { paso: 'suelo', etiqueta: 'Suelo' },

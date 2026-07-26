@@ -35,6 +35,7 @@
    * grep en la tarea 12. */
   --fondo-desactivado: #F4F7F4;
   --texto-sobre-verde: #FFFFFF;
+  --separador: #C3D2C6;
 
   --espacio-1: 4px;
   --espacio-2: 8px;
@@ -151,7 +152,7 @@ a { color: var(--verde); }
   padding: 2px 4px;
 }
 
-.miga-separador { color: #C3D2C6; }
+.miga-separador { color: var(--separador); }
 
 .progreso {
   height: 3px;
