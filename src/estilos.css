@@ -108,6 +108,40 @@ a { color: var(--verde); }
   color: var(--texto-tenue);
 }
 
+.cabecera {
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borde);
+  padding: var(--espacio-3) var(--espacio-4);
+}
+
+.cabecera-interior {
+  max-width: var(--ancho-contenido);
+  margin: 0 auto;
+}
+
+.cabecera-marca {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-3);
+}
+
+.cabecera-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radio-s);
+  background: var(--verde-vivo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.cabecera-nombre {
+  font-weight: 650;
+  font-size: 15px;
+}
+
 .miga {
   display: flex;
   flex-wrap: wrap;
