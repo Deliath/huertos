@@ -1,0 +1,297 @@
+/* Hoja de estilos única de la aplicación.
+ *
+ * Orden de los bloques: tokens → base → armazón → tarjetas → botones →
+ * formularios → avisos → utilidades → móvil. Ningún color literal fuera de
+ * :root; la excepción deliberada es el SVG del plano (PlanoBancal.tsx), que
+ * se estila en línea porque se exporta aislado y perdería las clases.
+ */
+
+/* ─────────────── TOKENS ─────────────── */
+:root {
+  --fondo: #F1F5F0;
+  --superficie: #FFFFFF;
+  --superficie-tenue: #FAFCFA;
+
+  --texto: #16241C;
+  --texto-medio: #4B5D51;
+  --texto-tenue: #5E6E64;
+  --texto-apagado: #9FB0A4;
+
+  --borde: #DCE5DD;
+  --borde-suave: #EDF2EE;
+  --borde-verde: #C6DFCB;
+
+  --verde: #166534;
+  /* Decorativo: 3,3:1, no alcanza el mínimo para texto. */
+  --verde-vivo: #16A34A;
+  --pista: #E3EBE4;
+
+  --aviso-fondo: #FFF8E6;
+  --aviso-borde: #E8D9A8;
+  --aviso-texto: #6B5200;
+
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 24px;
+  --espacio-6: 32px;
+
+  --radio-s: 8px;
+  --radio-m: 10px;
+  --radio-l: 14px;
+
+  --sombra: 0 1px 2px rgba(16, 40, 24, .06);
+  --sombra-elevada: 0 1px 2px rgba(16, 40, 24, .10);
+
+  --fuente: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ancho-contenido: 960px;
+  --ancho-estrecho: 720px;
+}
+
+/* ─────────────── BASE ─────────────── */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--fuente);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--texto);
+  background: var(--fondo);
+}
+
+a { color: var(--verde); }
+
+:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+  border-radius: var(--radio-s);
+}
+
+/* ─────────────── ARMAZÓN ─────────────── */
+.pagina { min-height: 100vh; }
+
+.contenido {
+  max-width: var(--ancho-contenido);
+  margin: 0 auto;
+  padding: var(--espacio-5) var(--espacio-4) var(--espacio-6);
+}
+
+.contenido-estrecho {
+  max-width: var(--ancho-estrecho);
+  margin: 0 auto;
+}
+
+.titulo-pantalla {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin: 0 0 var(--espacio-1);
+}
+
+.subtitulo-pantalla {
+  font-size: 15px;
+  color: var(--texto-medio);
+  margin: 0 0 var(--espacio-4);
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+/* ─────────────── TARJETAS ─────────────── */
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-l);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  margin-bottom: var(--espacio-3);
+}
+
+.tarjeta-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  flex-wrap: wrap;
+  padding: var(--espacio-3) var(--espacio-4);
+  border-bottom: 1px solid var(--borde-suave);
+}
+
+.tarjeta-cuerpo { padding: var(--espacio-4); }
+
+.tarjeta-titulo {
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0;
+}
+
+/* ─────────────── BOTONES ─────────────── */
+.boton {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radio-s);
+  padding: 9px 18px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--texto-medio);
+}
+
+.boton:disabled {
+  cursor: default;
+  color: var(--texto-apagado);
+  background: #F4F7F4;
+  border-color: var(--borde);
+}
+
+.boton-primario {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: #fff;
+}
+
+.boton-contorno {
+  background: var(--superficie);
+  border-color: var(--borde-verde);
+  color: var(--verde);
+}
+
+.boton-plano { color: var(--texto-medio); }
+
+.boton-icono {
+  padding: 4px 9px;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.boton-pequeno {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+/* ─────────────── FORMULARIOS ─────────────── */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-medio);
+}
+
+.entrada,
+.selector {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-s);
+  padding: 8px 10px;
+}
+
+.entrada:disabled { background: #F4F7F4; color: var(--texto-apagado); }
+
+/* Control segmentado: por dentro sigue siendo un fieldset con radios reales.
+ * El radio se mantiene enfocable y visible para el lector de pantalla; solo
+ * se oculta a la vista.
+ *
+ * La píldora es un div INTERIOR, no el propio fieldset: un <legend> dentro de
+ * un fieldset con display:inline-flex se convierte en elemento flex y se mete
+ * dentro de la píldora. */
+.grupo-segmentado {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.grupo-segmentado legend {
+  padding: 0;
+  margin-bottom: var(--espacio-2);
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.segmentado {
+  display: inline-flex;
+  flex-wrap: wrap;
+  background: var(--pista);
+  border-radius: 9px;
+  padding: 3px;
+}
+
+.segmentado-opcion {
+  position: relative;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  color: var(--texto-medio);
+  cursor: pointer;
+}
+
+.segmentado-opcion input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.segmentado-opcion:has(input:checked) {
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 600;
+  box-shadow: var(--sombra-elevada);
+}
+
+.segmentado-opcion:has(input:focus-visible) {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+}
+
+/* ─────────────── AVISOS ─────────────── */
+.aviso {
+  background: var(--aviso-fondo);
+  border: 1px solid var(--aviso-borde);
+  border-radius: var(--radio-m);
+  color: var(--aviso-texto);
+  font-size: 14px;
+  padding: var(--espacio-3) var(--espacio-4);
+  margin: var(--espacio-3) 0;
+}
+
+.aviso-atencion { font-weight: 600; }
+
+/* ─────────────── UTILIDADES ─────────────── */
+.lista-limpia {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--espacio-3);
+}
+
+/* Dentro de la rejilla el hueco lo pone el gap, no el margen de la tarjeta. */
+.rejilla > .tarjeta { margin-bottom: 0; }
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  flex-wrap: wrap;
+}
+
+/* ─────────────── MÓVIL ─────────────── */
+@media (max-width: 720px) {
+  .contenido { padding: var(--espacio-4) var(--espacio-3) var(--espacio-5); }
+  .rejilla { grid-template-columns: 1fr; }
+}
