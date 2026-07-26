@@ -1,13 +1,14 @@
 import type { PerfilSuelo } from '../dominio/tipos'
 import { sueloManual } from '../dominio/suelo'
 import { TIPOS_SUELO, GUIA_EXPERIMENTACION } from '../datos/suelos'
+import { numero } from '../app/formato'
 
 export function PasoSuelo({ sueloAuto, onElegir }: { sueloAuto: PerfilSuelo | null; onElegir: (s: PerfilSuelo) => void }) {
   return (
     <div className="contenido-estrecho">
       <h2 className="titulo-pantalla">¿Cómo es tu suelo?</h2>
       {sueloAuto && (
-        <p className="subtitulo-pantalla">Hemos deducido de tu ubicación un suelo <strong>{sueloAuto.textura}</strong> (pH {sueloAuto.ph}). Puedes cambiarlo abajo.</p>
+        <p className="subtitulo-pantalla">Hemos deducido de tu ubicación un suelo <strong>{sueloAuto.textura}</strong> (pH {numero(sueloAuto.ph)}). Puedes cambiarlo abajo.</p>
       )}
       <div className="tarjeta">
         <div className="tarjeta-cuerpo">

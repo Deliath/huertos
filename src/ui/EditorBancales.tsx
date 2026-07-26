@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Bancal, Orientacion } from '../dominio/tipos'
 import { PlanoBancal } from './PlanoBancal'
+import { numero } from '../app/formato'
 
 interface Props {
   bancales: Bancal[]
@@ -95,7 +96,7 @@ export function EditorBancales({ bancales, orientacionNorte, onAñadir, onBorrar
                 <PlanoBancal bancal={b} asignaciones={[]} orientacionNorte={orientacionNorte} modoIntercalado="bloques" maxAnchoPx={b.anchoM * pxPorMetro} />
                 <div>
                   <div className="tarjeta-titulo">{b.nombre}</div>
-                  <div className="meta">{b.anchoM} × {b.largoM} m</div>
+                  <div className="meta">{numero(b.anchoM)} × {numero(b.largoM)} m</div>
                 </div>
               </div>
               <button type="button" className="boton boton-plano boton-icono" onClick={() => onBorrar(b.id)} aria-label={`Borrar ${b.nombre}`}>✕</button>

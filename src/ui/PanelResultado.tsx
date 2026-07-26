@@ -3,6 +3,7 @@ import type { Propuesta } from '../app/proponer'
 import type { Bancal, Orientacion } from '../dominio/tipos'
 import { buscarCultivo } from '../datos/cultivos'
 import { cabeUnaMas, type ModoIntercalado } from '../dominio/distribucion'
+import { numero } from '../app/formato'
 import { PlanoBancal } from './PlanoBancal'
 import { VistaCalendario } from './VistaCalendario'
 
@@ -56,7 +57,7 @@ export function PanelResultado({ propuesta, bancales, orientacionNorte, modoInte
               <div className="tarjeta-cabecera">
                 <div>
                   <h3 className="tarjeta-titulo">{b.nombre}</h3>
-                  <div className="meta">{b.anchoM} × {b.largoM} m · {(b.anchoM * b.largoM).toFixed(1)} m² · {totalPlantas} plantas</div>
+                  <div className="meta">{numero(b.anchoM)} × {numero(b.largoM)} m · {numero(b.anchoM * b.largoM, 2)} m² · {totalPlantas} plantas</div>
                 </div>
                 <div className="fila">
                   <button type="button" className="boton boton-contorno boton-pequeno" onClick={() => { void exportarPng(b) }}>Descargar PNG</button>
@@ -117,7 +118,7 @@ export function PanelResultado({ propuesta, bancales, orientacionNorte, modoInte
                 <li key={c.cultivoId} className="leyenda-fila">
                   <span aria-hidden="true">{buscarCultivo(c.cultivoId)?.icono}</span>
                   <span className="leyenda-nombre">{nombre(c.cultivoId)} — ~{c.numPlantas} plantas</span>
-                  <strong>{c.cosecha!.cantidadMin}–{c.cosecha!.cantidadMax} {c.cosecha!.unidad}</strong>
+                  <strong>{numero(c.cosecha!.cantidadMin)}–{numero(c.cosecha!.cantidadMax)} {c.cosecha!.unidad}</strong>
                 </li>
               ))}
             </ul>
