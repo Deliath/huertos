@@ -20,7 +20,7 @@ Se aplican a **todas** las tareas:
 - **Contraste mínimo 4,5:1** para todo texto. `--verde-vivo` (`#16A34A`, 3,3:1) solo para elementos decorativos: nunca texto ni fondo de texto.
 - **No se afirma sobre color en los tests.** Vitest no carga la hoja de estilos; un test de color sería falso.
 - **Si un test existente falla, se arregla sin debilitar la aserción.** Si la única forma de que pase es relajar lo que comprueba, **parar y preguntar**.
-- **Durante las tareas, ejecutar solo los tests afectados** con `npx vitest run <archivo>` (segundos). La suite completa tarda ~8,5 minutos y solo se ejecuta en la tarea 12.
+- **Durante las tareas, ejecutar solo los tests afectados** con `npx vitest run <archivo>` (segundos). La suite completa tarda ~8,5 minutos y solo se ejecuta en la tarea 13.
 - **Cualquier ejecución larga va en segundo plano** (la herramienta Bash corta a los 10 minutos), y hay que consultar su salida en bucle, no esperar una notificación.
 
 ---
@@ -100,7 +100,7 @@ Esperado: `found 0 vulnerabilities`. Si `npm audit fix` no la resuelve y propone
 
   /* Estado y contraste. Existen como tokens y no como literales sueltos para
    * que la regla «ningún color fuera de :root» siga siendo comprobable con un
-   * grep en la tarea 12. */
+   * grep en la tarea 13. */
   --fondo-desactivado: #F4F7F4;
   --texto-sobre-verde: #FFFFFF;
   --separador: #C3D2C6;
@@ -1783,7 +1783,125 @@ en rejilla de tarjetas."
 
 ---
 
-## Tarea 12: Pie, cierre y verificación completa
+## Tarea 12: Formato numérico en español
+
+La interfaz está en español pero los números salen con punto decimal: «6.0 m²», «0.4 × 1.2 m». Lo detectó la revisión de la tarea 11. No lo introduce el rediseño —viene de antes—, pero se arregla aquí, en toda la aplicación, por decisión de la usuaria.
+
+**Archivos:**
+- Modificar: `src/app/formato.ts` (ya existe, con `nombreMes` y `rangoMeses`)
+- Modificar: `src/ui/PanelResultado.tsx`, `src/ui/EditorBancales.tsx`, `src/ui/PasoSuelo.tsx`
+- Test: `src/app/formato.test.ts` (existente, se amplía)
+
+**Interfaces:**
+- Produce: `numero(valor: number, decimalesMax?: number): string`.
+
+**Qué NO entra:** las coordenadas de `src/ui/plan-resumen.ts:8` se quedan con punto. Con coma decimal, el par «40,42, -3,70» se vuelve ambiguo porque la coma separa también los dos valores. La notación de coordenadas con punto es la habitual en cartografía y no se toca.
+
+- [ ] **Paso 1: Escribir el test que falla**
+
+Añadir al final de `src/app/formato.test.ts`:
+
+```ts
+describe('numero', () => {
+  it('usa la coma como separador decimal', () => {
+    expect(numero(2.88, 2)).toBe('2,88')
+    expect(numero(1.2)).toBe('1,2')
+  })
+
+  it('no arrastra ceros finales innecesarios', () => {
+    expect(numero(6)).toBe('6')
+    expect(numero(2.5, 2)).toBe('2,5')
+  })
+
+  it('redondea a los decimales pedidos', () => {
+    expect(numero(2.88)).toBe('2,9')
+    expect(numero(0.04, 2)).toBe('0,04')
+  })
+
+  it('por defecto muestra un decimal como mucho', () => {
+    expect(numero(3.14159)).toBe('3,1')
+  })
+})
+```
+
+Añadir `numero` a la importación que ya haya del módulo, y `describe`/`it`/`expect` si el archivo no los importa ya.
+
+- [ ] **Paso 2: Ejecutar el test y verlo fallar**
+
+Run: `npx vitest run src/app/formato.test.ts`
+Expected: FALLO, «numero is not a function» o un error de importación.
+
+- [ ] **Paso 3: Escribir la implementación**
+
+Añadir a `src/app/formato.ts`:
+
+```ts
+// La interfaz está en español, así que los números se muestran con coma
+// decimal. `maximumFractionDigits` también quita los ceros finales, que es lo
+// que se quiere: «6 m²» y no «6,0 m²».
+export function numero(valor: number, decimalesMax = 1): string {
+  return valor.toLocaleString('es-ES', { maximumFractionDigits: decimalesMax })
+}
+```
+
+- [ ] **Paso 4: Ejecutar el test y verlo pasar**
+
+Run: `npx vitest run src/app/formato.test.ts`
+Expected: PASA.
+
+- [ ] **Paso 5: Aplicarlo en las tres pantallas**
+
+En `src/ui/PanelResultado.tsx`, la cabecera del bancal. La superficie usa dos decimales para que un bancal muy pequeño no se muestre como «0»:
+
+```tsx
+                  <div className="meta">{numero(b.anchoM)} × {numero(b.largoM)} m · {numero(b.anchoM * b.largoM, 2)} m² · {totalPlantas} plantas</div>
+```
+
+En la sección de cosecha, el rango:
+
+```tsx
+                  <strong>{numero(c.cosecha!.cantidadMin)}–{numero(c.cosecha!.cantidadMax)} {c.cosecha!.unidad}</strong>
+```
+
+En `src/ui/EditorBancales.tsx`, la fila de cada bancal:
+
+```tsx
+                  <div className="meta">{numero(b.anchoM)} × {numero(b.largoM)} m</div>
+```
+
+En `src/ui/PasoSuelo.tsx`, el pH deducido:
+
+```tsx
+        <p className="subtitulo-pantalla">Hemos deducido de tu ubicación un suelo <strong>{sueloAuto.textura}</strong> (pH {numero(sueloAuto.ph)}). Puedes cambiarlo abajo.</p>
+```
+
+Añadir en cada archivo `import { numero } from '../app/formato'`.
+
+**No tocar** las distancias de la leyenda (`{c.distanciaPlantaCm} × {c.distanciaLineaCm} cm`): son enteros en centímetros y no tienen parte decimal.
+
+- [ ] **Paso 6: Comprobar que los tests que consultan esos textos siguen pasando**
+
+```bash
+npx vitest run src/app/formato.test.ts src/ui/PanelResultado.test.tsx src/ui/EditorBancales.test.tsx src/ui/PasoSuelo.test.tsx
+npm run lint
+```
+
+Si alguna consulta buscaba un texto con punto decimal, actualízala al texto con coma: es la misma aserción sobre el texto correcto. Si para que pase hubiera que debilitar lo que comprueba, **parar y preguntar**.
+
+- [ ] **Paso 7: Commit**
+
+```bash
+git add src/app/formato.ts src/app/formato.test.ts src/ui/PanelResultado.tsx src/ui/EditorBancales.tsx src/ui/PasoSuelo.tsx
+git commit -m "feat: coma decimal en los números de la interfaz
+
+La interfaz está en español pero los números salían con punto. Las
+coordenadas se quedan con punto a propósito: con coma, el par de valores
+se vuelve ambiguo."
+```
+
+---
+
+## Tarea 13: Pie, cierre y verificación completa
 
 **Archivos:**
 - Modificar: `src/ui/PieAtribuciones.tsx`, `src/ui/AvisoPrivacidad.tsx`, `src/estilos.css`
@@ -1812,7 +1930,24 @@ En `src/ui/PieAtribuciones.tsx`, borrar las constantes `estiloPie` y `estiloList
 
 En `src/ui/AvisoPrivacidad.tsx`, sustituir el `style={{ fontSize: 12, color: '#555' }}` por `className="meta"`. Es el mismo tamaño y un gris que sí pasa el contraste.
 
-- [ ] **Paso 3: Buscar restos de estilos en línea y colores literales**
+- [ ] **Paso 3: Auditar el reflow en móvil**
+
+La revisión de la tarea 11 encontró que `.bancal-plano` tenía `min-width: 300px` sin neutralizar en la media query, lo que desbordaba la página a 320 px de ancho. Se arregló, pero nadie ha comprobado el resto de la hoja. Como aquí no hay navegador, se audita leyendo.
+
+```bash
+grep -nE "min-width|max-width|flex-basis|[^-]width: *[0-9]+px" src/estilos.css
+```
+
+Para **cada** anchura fija o mínima en píxeles que aparezca fuera de `:root`, comprobar una de estas dos cosas y anotarla en el informe:
+
+- que está dentro de la media query `@media (max-width: 720px)` y por tanto solo aplica en móvil, o
+- que la media query la neutraliza (con `min-width: 0`, `flex-basis: 100%`, `grid-template-columns: 1fr` o equivalente).
+
+Si alguna no cumple ninguna de las dos, calcular el ancho disponible a 320 px —restando el padding de `.contenido` en móvil y los bordes— y comprobar si cabe. Si no cabe, es un desbordamiento horizontal: arreglarlo con el mismo patrón que `.bancal-plano`.
+
+También hay que corregir dos comentarios que quedaron desfasados al renumerarse las tareas. En `src/estilos.css` hay dos menciones a «la tarea 12» —una en el comentario de cabecera del archivo y otra junto a los tokens de estado— que ahora se refieren a **la tarea 13**, que es esta. Localízalas con `grep -n "tarea 12" src/estilos.css` y actualiza el número.
+
+- [ ] **Paso 4: Buscar restos de estilos en línea y colores literales**
 
 ```bash
 grep -rn "style={{" src/ui/ --include=*.tsx | grep -v "var(--"
@@ -1821,7 +1956,7 @@ grep -rniE "#[0-9a-f]{3,6}" src/ui/ --include=*.tsx
 
 Esperado: los únicos colores literales que quedan son los de `PlanoBancal.tsx` (constantes `COLOR_*`, con su comentario) y el azul `#1a5aa8` de las heladas en `ResumenClima.tsx`. Los únicos `style` en línea que quedan son los que calculan un valor en tiempo de ejecución: el `width` del progreso, el `maxWidth` del plano y el `maxAnchoPx` de las miniaturas. Si aparece cualquier otro, moverlo a `estilos.css`.
 
-- [ ] **Paso 4: Build y servido**
+- [ ] **Paso 5: Build y servido**
 
 ```bash
 npm run build
@@ -1836,7 +1971,7 @@ kill %1
 
 Esperado: `CSS 200` y `HTML 200`, y el `<link>` presente.
 
-- [ ] **Paso 5: Auditoría y lint**
+- [ ] **Paso 6: Auditoría y lint**
 
 ```bash
 npm audit
@@ -1845,7 +1980,7 @@ npm run lint
 
 Esperado: `found 0 vulnerabilities` y lint limpio.
 
-- [ ] **Paso 6: Suite completa, en segundo plano**
+- [ ] **Paso 7: Suite completa, en segundo plano**
 
 ```bash
 ./scripts/verificar-suite.sh 3
@@ -1855,7 +1990,7 @@ Tres ejecuciones a ~8,5 minutos cada una: unos 25 minutos. **Lanzarlo en segundo
 
 Esperado: «La suite es fiable: 3 de 3 ejecuciones correctas». El guion compara los archivos ejecutados con los que hay en disco; ahora hay **16** archivos de test (los 14 de antes más `tamano-icono.test.ts` y `MigaPasos.test.tsx`) y el guion los cuenta solo, no hay nada que actualizar.
 
-- [ ] **Paso 7: Commit y despliegue**
+- [ ] **Paso 8: Commit y despliegue**
 
 ```bash
 git add src/ui/PieAtribuciones.tsx src/ui/AvisoPrivacidad.tsx src/estilos.css
@@ -1865,7 +2000,7 @@ git push
 
 El push despliega solo. **Avisar al usuario de que ya puede revisar https://Deliath.github.io/huertos/**, que es donde se juzga lo puramente visual: aquí no hay navegador.
 
-- [ ] **Paso 8: Recordarle el recorrido pendiente**
+- [ ] **Paso 9: Recordarle el recorrido pendiente**
 
 Sigue abierto desde el proyecto 1 el recorrido de verificación de la §8 de la spec de publicación, y en particular el punto 2: entrar en el paso de ubicación, elegir ubicación precisa y pinchar en el mapa para ver si aparece el marcador. Nadie lo ha comprobado nunca. Ahora que el usuario va a mirar la web de todas formas, es el momento de pedírselo.
 
