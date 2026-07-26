@@ -98,6 +98,12 @@ Esperado: `found 0 vulnerabilities`. Si `npm audit fix` no la resuelve y propone
   --aviso-borde: #E8D9A8;
   --aviso-texto: #6B5200;
 
+  /* Estado y contraste. Existen como tokens y no como literales sueltos para
+   * que la regla «ningún color fuera de :root» siga siendo comprobable con un
+   * grep en la tarea 12. */
+  --fondo-desactivado: #F4F7F4;
+  --texto-sobre-verde: #FFFFFF;
+
   --espacio-1: 4px;
   --espacio-2: 8px;
   --espacio-3: 12px;
@@ -210,17 +216,19 @@ a { color: var(--verde); }
   color: var(--texto-medio);
 }
 
+/* --texto-apagado contrasta 2,28:1, por debajo del mínimo. Es correcto aquí y
+ * SOLO aquí: WCAG exime explícitamente el texto de los controles inactivos. */
 .boton:disabled {
   cursor: default;
   color: var(--texto-apagado);
-  background: #F4F7F4;
+  background: var(--fondo-desactivado);
   border-color: var(--borde);
 }
 
 .boton-primario {
   background: var(--verde);
   border-color: var(--verde);
-  color: #fff;
+  color: var(--texto-sobre-verde);
 }
 
 .boton-contorno {
@@ -264,7 +272,7 @@ a { color: var(--verde); }
   padding: 8px 10px;
 }
 
-.entrada:disabled { background: #F4F7F4; color: var(--texto-apagado); }
+.entrada:disabled { background: var(--fondo-desactivado); color: var(--texto-apagado); }
 
 /* Control segmentado: por dentro sigue siendo un fieldset con radios reales.
  * El radio se mantiene enfocable y visible para el lector de pantalla; solo
@@ -813,8 +821,12 @@ Añadir al bloque ARMAZÓN de `src/estilos.css`, después de `.meta`:
   padding: 2px 4px;
 }
 
+/* Los pasos futuros van en el gris de metadatos, no en --texto-apagado: son
+ * texto que hay que poder leer, y --texto-apagado (2,28:1) solo vale para
+ * controles inactivos. La señal de «aún no has llegado» la da que no son
+ * pulsables ni van en verde. */
 .miga-futuro {
-  color: var(--texto-apagado);
+  color: var(--texto-tenue);
   padding: 2px 4px;
 }
 
