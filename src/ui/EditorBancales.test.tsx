@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, test, vi } from 'vitest'
 import { EditorBancales } from './EditorBancales'
@@ -20,9 +20,14 @@ test('no añade con medidas a cero', async () => {
   expect(onAñadir).not.toHaveBeenCalled()
 })
 
-test('la etiqueta de la orientación se llama "Orientación"', () => {
-  render(<EditorBancales bancales={[]} orientacionNorte="norte" onAñadir={() => {}} onBorrar={() => {}} onOrientacion={() => {}} />)
-  expect(screen.getByLabelText(/Orientación/i)).toBeInTheDocument()
+test('el grupo de orientación tiene la etiqueta accesible correcta y permite elegir el norte', async () => {
+  const onOrientacion = vi.fn()
+  render(<EditorBancales bancales={[]} orientacionNorte="norte" onAñadir={() => {}} onBorrar={() => {}} onOrientacion={onOrientacion} />)
+  const grupo = screen.getByRole('group', { name: /¿Hacia dónde está el norte\?/i })
+  const radioSur = within(grupo).getByRole('radio', { name: /sur/i })
+  expect(radioSur).toBeInTheDocument()
+  await userEvent.click(radioSur)
+  expect(onOrientacion).toHaveBeenCalledWith('sur')
 })
 
 test('muestra una vista previa del bancal al introducir dimensiones', async () => {

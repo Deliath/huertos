@@ -19,9 +19,10 @@ export function EditorSuelo({ inicial, onCambio }: { inicial: PerfilSuelo | null
 
   return (
     <section>
-      <h3>Tu suelo</h3>
-      <label>Tipo de suelo{' '}
+      <h2 className="tarjeta-titulo">Tu suelo</h2>
+      <label className="campo">Tipo de suelo{' '}
         <select
+          className="selector"
           aria-label="Tipo de suelo"
           value={textura}
           onChange={(e) => { const t = e.target.value as '' | Textura; setTextura(t); emitir(t, ph) }}
@@ -30,9 +31,10 @@ export function EditorSuelo({ inicial, onCambio }: { inicial: PerfilSuelo | null
           {TIPOS_SUELO.map((t) => <option key={t.textura} value={t.textura}>{t.nombre}</option>)}
         </select>
       </label>
-      {info && <p><em>{info.descripcion}</em></p>}
-      <label>pH{' '}
+      {info && <p className="meta"><em>{info.descripcion}</em></p>}
+      <label className="campo">pH{' '}
         <input
+          className="entrada"
           aria-label="pH del suelo"
           type="number" step="0.1" min="0" max="14"
           value={ph}
@@ -40,7 +42,7 @@ export function EditorSuelo({ inicial, onCambio }: { inicial: PerfilSuelo | null
           onChange={(e) => { setPh(e.target.value); emitir(textura, e.target.value) }}
         />
       </label>
-      {textura === '' && <p>Si no lo indicas aquí, podrás elegirlo en el paso siguiente.</p>}
+      {textura === '' && <p className="meta">Si no lo indicas aquí, podrás elegirlo en el paso siguiente.</p>}
     </section>
   )
 }

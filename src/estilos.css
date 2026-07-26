@@ -1,0 +1,563 @@
+/* Hoja de estilos única de la aplicación.
+ *
+ * Orden de los bloques: tokens → base → armazón → tarjetas → botones →
+ * formularios → avisos → utilidades → móvil. Ningún color literal fuera de
+ * :root; la excepción deliberada es el SVG del plano (PlanoBancal.tsx), que
+ * se estila en línea porque se exporta aislado y perdería las clases.
+ */
+
+/* ─────────────── TOKENS ─────────────── */
+:root {
+  --fondo: #F1F5F0;
+  --superficie: #FFFFFF;
+  --superficie-tenue: #FAFCFA;
+
+  --texto: #16241C;
+  --texto-medio: #4B5D51;
+  --texto-tenue: #5E6E64;
+  --texto-apagado: #9FB0A4;
+
+  --borde: #DCE5DD;
+  --borde-suave: #EDF2EE;
+  /* El botón de contorno ya se identifica por su propio texto (verde oscuro,
+   * 7,1:1 sobre blanco), así que su borde no necesita por sí solo el 3:1 de
+   * WCAG 1.4.11; puede llevar este verde claro más suave, el de las maquetas
+   * aprobadas. */
+  --borde-verde: #C6DFCB;
+  /* Solo para campos de entrada (.entrada, .selector). Un campo vacío no tiene
+   * nada más que lo identifique, así que WCAG 1.4.11 le pide 3:1 de contraste
+   * en el borde. --borde (1,29:1) vale para separar tarjetas, no para
+   * delimitar un campo vacío. Éste da 4,1:1 sobre blanco. */
+  --borde-control: #767F79;
+
+  --verde: #166534;
+  /* Decorativo: 3,3:1, no alcanza el mínimo para texto. */
+  --verde-vivo: #16A34A;
+  --pista: #E3EBE4;
+
+  --aviso-fondo: #FFF8E6;
+  --aviso-borde: #E8D9A8;
+  --aviso-texto: #6B5200;
+
+  /* Estado y contraste. Existen como tokens y no como literales sueltos para
+   * que la regla «ningún color fuera de :root» siga siendo comprobable con un
+   * grep en la tarea 13. */
+  --fondo-desactivado: #F4F7F4;
+  --texto-sobre-verde: #FFFFFF;
+  --separador: #C3D2C6;
+
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 24px;
+  --espacio-6: 32px;
+
+  --radio-s: 8px;
+  --radio-m: 10px;
+  --radio-l: 14px;
+
+  --sombra: 0 1px 2px rgba(16, 40, 24, .06);
+  --sombra-elevada: 0 1px 2px rgba(16, 40, 24, .10);
+
+  --fuente: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ancho-contenido: 960px;
+  --ancho-estrecho: 720px;
+}
+
+/* ─────────────── BASE ─────────────── */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--fuente);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--texto);
+  background: var(--fondo);
+}
+
+a { color: var(--verde); }
+
+:focus-visible {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+  border-radius: var(--radio-s);
+}
+
+/* ─────────────── ARMAZÓN ─────────────── */
+.pagina { min-height: 100vh; }
+
+.contenido {
+  max-width: var(--ancho-contenido);
+  margin: 0 auto;
+  padding: var(--espacio-5) var(--espacio-4) var(--espacio-6);
+}
+
+.contenido-estrecho {
+  max-width: var(--ancho-estrecho);
+  margin: 0 auto;
+}
+
+.titulo-pantalla {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin: 0 0 var(--espacio-1);
+}
+
+.subtitulo-pantalla {
+  font-size: 15px;
+  color: var(--texto-medio);
+  margin: 0 0 var(--espacio-4);
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.meta-bloque {
+  display: block;
+  font-weight: 400;
+}
+
+.cabecera {
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borde);
+  padding: var(--espacio-3) var(--espacio-4);
+}
+
+.cabecera-interior {
+  max-width: var(--ancho-contenido);
+  margin: 0 auto;
+}
+
+.cabecera-marca {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  margin-bottom: var(--espacio-3);
+}
+
+.cabecera-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radio-s);
+  background: var(--verde-vivo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.cabecera-nombre {
+  font-weight: 650;
+  font-size: 15px;
+}
+
+.miga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+}
+
+.miga-paso {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-1);
+}
+
+.miga-enlace {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--verde);
+  background: none;
+  border: 0;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.miga-enlace:hover { text-decoration: underline; }
+
+.miga-actual {
+  color: var(--verde);
+  font-weight: 650;
+  padding: 2px 4px;
+}
+
+/* Los pasos futuros van en el gris de metadatos, no en --texto-apagado: son
+ * texto que hay que poder leer, y --texto-apagado (2,28:1) solo vale para
+ * controles inactivos. La señal de «aún no has llegado» la da que no son
+ * pulsables ni van en verde. */
+.miga-futuro {
+  color: var(--texto-tenue);
+  padding: 2px 4px;
+}
+
+.miga-separador { color: var(--separador); }
+
+.progreso {
+  height: 3px;
+  background: var(--pista);
+  border-radius: 2px;
+  margin-top: var(--espacio-2);
+}
+
+.progreso-relleno {
+  height: 3px;
+  background: var(--verde-vivo);
+  border-radius: 2px;
+}
+
+.pie {
+  font-size: 12px;
+  color: var(--texto-tenue);
+  line-height: 1.6;
+  border-top: 1px solid var(--borde);
+  margin-top: var(--espacio-6);
+  padding-top: var(--espacio-4);
+}
+
+.pie p { margin: var(--espacio-1) 0; }
+
+/* ─────────────── TARJETAS ─────────────── */
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-l);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  margin-bottom: var(--espacio-3);
+}
+
+.tarjeta-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  flex-wrap: wrap;
+  padding: var(--espacio-3) var(--espacio-4);
+  border-bottom: 1px solid var(--borde-suave);
+}
+
+/* Cuando la cabecera es el único contenido de la tarjeta (sin .tarjeta-cuerpo
+ * detrás), la raya de abajo queda a un píxel del propio borde de la tarjeta. */
+.tarjeta-cabecera:last-child { border-bottom: 0; }
+
+.tarjeta-cuerpo { padding: var(--espacio-4); }
+
+.tarjeta-titulo {
+  font-size: 15px;
+  font-weight: 650;
+  margin: 0;
+}
+
+/* ─────────────── BOTONES ─────────────── */
+.boton {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radio-s);
+  padding: 9px 18px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--texto-medio);
+}
+
+/* --texto-apagado contrasta 2,28:1, por debajo del mínimo. Es correcto aquí y
+ * SOLO aquí: WCAG exime explícitamente el texto de los controles inactivos. */
+.boton:disabled {
+  cursor: default;
+  color: var(--texto-apagado);
+  background: var(--fondo-desactivado);
+  border-color: var(--borde);
+}
+
+.boton-primario {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: var(--texto-sobre-verde);
+}
+
+.boton-contorno {
+  background: var(--superficie);
+  border-color: var(--borde-verde);
+  color: var(--verde);
+}
+
+.boton-plano { color: var(--texto-medio); }
+
+.boton-icono {
+  padding: 4px 9px;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.boton-pequeno {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+.boton-ancho {
+  width: 100%;
+  text-align: left;
+}
+
+/* ─────────────── FORMULARIOS ─────────────── */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-medio);
+}
+
+.entrada,
+.selector {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1px solid var(--borde-control);
+  border-radius: var(--radio-s);
+  padding: 8px 10px;
+}
+
+.entrada:disabled { background: var(--fondo-desactivado); color: var(--texto-apagado); }
+
+/* Control segmentado: por dentro sigue siendo un fieldset con radios reales.
+ * El radio se mantiene enfocable y visible para el lector de pantalla; solo
+ * se oculta a la vista.
+ *
+ * La píldora es un div INTERIOR, no el propio fieldset: un <legend> dentro de
+ * un fieldset con display:inline-flex se convierte en elemento flex y se mete
+ * dentro de la píldora. */
+.grupo-segmentado {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.grupo-segmentado legend {
+  padding: 0;
+  margin-bottom: var(--espacio-2);
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.segmentado {
+  display: inline-flex;
+  flex-wrap: wrap;
+  background: var(--pista);
+  border-radius: 9px;
+  padding: 3px;
+}
+
+.segmentado-opcion {
+  position: relative;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  color: var(--texto-medio);
+  cursor: pointer;
+}
+
+.segmentado-opcion input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  /* Sin esto, la regla genérica :focus-visible dibuja su anillo alrededor de
+   * esta caja de 0×0 (un punto suelto junto al texto). El anillo visible de
+   * verdad lo pone la etiqueta, en :has(input:focus-visible) más abajo. */
+  outline: none;
+}
+
+.segmentado-opcion:has(input:checked) {
+  background: var(--superficie);
+  color: var(--texto);
+  font-weight: 600;
+  box-shadow: var(--sombra-elevada);
+}
+
+.segmentado-opcion:has(input:focus-visible) {
+  outline: 2px solid var(--verde);
+  outline-offset: 2px;
+}
+
+/* ─────────────── AVISOS ─────────────── */
+.aviso {
+  background: var(--aviso-fondo);
+  border: 1px solid var(--aviso-borde);
+  border-radius: var(--radio-m);
+  color: var(--aviso-texto);
+  font-size: 14px;
+  padding: var(--espacio-3) var(--espacio-4);
+  margin: var(--espacio-3) 0;
+}
+
+.aviso-atencion { font-weight: 600; }
+
+/* ─────────────── UTILIDADES ─────────────── */
+.lista-limpia {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bancal-cuerpo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.bancal-plano {
+  flex: 1 1 340px;
+  min-width: 300px;
+  padding: var(--espacio-4);
+  background: var(--superficie-tenue);
+  text-align: center;
+}
+
+.bancal-leyenda {
+  flex: 1 1 260px;
+  padding: var(--espacio-4);
+}
+
+.leyenda-fila {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  padding: var(--espacio-2) 0;
+  border-bottom: 1px solid var(--borde-suave);
+  font-size: 14px;
+}
+
+.leyenda-fila:last-child { border-bottom: 0; }
+
+.leyenda-nombre { flex: 1 1 auto; }
+
+.leyenda-cantidad {
+  min-width: 2.5em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--espacio-3);
+}
+
+/* Dentro de la rejilla el hueco lo pone el gap, no el margen de la tarjeta. */
+.rejilla > .tarjeta { margin-bottom: 0; }
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  flex-wrap: wrap;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--borde-suave);
+}
+
+.tabla thead th {
+  color: var(--texto-tenue);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mes-actual { font-weight: 700; }
+.mes-normal { font-weight: 400; }
+
+/* En las celdas del cuerpo (sin regla de font-weight propia) .mes-actual y
+ * .mes-normal de arriba ya deciden el peso sin competencia. Pero en la
+ * cabecera, `.tabla thead th` (una clase + dos tipos, especificidad 0-1-2) le
+ * gana a una clase sola (0-1-0): sin este refuerzo, tanto `.mes-actual` como
+ * `.mes-normal` perderían siempre contra los 600 de `.tabla thead th` y el
+ * mes actual dejaría de resaltar. Se repite aquí con la especificidad que
+ * necesita para ganar en ese contexto. */
+.tabla thead th.mes-actual { font-weight: 700; }
+.tabla thead th.mes-normal { font-weight: 400; }
+
+.tabla caption {
+  caption-side: bottom;
+  text-align: left;
+  font-size: 12px;
+  color: var(--texto-tenue);
+  padding-top: var(--espacio-2);
+}
+
+.envoltorio-tabla { overflow-x: auto; }
+
+.mapa {
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-m);
+  overflow: hidden;
+}
+
+.cultivo {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-m);
+  padding: var(--espacio-3);
+}
+
+.cultivo:has(input:checked) {
+  border-color: var(--verde);
+  background: var(--superficie-tenue);
+}
+
+.cultivo-nombre {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cultivo-ajustes {
+  display: flex;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-2);
+}
+
+.cultivo-ajustes .selector {
+  font-size: 13px;
+  padding: 5px 8px;
+}
+
+.rejilla-cultivos { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+
+/* ─────────────── MÓVIL ─────────────── */
+@media (max-width: 720px) {
+  .contenido { padding: var(--espacio-4) var(--espacio-3) var(--espacio-5); }
+  .cabecera { padding: var(--espacio-3) var(--espacio-3); }
+  .rejilla { grid-template-columns: 1fr; }
+  .bancal-plano,
+  .bancal-leyenda {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}
