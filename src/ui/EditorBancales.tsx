@@ -42,7 +42,7 @@ export function EditorBancales({ bancales, orientacionNorte, onAñadir, onBorrar
 
   return (
     <div className="contenido-estrecho">
-      <h2 className="titulo-pantalla">Tus bancales</h2>
+      <h1 className="titulo-pantalla">Tus bancales</h1>
       <p className="subtitulo-pantalla">Añade cada bancal con sus medidas. Verás una vista previa a escala.</p>
 
       <div className="tarjeta">
@@ -75,7 +75,7 @@ export function EditorBancales({ bancales, orientacionNorte, onAñadir, onBorrar
 
           {previewValido && (
             <div style={{ marginTop: 'var(--espacio-4)' }}>
-              <h4 className="meta">Vista previa</h4>
+              <h3 className="meta">Vista previa</h3>
               <PlanoBancal
                 bancal={{ id: 'preview', nombre: 'nuevo bancal', anchoM, largoM }}
                 asignaciones={[]}

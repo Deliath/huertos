@@ -58,8 +58,8 @@ export function ResumenClima({ clima, mesActual }: { clima: PerfilClima; mesActu
         </table>
       </div>
       {hayHelada
-        ? <p>❄️ Meses con riesgo de helada resaltados: planta ahí solo especies resistentes o espera.</p>
-        : <p>Sin meses con riesgo de helada.</p>}
+        ? <p className="meta">❄️ Meses con riesgo de helada resaltados: planta ahí solo especies resistentes o espera.</p>
+        : <p className="meta">Sin meses con riesgo de helada.</p>}
     </section>
   )
 }

@@ -20,6 +20,10 @@
   --borde: #DCE5DD;
   --borde-suave: #EDF2EE;
   --borde-verde: #C6DFCB;
+  /* Los bordes de los controles identifican el propio control, así que WCAG
+   * 1.4.11 les pide 3:1. --borde (1,29:1) vale para separar tarjetas, no para
+   * delimitar un campo vacío. Éste da 4,1:1 sobre blanco. */
+  --borde-control: #767F79;
 
   --verde: #166534;
   /* Decorativo: 3,3:1, no alcanza el mínimo para texto. */
@@ -237,6 +241,10 @@ a { color: var(--verde); }
   border-bottom: 1px solid var(--borde-suave);
 }
 
+/* Cuando la cabecera es el único contenido de la tarjeta (sin .tarjeta-cuerpo
+ * detrás), la raya de abajo queda a un píxel del propio borde de la tarjeta. */
+.tarjeta-cabecera:last-child { border-bottom: 0; }
+
 .tarjeta-cuerpo { padding: var(--espacio-4); }
 
 .tarjeta-titulo {
@@ -275,7 +283,7 @@ a { color: var(--verde); }
 
 .boton-contorno {
   background: var(--superficie);
-  border-color: var(--borde-verde);
+  border-color: var(--borde-control);
   color: var(--verde);
 }
 
@@ -314,7 +322,7 @@ a { color: var(--verde); }
   font-weight: 400;
   color: var(--texto);
   background: var(--superficie);
-  border: 1px solid var(--borde);
+  border: 1px solid var(--borde-control);
   border-radius: var(--radio-s);
   padding: 8px 10px;
 }
@@ -363,6 +371,10 @@ a { color: var(--verde); }
   opacity: 0;
   width: 0;
   height: 0;
+  /* Sin esto, la regla genérica :focus-visible dibuja su anillo alrededor de
+   * esta caja de 0×0 (un punto suelto junto al texto). El anillo visible de
+   * verdad lo pone la etiqueta, en :has(input:focus-visible) más abajo. */
+  outline: none;
 }
 
 .segmentado-opcion:has(input:checked) {
@@ -536,6 +548,7 @@ a { color: var(--verde); }
 /* ─────────────── MÓVIL ─────────────── */
 @media (max-width: 720px) {
   .contenido { padding: var(--espacio-4) var(--espacio-3) var(--espacio-5); }
+  .cabecera { padding: var(--espacio-3) var(--espacio-3); }
   .rejilla { grid-template-columns: 1fr; }
   .bancal-plano,
   .bancal-leyenda {

@@ -67,7 +67,7 @@ export function PasoUbicacion({ onListo, mesActual = new Date().getMonth() }: { 
   if (confirmando) {
     return (
       <div className="contenido-estrecho">
-        <h2 className="titulo-pantalla">Confirma tu ubicación</h2>
+        <h1 className="titulo-pantalla">Confirma tu ubicación</h1>
         <div className="tarjeta">
           <div className="tarjeta-cuerpo">
             <ResumenClima clima={confirmando.clima} mesActual={mesActual} />
@@ -84,7 +84,7 @@ export function PasoUbicacion({ onListo, mesActual = new Date().getMonth() }: { 
 
   return (
     <div className="contenido-estrecho">
-      <h2 className="titulo-pantalla">¿Dónde está tu huerto?</h2>
+      <h1 className="titulo-pantalla">¿Dónde está tu huerto?</h1>
       <p className="subtitulo-pantalla">Con la ubicación deducimos tu clima y una estimación del suelo.</p>
       <div className="tarjeta">
         <div className="tarjeta-cuerpo">
@@ -96,7 +96,7 @@ export function PasoUbicacion({ onListo, mesActual = new Date().getMonth() }: { 
           {modo === 'precisa' && (
             <div>
               <form className="fila" onSubmit={(e) => { e.preventDefault(); void buscar() }}>
-                <label>Buscar dirección
+                <label className="campo">Buscar dirección
                   <input className="entrada" aria-label="Buscar dirección" value={consulta} onChange={(e) => setConsulta(e.target.value)} />
                 </label>
                 <button type="submit" className="boton boton-contorno">Buscar</button>
@@ -110,11 +110,11 @@ export function PasoUbicacion({ onListo, mesActual = new Date().getMonth() }: { 
                   ))}
                 </ul>
               )}
-              <Suspense fallback={<p>Cargando mapa…</p>}>
+              <Suspense fallback={<p className="meta">Cargando mapa…</p>}>
                 <div className="mapa">
                   <MapaSelector onSeleccion={usarCoordenadas} />
                 </div>
-                <p>Pincha tu punto en el mapa.</p>
+                <p className="meta">Pincha tu punto en el mapa.</p>
               </Suspense>
             </div>
           )}

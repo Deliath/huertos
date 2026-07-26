@@ -76,14 +76,18 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
                 onBorrar={(id) => dispatch({ tipo: 'borrar_bancal', id })}
                 onOrientacion={(o) => dispatch({ tipo: 'set_orientacion', orientacion: o })}
               />
-              <button type="button" className="boton boton-primario" disabled={estado.bancales.length === 0} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'suelo' })}>Siguiente</button>
+              <div className="contenido-estrecho">
+                <button type="button" className="boton boton-primario" disabled={estado.bancales.length === 0} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'suelo' })}>Siguiente</button>
+              </div>
             </div>
           )}
 
           {estado.paso === 'suelo' && (
             <div>
               <PasoSuelo sueloAuto={estado.suelo} onElegir={(s) => dispatch({ tipo: 'set_suelo', suelo: s })} />
-              <button type="button" className="boton boton-primario" disabled={!estado.suelo} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'especies' })}>Siguiente</button>
+              <div className="contenido-estrecho">
+                <button type="button" className="boton boton-primario" disabled={!estado.suelo} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'especies' })}>Siguiente</button>
+              </div>
             </div>
           )}
 
@@ -93,7 +97,9 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
                 elecciones={estado.elecciones} onCambio={(e) => dispatch({ tipo: 'set_elecciones', elecciones: e })}
                 clima={estado.clima} suelo={estado.suelo} mesActual={estado.mesSiembra} superficieM2={superficieM2}
               />
-              <button type="button" className="boton boton-primario" disabled={estado.elecciones.length === 0} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'resultado' })}>Ver mi huerto</button>
+              <div className="contenido-estrecho">
+                <button type="button" className="boton boton-primario" style={{ marginTop: 'var(--espacio-4)' }} disabled={estado.elecciones.length === 0} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'resultado' })}>Ver mi huerto</button>
+              </div>
             </div>
           )}
 

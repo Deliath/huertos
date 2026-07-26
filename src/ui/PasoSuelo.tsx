@@ -6,7 +6,7 @@ import { numero } from '../app/formato'
 export function PasoSuelo({ sueloAuto, onElegir }: { sueloAuto: PerfilSuelo | null; onElegir: (s: PerfilSuelo) => void }) {
   return (
     <div className="contenido-estrecho">
-      <h2 className="titulo-pantalla">¿Cómo es tu suelo?</h2>
+      <h1 className="titulo-pantalla">¿Cómo es tu suelo?</h1>
       {sueloAuto && (
         <p className="subtitulo-pantalla">Hemos deducido de tu ubicación un suelo <strong>{sueloAuto.textura}</strong> (pH {numero(sueloAuto.ph)}). Puedes cambiarlo abajo.</p>
       )}

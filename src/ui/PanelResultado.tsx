@@ -37,7 +37,7 @@ export function PanelResultado({ propuesta, bancales, orientacionNorte, modoInte
   return (
     <div>
       <section>
-        <h2 className="titulo-pantalla">Tu huerto</h2>
+        <h1 className="titulo-pantalla">Tu huerto</h1>
         <fieldset className="grupo-segmentado" style={{ marginBottom: 'var(--espacio-4)' }}>
           <legend>¿Intercalar especies?</legend>
           <div className="segmentado">
@@ -56,7 +56,7 @@ export function PanelResultado({ propuesta, bancales, orientacionNorte, modoInte
             <div key={b.id} className="tarjeta" ref={(el) => { contenedores.current[b.id] = el }}>
               <div className="tarjeta-cabecera">
                 <div>
-                  <h3 className="tarjeta-titulo">{b.nombre}</h3>
+                  <h2 className="tarjeta-titulo">{b.nombre}</h2>
                   <div className="meta">{numero(b.anchoM)} × {numero(b.largoM)} m · {numero(b.anchoM * b.largoM, 2)} m² · {totalPlantas} plantas</div>
                 </div>
                 <div className="fila">

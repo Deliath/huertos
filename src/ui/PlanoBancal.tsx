@@ -15,7 +15,15 @@ const COLOR_BORDE_PLANO = '#E2E6DC'
 const COLOR_MARCO_BANCAL = '#C9CDBF'
 const COLOR_LINEA_COTA = '#9AA694'
 const COLOR_TEXTO_COTA = '#5E6B5A'
+// Duplica el valor de --verde a propósito (ver comentario de arriba): si cambia
+// --verde, este literal también hay que cambiarlo a mano.
 const COLOR_BRUJULA = '#166534'
+
+// Igual que los colores de arriba: en pantalla el <svg> heredaría `system-ui`
+// de body, pero exportar.ts lo clona y serializa aislado, así que sin este
+// atributo el PNG/PDF saldrían con la fuente por defecto del renderizador.
+// Mismo valor que --fuente en estilos.css.
+const FUENTE_PLANO = "system-ui, -apple-system, 'Segoe UI', sans-serif"
 
 function LineaCota({ cota }: { cota: Cota }) {
   if (cota.orientacion === 'horizontal') {
@@ -70,6 +78,7 @@ export function PlanoBancal(props: {
       aria-label={`Plano del ${bancal.nombre}`}
       viewBox={`${x0} ${y0} ${anchoVista} ${largoCm - y0}`}
       width="100%"
+      fontFamily={FUENTE_PLANO}
       style={{ maxWidth: maxAnchoPx, border: `1px solid ${COLOR_BORDE_PLANO}`, borderRadius: 10, background: COLOR_FONDO_PLANO }}
     >
       <rect x={0} y={0} width={anchoCm} height={largoCm} fill="none" stroke={COLOR_MARCO_BANCAL} />

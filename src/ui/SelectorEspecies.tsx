@@ -24,7 +24,7 @@ export function SelectorEspecies({ elecciones, onCambio, clima, suelo, mesActual
 
   return (
     <div className="contenido-estrecho">
-      <h2 className="titulo-pantalla">¿Qué quieres cultivar?</h2>
+      <h1 className="titulo-pantalla">¿Qué quieres cultivar?</h1>
       <p className="subtitulo-pantalla">Marca lo que te apetezca, o deja que te propongamos una selección para tu clima y tu superficie.</p>
 
       <button type="button" className="boton boton-contorno" style={{ marginBottom: 'var(--espacio-4)' }} onClick={() => onCambio(sugerirEspecies(clima, suelo, mesActual, superficieM2))}>
