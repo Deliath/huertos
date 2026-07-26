@@ -392,6 +392,41 @@ a { color: var(--verde); }
   flex-wrap: wrap;
 }
 
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--borde-suave);
+}
+
+.tabla thead th {
+  color: var(--texto-tenue);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tabla caption {
+  caption-side: bottom;
+  text-align: left;
+  font-size: 12px;
+  color: var(--texto-tenue);
+  padding-top: var(--espacio-2);
+}
+
+.envoltorio-tabla { overflow-x: auto; }
+
+.mapa {
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-m);
+  overflow: hidden;
+}
+
 /* ─────────────── MÓVIL ─────────────── */
 @media (max-width: 720px) {
   .contenido { padding: var(--espacio-4) var(--espacio-3) var(--espacio-5); }

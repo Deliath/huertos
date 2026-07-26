@@ -66,61 +66,72 @@ export function PasoUbicacion({ onListo, mesActual = new Date().getMonth() }: { 
 
   if (confirmando) {
     return (
-      <div>
-        <h2>Confirma tu ubicación</h2>
-        <ResumenClima clima={confirmando.clima} mesActual={mesActual} />
-        <EditorSuelo inicial={confirmando.sueloAuto} onCambio={setSueloElegido} />
-        <div>
-          <button type="button" onClick={() => setConfirmando(null)}>Cambiar ubicación</button>
-          <button type="button" onClick={continuar}>Continuar</button>
+      <div className="contenido-estrecho">
+        <h2 className="titulo-pantalla">Confirma tu ubicación</h2>
+        <div className="tarjeta">
+          <div className="tarjeta-cuerpo">
+            <ResumenClima clima={confirmando.clima} mesActual={mesActual} />
+            <EditorSuelo inicial={confirmando.sueloAuto} onCambio={setSueloElegido} />
+            <div className="fila" style={{ marginTop: 'var(--espacio-4)' }}>
+              <button type="button" className="boton boton-primario" onClick={continuar}>Continuar</button>
+              <button type="button" className="boton boton-contorno" onClick={() => setConfirmando(null)}>Cambiar ubicación</button>
+            </div>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div>
-      <div role="group" aria-label="Modo de ubicación">
-        <button type="button" onClick={() => setModo('precisa')}>Usar ubicación precisa</button>
-        <button type="button" onClick={() => setModo('zona')}>Elegir por zona climática</button>
-      </div>
+    <div className="contenido-estrecho">
+      <h2 className="titulo-pantalla">¿Dónde está tu huerto?</h2>
+      <p className="subtitulo-pantalla">Con la ubicación deducimos tu clima y una estimación del suelo.</p>
+      <div className="tarjeta">
+        <div className="tarjeta-cuerpo">
+          <div className="fila" role="group" aria-label="Modo de ubicación">
+            <button type="button" className="boton boton-contorno" onClick={() => setModo('precisa')}>Usar ubicación precisa</button>
+            <button type="button" className="boton boton-contorno" onClick={() => setModo('zona')}>Elegir por zona climática</button>
+          </div>
 
-      {modo === 'precisa' && (
-        <div>
-          <form onSubmit={(e) => { e.preventDefault(); void buscar() }}>
-            <label>Buscar dirección
-              <input aria-label="Buscar dirección" value={consulta} onChange={(e) => setConsulta(e.target.value)} />
-            </label>
-            <button type="submit">Buscar</button>
-          </form>
-          {resultados.length > 0 && (
-            <ul>
-              {resultados.map((r, i) => (
-                <li key={`${r.lat}-${r.lon}-${i}`}>
-                  <button type="button" onClick={() => usarCoordenadas(r.lat, r.lon)}>{r.nombre}</button>
-                </li>
-              ))}
-            </ul>
+          {modo === 'precisa' && (
+            <div>
+              <form className="fila" onSubmit={(e) => { e.preventDefault(); void buscar() }}>
+                <label>Buscar dirección
+                  <input className="entrada" aria-label="Buscar dirección" value={consulta} onChange={(e) => setConsulta(e.target.value)} />
+                </label>
+                <button type="submit" className="boton boton-contorno">Buscar</button>
+              </form>
+              {resultados.length > 0 && (
+                <ul className="lista-limpia">
+                  {resultados.map((r, i) => (
+                    <li key={`${r.lat}-${r.lon}-${i}`}>
+                      <button type="button" className="boton boton-plano" onClick={() => usarCoordenadas(r.lat, r.lon)}>{r.nombre}</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <Suspense fallback={<p>Cargando mapa…</p>}>
+                <div className="mapa">
+                  <MapaSelector onSeleccion={usarCoordenadas} />
+                </div>
+                <p>Pincha tu punto en el mapa.</p>
+              </Suspense>
+            </div>
           )}
-          <Suspense fallback={<p>Cargando mapa…</p>}>
-            <MapaSelector onSeleccion={usarCoordenadas} />
-            <p>Pincha tu punto en el mapa.</p>
-          </Suspense>
-        </div>
-      )}
 
-      {modo === 'zona' && (
-        <div>
-          <label>Zona climática
-            <select aria-label="Zona climática" value={zonaId} onChange={(e) => setZonaId(e.target.value)}>
-              {ZONAS_CLIMATICAS.map((z) => <option key={z.id} value={z.id}>{z.nombre}</option>)}
-            </select>
-          </label>
-          <button type="button" onClick={usarZona}>Usar esta zona</button>
+          {modo === 'zona' && (
+            <div>
+              <label className="campo">Zona climática
+                <select className="selector" aria-label="Zona climática" value={zonaId} onChange={(e) => setZonaId(e.target.value)}>
+                  {ZONAS_CLIMATICAS.map((z) => <option key={z.id} value={z.id}>{z.nombre}</option>)}
+                </select>
+              </label>
+              <button type="button" className="boton boton-primario" onClick={usarZona}>Usar esta zona</button>
+            </div>
+          )}
         </div>
-      )}
-
-      {error && <p role="alert">{error}</p>}
+      </div>
+      {error && <p className="aviso aviso-atencion" role="alert">{error}</p>}
     </div>
   )
 }
