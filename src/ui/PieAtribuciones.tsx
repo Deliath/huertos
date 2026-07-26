@@ -3,18 +3,15 @@ import { AvisoPrivacidad } from './AvisoPrivacidad'
 // Open-Meteo y SoilGrids publican sus datos bajo CC BY 4.0, y Nominatim y los
 // tiles del mapa bajo ODbL. Las tres licencias exigen atribución visible, así
 // que este pie no es decorativo: es una obligación de publicar la web.
-const estiloPie = { fontSize: 12, color: '#555', marginTop: 24, lineHeight: 1.6 }
-const estiloLista = { listStyle: 'none', padding: 0, margin: '4px 0' }
 
 export function PieAtribuciones() {
   const urlLicencias = `${import.meta.env.BASE_URL}third-party-licenses.txt`
 
   return (
-    <footer style={estiloPie}>
-      <hr />
+    <footer className="pie">
       <AvisoPrivacidad />
-      <p style={{ margin: '4px 0' }}>Datos de:</p>
-      <ul style={estiloLista}>
+      <p>Datos de:</p>
+      <ul className="lista-limpia">
         <li>
           Clima: <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> (CC BY 4.0)
         </li>
@@ -25,7 +22,7 @@ export function PieAtribuciones() {
           Mapa y direcciones: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> (ODbL)
         </li>
       </ul>
-      <p style={{ margin: '4px 0' }}>
+      <p>
         Código bajo licencia MIT. Contenido bajo{' '}
         <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.es" target="_blank" rel="noreferrer">CC BY-NC 4.0</a>.{' '}
         <a href={urlLicencias} target="_blank" rel="noreferrer">Licencias de terceros</a>.

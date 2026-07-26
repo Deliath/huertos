@@ -79,7 +79,7 @@ export function PanelResultado({ propuesta, bancales, orientacionNorte, modoInte
                           <span aria-hidden="true">{c.icono}</span>
                           <span className="leyenda-nombre">
                             {c.nombreComun}
-                            <span className="meta" style={{ display: 'block' }}>{c.distanciaPlantaCm} × {c.distanciaLineaCm} cm</span>
+                            <span className="meta meta-bloque">{c.distanciaPlantaCm} × {c.distanciaLineaCm} cm</span>
                           </span>
                           <button type="button" className="boton boton-contorno boton-icono" aria-label={`Quitar ${c.nombreComun} de ${b.nombre}`} disabled={a.numPlantas === 0}
                             onClick={() => onAjustarCantidad(b.id, a.cultivoId, a.numPlantas - 1)}>−</button>

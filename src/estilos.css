@@ -32,7 +32,7 @@
 
   /* Estado y contraste. Existen como tokens y no como literales sueltos para
    * que la regla «ningún color fuera de :root» siga siendo comprobable con un
-   * grep en la tarea 12. */
+   * grep en la tarea 13. */
   --fondo-desactivado: #F4F7F4;
   --texto-sobre-verde: #FFFFFF;
   --separador: #C3D2C6;
@@ -106,6 +106,11 @@ a { color: var(--verde); }
 .meta {
   font-size: 12px;
   color: var(--texto-tenue);
+}
+
+.meta-bloque {
+  display: block;
+  font-weight: 400;
 }
 
 .cabecera {
@@ -201,6 +206,17 @@ a { color: var(--verde); }
   border-radius: 2px;
 }
 
+.pie {
+  font-size: 12px;
+  color: var(--texto-tenue);
+  line-height: 1.6;
+  border-top: 1px solid var(--borde);
+  margin-top: var(--espacio-6);
+  padding-top: var(--espacio-4);
+}
+
+.pie p { margin: var(--espacio-1) 0; }
+
 /* ─────────────── TARJETAS ─────────────── */
 .tarjeta {
   background: var(--superficie);
@@ -274,6 +290,11 @@ a { color: var(--verde); }
 .boton-pequeno {
   font-size: 12px;
   padding: 5px 10px;
+}
+
+.boton-ancho {
+  width: 100%;
+  text-align: left;
 }
 
 /* ─────────────── FORMULARIOS ─────────────── */
@@ -447,7 +468,10 @@ a { color: var(--verde); }
   color: var(--texto-tenue);
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
+
+.mes-actual { font-weight: 700; }
 
 .tabla caption {
   caption-side: bottom;

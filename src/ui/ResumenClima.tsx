@@ -24,14 +24,11 @@ export function ResumenClima({ clima, mesActual }: { clima: PerfilClima; mesActu
                 <th
                   key={m}
                   scope="col"
+                  className={i === mesActual ? 'mes-actual' : undefined}
                   data-helada={conHelada[i] ? 'true' : undefined}
                   aria-current={i === mesActual ? 'date' : undefined}
                   title={conHelada[i] ? 'Riesgo de helada' : undefined}
-                  style={{
-                    fontWeight: i === mesActual ? 700 : 400,
-                    color: conHelada[i] ? '#1a5aa8' : undefined,
-                    whiteSpace: 'nowrap',
-                  }}
+                  style={{ color: conHelada[i] ? '#1a5aa8' : undefined }}
                 >
                   {m}{conHelada[i] ? ' ❄️' : ''}
                 </th>
@@ -42,13 +39,17 @@ export function ResumenClima({ clima, mesActual }: { clima: PerfilClima; mesActu
             <tr>
               <th scope="row">Media</th>
               {clima.tempMediaMensual.map((t, i) => (
-                <td key={i} style={{ fontWeight: i === mesActual ? 700 : 400 }}>{Math.round(t)}</td>
+                <td key={i} className={i === mesActual ? 'mes-actual' : undefined}>{Math.round(t)}</td>
               ))}
             </tr>
             <tr>
               <th scope="row">Mínima</th>
               {clima.tempMinMensual.map((t, i) => (
-                <td key={i} style={{ color: conHelada[i] ? '#1a5aa8' : undefined, fontWeight: i === mesActual ? 700 : 400 }}>
+                <td
+                  key={i}
+                  className={i === mesActual ? 'mes-actual' : undefined}
+                  style={{ color: conHelada[i] ? '#1a5aa8' : undefined }}
+                >
                   {Math.round(t)}
                 </td>
               ))}

@@ -15,9 +15,9 @@ export function PasoSuelo({ sueloAuto, onElegir }: { sueloAuto: PerfilSuelo | nu
           <ul className="lista-limpia">
             {TIPOS_SUELO.map((t) => (
               <li key={t.textura} style={{ marginBottom: 'var(--espacio-2)' }}>
-                <button type="button" className="boton boton-contorno" style={{ textAlign: 'left', width: '100%' }} onClick={() => onElegir(sueloManual(t.textura))}>
+                <button type="button" className="boton boton-contorno boton-ancho" onClick={() => onElegir(sueloManual(t.textura))}>
                   <span className="tarjeta-titulo">{t.nombre}</span>
-                  <span className="meta" style={{ display: 'block', fontWeight: 400 }}>{t.descripcion}</span>
+                  <span className="meta meta-bloque">{t.descripcion}</span>
                 </button>
               </li>
             ))}
