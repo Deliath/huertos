@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react'
-import { expect, test } from 'vitest'
+import { expect, it, test } from 'vitest'
 import { PlanoBancal } from './PlanoBancal'
 import type { Bancal } from '../dominio/tipos'
 
@@ -47,4 +47,26 @@ test('muestra cotas con la distancia entre plantas', () => {
   )
   expect(container.querySelectorAll('[data-cota]').length).toBeGreaterThan(0)
   expect(screen.getByText('25 cm')).toBeInTheDocument()
+})
+
+it('escala el icono a la separación de cada cultivo', () => {
+  // La cebolla va a 10 cm y el tomate a 50: sus iconos no pueden medir igual.
+  const bancal = { id: 'b1', nombre: 'Bancal 1', anchoM: 5, largoM: 5 }
+  const { container } = render(
+    <PlanoBancal
+      bancal={bancal}
+      asignaciones={[
+        { cultivoId: 'cebolla', numPlantas: 4 },
+        { cultivoId: 'tomate', numPlantas: 4 },
+      ]}
+      orientacionNorte="norte"
+      modoIntercalado="bloques"
+    />,
+  )
+
+  const tamaños = new Set(
+    [...container.querySelectorAll('[data-marca] text')].map((t) => t.getAttribute('font-size')),
+  )
+  expect(tamaños.size).toBe(2)
+  expect(tamaños).not.toContain('16')
 })
