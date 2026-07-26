@@ -103,6 +103,7 @@ Esperado: `found 0 vulnerabilities`. Si `npm audit fix` no la resuelve y propone
    * grep en la tarea 12. */
   --fondo-desactivado: #F4F7F4;
   --texto-sobre-verde: #FFFFFF;
+  --separador: #C3D2C6;
 
   --espacio-1: 4px;
   --espacio-2: 8px;
@@ -677,7 +678,7 @@ Componente aislado, con el único comportamiento nuevo del proyecto. Se construy
 
 **Interfaces:**
 - Consume: el tipo `Paso` de `src/app/estado.ts` (`'inicio' | 'ubicacion' | 'bancales' | 'suelo' | 'especies' | 'resultado'`).
-- Produce: `<MigaPasos pasoActual={paso} onIr={(paso) => void} />` y la constante `PASOS_ASISTENTE`. Lo consume la tarea 5.
+- Produce: `<MigaPasos pasoActual={paso} onIr={(paso) => void} />`. Lo consume la tarea 5. `PASOS_ASISTENTE` es interna del módulo y **no se exporta**: nadie fuera la usa, y exportarla junto al componente dispara el aviso `react(only-export-components)` de oxlint.
 
 - [ ] **Paso 1: Escribir el test que falla**
 
@@ -830,7 +831,7 @@ Añadir al bloque ARMAZÓN de `src/estilos.css`, después de `.meta`:
   padding: 2px 4px;
 }
 
-.miga-separador { color: #C3D2C6; }
+.miga-separador { color: var(--separador); }
 
 .progreso {
   height: 3px;
