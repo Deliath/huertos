@@ -4,27 +4,37 @@ import { TIPOS_SUELO, GUIA_EXPERIMENTACION } from '../datos/suelos'
 
 export function PasoSuelo({ sueloAuto, onElegir }: { sueloAuto: PerfilSuelo | null; onElegir: (s: PerfilSuelo) => void }) {
   return (
-    <div>
+    <div className="contenido-estrecho">
+      <h2 className="titulo-pantalla">¿Cómo es tu suelo?</h2>
       {sueloAuto && (
-        <p>Hemos deducido de tu ubicación un suelo <strong>{sueloAuto.textura}</strong> (pH {sueloAuto.ph}). Puedes cambiarlo abajo.</p>
+        <p className="subtitulo-pantalla">Hemos deducido de tu ubicación un suelo <strong>{sueloAuto.textura}</strong> (pH {sueloAuto.ph}). Puedes cambiarlo abajo.</p>
       )}
-      <div>
-        {TIPOS_SUELO.map((t) => (
-          <button key={t.textura} type="button" onClick={() => onElegir(sueloManual(t.textura))}>
-            {t.nombre} — {t.descripcion}
-          </button>
-        ))}
+      <div className="tarjeta">
+        <div className="tarjeta-cuerpo">
+          <ul className="lista-limpia">
+            {TIPOS_SUELO.map((t) => (
+              <li key={t.textura} style={{ marginBottom: 'var(--espacio-2)' }}>
+                <button type="button" className="boton boton-contorno" style={{ textAlign: 'left', width: '100%' }} onClick={() => onElegir(sueloManual(t.textura))}>
+                  <span className="tarjeta-titulo">{t.nombre}</span>
+                  <span className="meta" style={{ display: 'block', fontWeight: 400 }}>{t.descripcion}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       {!sueloAuto && (
-        <section>
-          <h3>¿No sabes qué suelo tienes? Averígualo así</h3>
-          {GUIA_EXPERIMENTACION.map((g) => (
-            <details key={g.titulo}>
-              <summary>{g.titulo}</summary>
-              <ol>{g.pasos.map((p, i) => <li key={i}>{p}</li>)}</ol>
-            </details>
-          ))}
-        </section>
+        <div className="tarjeta">
+          <div className="tarjeta-cuerpo">
+            <h3 className="tarjeta-titulo">¿No sabes qué suelo tienes? Averígualo así</h3>
+            {GUIA_EXPERIMENTACION.map((g) => (
+              <details key={g.titulo} style={{ marginTop: 'var(--espacio-2)' }}>
+                <summary>{g.titulo}</summary>
+                <ol>{g.pasos.map((p, i) => <li key={i}>{p}</li>)}</ol>
+              </details>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

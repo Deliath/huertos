@@ -83,7 +83,7 @@ export function App({ mesActual: mesInyectado }: { mesActual?: number } = {}) {
           {estado.paso === 'suelo' && (
             <div>
               <PasoSuelo sueloAuto={estado.suelo} onElegir={(s) => dispatch({ tipo: 'set_suelo', suelo: s })} />
-              <button type="button" disabled={!estado.suelo} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'especies' })}>Siguiente</button>
+              <button type="button" className="boton boton-primario" disabled={!estado.suelo} onClick={() => dispatch({ tipo: 'ir_a_paso', paso: 'especies' })}>Siguiente</button>
             </div>
           )}
 
